@@ -23,7 +23,7 @@ async function callClaude(messages, maxTokens=1000) {
   const res = await fetch("/api/anthropic", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model:"claude-3-haiku-20240307", max_tokens: maxTokens, messages })
+    body: JSON.stringify({ model:"claude-sonnet-4-6", max_tokens: maxTokens, messages })
   });
   const data = await res.json();
   if (data.error) throw new Error(data.error.message);
