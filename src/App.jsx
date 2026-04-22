@@ -81,6 +81,7 @@ export default function App() {
   const [tab, setTab] = useState("search");
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState("");
+  const [searchProgress, setSearchProgress] = useState(0);
   const [error, setError] = useState("");
   const [jobs, setJobs] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -111,9 +112,15 @@ export default function App() {
   const activeProfile = importedProfile || BASE_PROFILE;
 
   async function handleSearch() {
-    setLoading(true); setError(""); setJobs([]); setSelected(null); setAdaptedCV("");
+    let progressTimer = null;
+    setLoading(true); setError(""); setJobs([]); setSelected(null); setAdaptedCV(""); setSearchProgress(6);
     try {
-      setLoadingMsg("Génération des offres...");
+      progressTimer = setInterval(() => {
+        setSearchProgress(prev => (prev >= 94 ? prev : Math.min(94, prev + (prev < 40 ? 2 : prev < 75 ? 1 : 0))));
+      }, 130);
+
+      setLoadingMsg("Préparation de la recherche...");
+      setSearchProgress(12);
       // NOUVEAU : injection du type, niveau et mots-clés dans le prompt
       const levelClause = studyLevel === "Indifférent" ? "niveaux Bac+2 à Bac+4" : `niveau ${studyLevel}`;
       const keywordsClause = keywords.trim() ? ` Inclure des offres avec compétences: ${keywords.trim()}.` : "";
@@ -123,11 +130,14 @@ Réponds UNIQUEMENT avec le tableau JSON ci-dessous, AUCUN texte avant ou après
 [{"id":"1","title":"Développeur Web Full Stack","company":"Capgemini","location":"Toulouse","level":"Bac+3","domain":"Dev","description":"Intégration dans une équipe Agile pour développer des applications web en React et Node.js pour des clients grands comptes. Participation aux sprints, code reviews et déploiements CI/CD.","requirements":["JavaScript","React","SQL","Git","HTML/CSS","Agile"],"duration":"24 mois","url":"https://fr.indeed.com/jobs"},{"id":"2","title":"Data Analyst","company":"SNCF","location":"Paris","level":"Bac+4","domain":"Data","description":"Analyse des données de trafic ferroviaire et construction de dashboards Power BI. Automatisation de rapports Python/Pandas et présentation aux équipes métiers.","requirements":["Python","Pandas","SQL","Power BI","Excel","Statistiques"],"duration":"24 mois","url":"https://fr.indeed.com/jobs"}]
 Génère exactement 12 offres dans ce format, ids de 1 à 12.`;
 
+  setLoadingMsg("Génération des offres...");
+  setSearchProgress(35);
       const r1 = await callClaude([{role:"user",content:jobsPrompt}], 2500);
       const found = safeParseJSON(r1);
       if (!found.length) throw new Error("Format de réponse invalide. Réessaie dans quelques secondes.");
 
       setLoadingMsg("Scoring des offres selon ton profil...");
+  setSearchProgress(64);
       const scorePrompt = `Score ces offres de 0 à 100 selon l adéquation avec ce profil étudiant MIASHS polyvalent Dev/Data:
 ${activeProfile}
 
@@ -140,6 +150,7 @@ Un objet par offre, score entre 0 et 100.`;
 
       const r2 = await callClaude([{role:"user",content:scorePrompt}], 1000);
       const scores = safeParseJSON(r2);
+      setSearchProgress(88);
 
       // NOUVEAU : attribution aléatoire de la source et de l ancienneté de publication
       const scored = found.map(j => {
@@ -149,12 +160,15 @@ Un objet par offre, score entre 0 et 100.`;
         return {...j, score: Math.min(100,Math.max(0,s?.score??55)), reason: s?.reason??"", source, publishedAge};
       }).sort((a,b)=>b.score-a.score);
 
+      setSearchProgress(100);
       setJobs(scored);
       setTab("results");
     } catch(e) {
       setError(e.message||"Erreur inconnue. Réessaie.");
     } finally {
+      if (progressTimer) clearInterval(progressTimer);
       setLoading(false); setLoadingMsg("");
+      setTimeout(() => setSearchProgress(0), 250);
     }
   }
 
@@ -351,6 +365,20 @@ Structure obligatoire: PROFIL PROFESSIONNEL · COMPÉTENCES CLÉS (les plus pert
               {error&&<div style={{background:"rgba(220,38,38,.12)",border:"1px solid rgba(220,38,38,.3)",borderRadius:7,padding:"9px 11px",color:"#fca5a5",fontSize:12}}>{error}</div>}
               {loading&&<div style={{background:"rgba(37,99,235,.1)",border:"1px solid rgba(37,99,235,.22)",borderRadius:7,padding:"9px 12px",color:"#93c5fd",fontSize:12,display:"flex",alignItems:"center",gap:9}}>
                 <RefreshCw size={12} style={{animation:"spin 1s linear infinite",flexShrink:0}}/>{loadingMsg}
+              </div>}
+              {loading&&<div style={{background:"rgba(10,10,15,.95)",border:"1px solid rgba(34,197,94,.22)",borderRadius:10,padding:"10px 11px",boxShadow:"inset 0 0 18px rgba(37,99,235,.08)"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6,fontSize:10,color:muted,textTransform:"uppercase",letterSpacing:".06em"}}>
+                  <span>Chargement du moteur</span>
+                  <span style={{fontFamily:"monospace",color:"#93c5fd"}}>{searchProgress}%</span>
+                </div>
+                <div style={{height:12,background:"#111118",borderRadius:999,overflow:"hidden",border:"1px solid #283044"}}>
+                  <div style={{height:"100%",width:`${searchProgress}%`,background:"linear-gradient(90deg,#2563eb 0%,#22c55e 55%,#f59e0b 100%)",boxShadow:"0 0 18px rgba(34,197,94,.35)",transition:"width .18s ease"}} />
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",marginTop:6,fontSize:10,color:"#444460"}}>
+                  <span>Analyse du prompt</span>
+                  <span>Recherche des offres</span>
+                  <span>Score final</span>
+                </div>
               </div>}
               <button onClick={handleSearch} disabled={loading} style={{padding:"10px 0",borderRadius:9,border:"none",cursor:loading?"not-allowed":"pointer",fontSize:13,fontWeight:600,background:loading?"#1c1c2a":"#2563eb",color:loading?"#444460":"#fff"}}>
                 {loading?"Recherche en cours...":"🚀 Lancer la recherche IA"}
