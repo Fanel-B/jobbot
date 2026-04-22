@@ -48,6 +48,24 @@ function isDirectOfferUrl(url) {
   return !searchPatterns.some(p => lower.includes(p));
 }
 
+function normalizeOfferUrl(url) {
+  if (!isDirectOfferUrl(url)) return "";
+  const lower = String(url).toLowerCase();
+  // Filtre les exemples/valeurs factices souvent renvoyés par l'IA
+  if (lower.includes("abc123") || lower.includes("1234567890") || lower.includes("example.com")) return "";
+  return url;
+}
+
+function buildSourceSearchUrl(source, title = "", company = "", location = "") {
+  const q = encodeURIComponent([title, company, location].filter(Boolean).join(" "));
+  if (source === "Indeed") return `https://fr.indeed.com/jobs?q=${q}`;
+  if (source === "Welcome to the Jungle") return `https://www.welcometothejungle.com/fr/jobs?query=${q}`;
+  if (source === "LinkedIn") return `https://www.linkedin.com/jobs/search/?keywords=${q}`;
+  if (source === "HelloWork") return `https://www.hellowork.com/fr-fr/emploi/recherche.html?k=${q}`;
+  if (source === "Alternance.gouv.fr") return "https://labonnealternance.apprentissage.beta.gouv.fr/recherche-apprentissage?display=list";
+  return `https://fr.indeed.com/jobs?q=${q}`;
+}
+
 // NOUVEAU : anciennetés de publication simulées (en jours)
 const PUBLISHED_AGES = [1, 2, 3, 7, 14, 30];
 
@@ -139,14 +157,14 @@ export default function App() {
       Réponds UNIQUEMENT avec le tableau JSON ci-dessous, AUCUN texte avant ou après, AUCUN backtick markdown:
       [{"id":"1","title":"Equipier polyvalent","company":"McDonald's","location":"Toulouse","level":"Bac+2","domain":"Job étudiant","source":"Indeed","description":"Accueil client, préparation des commandes et entretien de l'espace de vente sur des créneaux soir/week-end.","requirements":["Ponctualité","Service client","Travail en équipe"],"duration":"12 mois","url":"https://fr.indeed.com/viewjob?jk=abc123"},{"id":"2","title":"Hôte de caisse","company":"Carrefour","location":"Paris","level":"Bac+3","domain":"Job étudiant","source":"HelloWork","description":"Encaissement, orientation client et mise en rayon sur contrat étudiant 20h/semaine.","requirements":["Relation client","Rigueur","Disponibilité week-end"],"duration":"6 mois","url":"https://www.hellowork.com/fr-fr/emplois/123456.html"}]
 
-      IMPORTANT: "url" doit être un lien DIRECT vers la page de l'annonce (pas une page de recherche, pas une liste générale).
+      IMPORTANT: "url" doit être un lien DIRECT vers la page de l'annonce (pas une page de recherche, pas une liste générale). Si tu n'es pas sûr du lien exact, mets "url":"".
       Génère exactement 12 offres dans ce format, ids de 1 à 12.`
         : `Génère 12 offres "${searchType}" informatique réalistes pour la France 2025-2026 dans les villes ${loc1} et ${loc2}, ${levelClause}. 6 offres domaine Dev (web/mobile/logiciel), 6 offres domaine Data (analyst/BI/scientist).${keywordsClause} Utilise des entreprises françaises connues: Capgemini, Sopra Steria, Airbus, CNES, SNCF, Météo-France, Aubay, CGI, Atos, Thales, Mairie de Toulouse, INSEE, La Poste, Crédit Agricole, Engie, Orange, Total, Renault, etc. Alterne les localisations entre ${loc1} et ${loc2}. Source autorisée par offre: ${SOURCES_LIST.join(", ")}.
 
       Réponds UNIQUEMENT avec le tableau JSON ci-dessous, AUCUN texte avant ou après, AUCUN backtick markdown:
       [{"id":"1","title":"Développeur Web Full Stack","company":"Capgemini","location":"Toulouse","level":"Bac+3","domain":"Dev","source":"Indeed","description":"Intégration dans une équipe Agile pour développer des applications web en React et Node.js pour des clients grands comptes. Participation aux sprints, code reviews et déploiements CI/CD.","requirements":["JavaScript","React","SQL","Git","HTML/CSS","Agile"],"duration":"24 mois","url":"https://fr.indeed.com/viewjob?jk=abc123"},{"id":"2","title":"Data Analyst","company":"SNCF","location":"Paris","level":"Bac+4","domain":"Data","source":"LinkedIn","description":"Analyse des données de trafic ferroviaire et construction de dashboards Power BI. Automatisation de rapports Python/Pandas et présentation aux équipes métiers.","requirements":["Python","Pandas","SQL","Power BI","Excel","Statistiques"],"duration":"24 mois","url":"https://www.linkedin.com/jobs/view/1234567890"}]
 
-      IMPORTANT: "url" doit être un lien DIRECT vers la page de l'annonce (pas une page de recherche, pas une liste générale).
+      IMPORTANT: "url" doit être un lien DIRECT vers la page de l'annonce (pas une page de recherche, pas une liste générale). Si tu n'es pas sûr du lien exact, mets "url":"".
       Génère exactement 12 offres dans ce format, ids de 1 à 12.`;
 
   setLoadingMsg("Génération des offres...");
@@ -187,10 +205,10 @@ Réponds UNIQUEMENT avec le tableau JSON ci-dessous, AUCUN texte avant ou après
       const scored = found.map(j => {
         const s = scores.find(sc => String(sc.id)===String(j.id));
         const source = SOURCES_LIST.includes(j.source) ? j.source : SOURCES_LIST[Math.floor(Math.random() * SOURCES_LIST.length)];
-        const sourceMeta = SOURCES.find(x => x.name === source) || SOURCES[0];
-        const offerUrl = isDirectOfferUrl(j.url) ? j.url : "";
+        const offerUrl = normalizeOfferUrl(j.url);
+        const searchFallbackUrl = buildSourceSearchUrl(source, j.title, j.company, j.location);
         const publishedAge = PUBLISHED_AGES[Math.floor(Math.random() * PUBLISHED_AGES.length)];
-        return {...j, score: Math.min(100,Math.max(0,s?.score??55)), reason: s?.reason??"", source, offerUrl, searchFallbackUrl: sourceMeta.searchUrl, publishedAge};
+        return {...j, score: Math.min(100,Math.max(0,s?.score??55)), reason: s?.reason??"", source, offerUrl, searchFallbackUrl, publishedAge};
       }).sort((a,b)=>b.score-a.score);
 
       setSearchProgress(100);
@@ -292,7 +310,7 @@ Structure obligatoire: PROFIL PROFESSIONNEL · COMPÉTENCES CLÉS (les plus pert
     setTracking(prev => {
       const exists = prev.find(t=>t.title===job.title&&t.company===job.company);
       if (exists) return prev.map(t=>t.title===job.title&&t.company===job.company?{...t,hasCV:t.hasCV||hasCV}:t);
-      return [{id:Date.now(),date:new Date().toLocaleDateString("fr-FR"),title:job.title,company:job.company,location:job.location,domain:job.domain,score:job.score,url:job.offerUrl||"",status:"À envoyer",hasCV},...prev];
+      return [{id:Date.now(),date:new Date().toLocaleDateString("fr-FR"),title:job.title,company:job.company,location:job.location,domain:job.domain,score:job.score,url:job.offerUrl||job.searchFallbackUrl||"",status:"À envoyer",hasCV},...prev];
     });
   }
 
@@ -498,7 +516,13 @@ Structure obligatoire: PROFIL PROFESSIONNEL · COMPÉTENCES CLÉS (les plus pert
                       <button onClick={()=>copyLink(selected.id, selected.offerUrl)} style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,background:"transparent",border:"none",color:copied===selected.id?"#6ee7b7":muted,cursor:"pointer",padding:0}}>
                         <Copy size={9}/>{copied===selected.id?"Copié !":"Copier le lien"}
                       </button>
-                    </> : <span style={{fontSize:10,color:"#fca5a5"}}>Lien direct indisponible, relance la recherche.</span>}
+                    </> : <span style={{fontSize:10,color:"#fca5a5"}}>Lien direct indisponible (évite les 404).</span>}
+                    <a href={selected.searchFallbackUrl || buildSourceSearchUrl(selected.source, selected.title, selected.company, selected.location)} target="_blank" rel="noopener noreferrer" style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,color:"#93c5fd",textDecoration:"none"}}>
+                      <ExternalLink size={9}/>Recherche sur le site
+                    </a>
+                    <button onClick={()=>copyLink(selected.id, selected.offerUrl || selected.searchFallbackUrl || buildSourceSearchUrl(selected.source, selected.title, selected.company, selected.location))} style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,background:"transparent",border:"none",color:copied===selected.id?"#6ee7b7":muted,cursor:"pointer",padding:0}}>
+                      <Copy size={9}/>{copied===selected.id?"Copié !":"Copier"}
+                    </button>
                   </div>
                 </div>
                 <div style={{flex:1,overflowY:"auto",padding:16,display:"flex",flexDirection:"column",gap:14}}>
