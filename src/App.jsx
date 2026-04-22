@@ -30,15 +30,23 @@ async function callClaude(messages, maxTokens=1000) {
   return (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
 }
 
-// NOUVEAU : définition des sources avec couleurs et URL de recherche réelle
+// NOUVEAU : définition des sources avec couleurs et URL de recherche (fallback)
 const SOURCES = [
-  { name: "Indeed",                color: "#2164f3", bg: "rgba(33,100,243,.18)",  url: "https://fr.indeed.com/jobs?q=alternance+informatique" },
-  { name: "Welcome to the Jungle", color: "#10b981", bg: "rgba(16,185,129,.18)", url: "https://www.welcometothejungle.com/fr/jobs?query=alternance+informatique" },
-  { name: "LinkedIn",              color: "#0a66c2", bg: "rgba(10,102,194,.18)",  url: "https://www.linkedin.com/jobs/search/?keywords=alternance+informatique" },
-  { name: "Alternance.gouv.fr",    color: "#e1000f", bg: "rgba(225,0,15,.18)",    url: "https://labonnealternance.apprentissage.beta.gouv.fr/recherche-apprentissage?display=list&radius=30&romes=M1805,M1802" },
-  { name: "HelloWork",             color: "#7c3aed", bg: "rgba(124,58,237,.18)",  url: "https://www.hellowork.com/fr-fr/emploi/recherche.html?k=alternance+informatique" },
+  { name: "Indeed",                color: "#2164f3", bg: "rgba(33,100,243,.18)",  searchUrl: "https://fr.indeed.com/jobs?q=alternance+informatique" },
+  { name: "Welcome to the Jungle", color: "#10b981", bg: "rgba(16,185,129,.18)", searchUrl: "https://www.welcometothejungle.com/fr/jobs?query=alternance+informatique" },
+  { name: "LinkedIn",              color: "#0a66c2", bg: "rgba(10,102,194,.18)",  searchUrl: "https://www.linkedin.com/jobs/search/?keywords=alternance+informatique" },
+  { name: "Alternance.gouv.fr",    color: "#e1000f", bg: "rgba(225,0,15,.18)",    searchUrl: "https://labonnealternance.apprentissage.beta.gouv.fr/recherche-apprentissage?display=list&radius=30&romes=M1805,M1802" },
+  { name: "HelloWork",             color: "#7c3aed", bg: "rgba(124,58,237,.18)",  searchUrl: "https://www.hellowork.com/fr-fr/emploi/recherche.html?k=alternance+informatique" },
 ];
 const SOURCES_LIST = SOURCES.map(s => s.name);
+
+function isDirectOfferUrl(url) {
+  if (typeof url !== "string") return false;
+  if (!/^https?:\/\//i.test(url)) return false;
+  const lower = url.toLowerCase();
+  const searchPatterns = ["/jobs?q=", "/jobs?", "/search", "query=", "keywords=", "?k="];
+  return !searchPatterns.some(p => lower.includes(p));
+}
 
 // NOUVEAU : anciennetés de publication simulées (en jours)
 const PUBLISHED_AGES = [1, 2, 3, 7, 14, 30];
@@ -124,11 +132,13 @@ export default function App() {
       // NOUVEAU : injection du type, niveau et mots-clés dans le prompt
       const levelClause = studyLevel === "Indifférent" ? "niveaux Bac+2 à Bac+4" : `niveau ${studyLevel}`;
       const keywordsClause = keywords.trim() ? ` Inclure des offres avec compétences: ${keywords.trim()}.` : "";
-      const jobsPrompt = `Génère 12 offres "${searchType}" informatique réalistes pour la France 2025-2026 dans les villes ${loc1} et ${loc2}, ${levelClause}. 6 offres domaine Dev (web/mobile/logiciel), 6 offres domaine Data (analyst/BI/scientist).${keywordsClause} Utilise des entreprises françaises connues: Capgemini, Sopra Steria, Airbus, CNES, SNCF, Météo-France, Aubay, CGI, Atos, Thales, Mairie de Toulouse, INSEE, La Poste, Crédit Agricole, Engie, Orange, Total, Renault, etc. Alterne les localisations entre ${loc1} et ${loc2}.
+      const jobsPrompt = `Génère 12 offres "${searchType}" informatique réalistes pour la France 2025-2026 dans les villes ${loc1} et ${loc2}, ${levelClause}. 6 offres domaine Dev (web/mobile/logiciel), 6 offres domaine Data (analyst/BI/scientist).${keywordsClause} Utilise des entreprises françaises connues: Capgemini, Sopra Steria, Airbus, CNES, SNCF, Météo-France, Aubay, CGI, Atos, Thales, Mairie de Toulouse, INSEE, La Poste, Crédit Agricole, Engie, Orange, Total, Renault, etc. Alterne les localisations entre ${loc1} et ${loc2}. Source autorisée par offre: ${SOURCES_LIST.join(", ")}.
 
-Réponds UNIQUEMENT avec le tableau JSON ci-dessous, AUCUN texte avant ou après, AUCUN backtick markdown:
-[{"id":"1","title":"Développeur Web Full Stack","company":"Capgemini","location":"Toulouse","level":"Bac+3","domain":"Dev","description":"Intégration dans une équipe Agile pour développer des applications web en React et Node.js pour des clients grands comptes. Participation aux sprints, code reviews et déploiements CI/CD.","requirements":["JavaScript","React","SQL","Git","HTML/CSS","Agile"],"duration":"24 mois","url":"https://fr.indeed.com/jobs"},{"id":"2","title":"Data Analyst","company":"SNCF","location":"Paris","level":"Bac+4","domain":"Data","description":"Analyse des données de trafic ferroviaire et construction de dashboards Power BI. Automatisation de rapports Python/Pandas et présentation aux équipes métiers.","requirements":["Python","Pandas","SQL","Power BI","Excel","Statistiques"],"duration":"24 mois","url":"https://fr.indeed.com/jobs"}]
-Génère exactement 12 offres dans ce format, ids de 1 à 12.`;
+    Réponds UNIQUEMENT avec le tableau JSON ci-dessous, AUCUN texte avant ou après, AUCUN backtick markdown:
+    [{"id":"1","title":"Développeur Web Full Stack","company":"Capgemini","location":"Toulouse","level":"Bac+3","domain":"Dev","source":"Indeed","description":"Intégration dans une équipe Agile pour développer des applications web en React et Node.js pour des clients grands comptes. Participation aux sprints, code reviews et déploiements CI/CD.","requirements":["JavaScript","React","SQL","Git","HTML/CSS","Agile"],"duration":"24 mois","url":"https://fr.indeed.com/viewjob?jk=abc123"},{"id":"2","title":"Data Analyst","company":"SNCF","location":"Paris","level":"Bac+4","domain":"Data","source":"LinkedIn","description":"Analyse des données de trafic ferroviaire et construction de dashboards Power BI. Automatisation de rapports Python/Pandas et présentation aux équipes métiers.","requirements":["Python","Pandas","SQL","Power BI","Excel","Statistiques"],"duration":"24 mois","url":"https://www.linkedin.com/jobs/view/1234567890"}]
+
+    IMPORTANT: "url" doit être un lien DIRECT vers la page de l'annonce (pas une page de recherche, pas une liste générale).
+    Génère exactement 12 offres dans ce format, ids de 1 à 12.`;
 
   setLoadingMsg("Génération des offres...");
   setSearchProgress(35);
@@ -155,9 +165,11 @@ Un objet par offre, score entre 0 et 100.`;
       // NOUVEAU : attribution aléatoire de la source et de l ancienneté de publication
       const scored = found.map(j => {
         const s = scores.find(sc => String(sc.id)===String(j.id));
-        const source = SOURCES_LIST[Math.floor(Math.random() * SOURCES_LIST.length)];
+        const source = SOURCES_LIST.includes(j.source) ? j.source : SOURCES_LIST[Math.floor(Math.random() * SOURCES_LIST.length)];
+        const sourceMeta = SOURCES.find(x => x.name === source) || SOURCES[0];
+        const offerUrl = isDirectOfferUrl(j.url) ? j.url : "";
         const publishedAge = PUBLISHED_AGES[Math.floor(Math.random() * PUBLISHED_AGES.length)];
-        return {...j, score: Math.min(100,Math.max(0,s?.score??55)), reason: s?.reason??"", source, publishedAge};
+        return {...j, score: Math.min(100,Math.max(0,s?.score??55)), reason: s?.reason??"", source, offerUrl, searchFallbackUrl: sourceMeta.searchUrl, publishedAge};
       }).sort((a,b)=>b.score-a.score);
 
       setSearchProgress(100);
@@ -259,7 +271,7 @@ Structure obligatoire: PROFIL PROFESSIONNEL · COMPÉTENCES CLÉS (les plus pert
     setTracking(prev => {
       const exists = prev.find(t=>t.title===job.title&&t.company===job.company);
       if (exists) return prev.map(t=>t.title===job.title&&t.company===job.company?{...t,hasCV:t.hasCV||hasCV}:t);
-      return [{id:Date.now(),date:new Date().toLocaleDateString("fr-FR"),title:job.title,company:job.company,location:job.location,domain:job.domain,score:job.score,url:job.url||"",status:"À envoyer",hasCV},...prev];
+      return [{id:Date.now(),date:new Date().toLocaleDateString("fr-FR"),title:job.title,company:job.company,location:job.location,domain:job.domain,score:job.score,url:job.offerUrl||"",status:"À envoyer",hasCV},...prev];
     });
   }
 
@@ -458,17 +470,14 @@ Structure obligatoire: PROFIL PROFESSIONNEL · COMPÉTENCES CLÉS (les plus pert
                   <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,flexWrap:"wrap"}}>
                     <SourceBadge source={selected.source}/>
                     <span style={{fontSize:10,color:muted}}>{formatAge(selected.publishedAge)}</span>
-                    {(() => {
-                      const src = SOURCES.find(s=>s.name===selected.source) || SOURCES[0];
-                      return <>
-                        <a href={src.url} target="_blank" rel="noopener noreferrer" style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,color:"#3b82f6",textDecoration:"none"}}>
-                          <ExternalLink size={9}/>Voir l offre
-                        </a>
-                        <button onClick={()=>copyLink(selected.id, src.url)} style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,background:"transparent",border:"none",color:copied===selected.id?"#6ee7b7":muted,cursor:"pointer",padding:0}}>
-                          <Copy size={9}/>{copied===selected.id?"Copié !":"Copier le lien"}
-                        </button>
-                      </>;
-                    })()}
+                    {selected.offerUrl ? <>
+                      <a href={selected.offerUrl} target="_blank" rel="noopener noreferrer" style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,color:"#3b82f6",textDecoration:"none"}}>
+                        <ExternalLink size={9}/>Voir l offre
+                      </a>
+                      <button onClick={()=>copyLink(selected.id, selected.offerUrl)} style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,background:"transparent",border:"none",color:copied===selected.id?"#6ee7b7":muted,cursor:"pointer",padding:0}}>
+                        <Copy size={9}/>{copied===selected.id?"Copié !":"Copier le lien"}
+                      </button>
+                    </> : <span style={{fontSize:10,color:"#fca5a5"}}>Lien direct indisponible, relance la recherche.</span>}
                   </div>
                 </div>
                 <div style={{flex:1,overflowY:"auto",padding:16,display:"flex",flexDirection:"column",gap:14}}>
