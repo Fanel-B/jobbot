@@ -130,15 +130,24 @@ export default function App() {
       setLoadingMsg("Préparation de la recherche...");
       setSearchProgress(12);
       // NOUVEAU : injection du type, niveau et mots-clés dans le prompt
+            const isStudentJob = searchType === "Job étudiant";
       const levelClause = studyLevel === "Indifférent" ? "niveaux Bac+2 à Bac+4" : `niveau ${studyLevel}`;
       const keywordsClause = keywords.trim() ? ` Inclure des offres avec compétences: ${keywords.trim()}.` : "";
-      const jobsPrompt = `Génère 12 offres "${searchType}" informatique réalistes pour la France 2025-2026 dans les villes ${loc1} et ${loc2}, ${levelClause}. 6 offres domaine Dev (web/mobile/logiciel), 6 offres domaine Data (analyst/BI/scientist).${keywordsClause} Utilise des entreprises françaises connues: Capgemini, Sopra Steria, Airbus, CNES, SNCF, Météo-France, Aubay, CGI, Atos, Thales, Mairie de Toulouse, INSEE, La Poste, Crédit Agricole, Engie, Orange, Total, Renault, etc. Alterne les localisations entre ${loc1} et ${loc2}. Source autorisée par offre: ${SOURCES_LIST.join(", ")}.
+            const jobsPrompt = isStudentJob
+        ? `Génère 12 offres réalistes de "Job étudiant" en France 2025-2026 dans les villes ${loc1} et ${loc2}, temps partiel classique (pas de postes informatiques, pas de dev, pas de data). Types de jobs attendus: vente, restauration, caisse, accueil, logistique, préparation de commandes, service client, animation, aide en magasin. ${levelClause}.${keywordsClause} Utilise des entreprises connues: McDonald's, Burger King, Carrefour, Auchan, Monoprix, Decathlon, Zara, H&M, Fnac, Primark, UGC, Pathé, La Poste, SNCF, etc. Alterne les localisations entre ${loc1} et ${loc2}. Source autorisée par offre: ${SOURCES_LIST.join(", ")}.
 
-    Réponds UNIQUEMENT avec le tableau JSON ci-dessous, AUCUN texte avant ou après, AUCUN backtick markdown:
-    [{"id":"1","title":"Développeur Web Full Stack","company":"Capgemini","location":"Toulouse","level":"Bac+3","domain":"Dev","source":"Indeed","description":"Intégration dans une équipe Agile pour développer des applications web en React et Node.js pour des clients grands comptes. Participation aux sprints, code reviews et déploiements CI/CD.","requirements":["JavaScript","React","SQL","Git","HTML/CSS","Agile"],"duration":"24 mois","url":"https://fr.indeed.com/viewjob?jk=abc123"},{"id":"2","title":"Data Analyst","company":"SNCF","location":"Paris","level":"Bac+4","domain":"Data","source":"LinkedIn","description":"Analyse des données de trafic ferroviaire et construction de dashboards Power BI. Automatisation de rapports Python/Pandas et présentation aux équipes métiers.","requirements":["Python","Pandas","SQL","Power BI","Excel","Statistiques"],"duration":"24 mois","url":"https://www.linkedin.com/jobs/view/1234567890"}]
+      Réponds UNIQUEMENT avec le tableau JSON ci-dessous, AUCUN texte avant ou après, AUCUN backtick markdown:
+      [{"id":"1","title":"Equipier polyvalent","company":"McDonald's","location":"Toulouse","level":"Bac+2","domain":"Job étudiant","source":"Indeed","description":"Accueil client, préparation des commandes et entretien de l'espace de vente sur des créneaux soir/week-end.","requirements":["Ponctualité","Service client","Travail en équipe"],"duration":"12 mois","url":"https://fr.indeed.com/viewjob?jk=abc123"},{"id":"2","title":"Hôte de caisse","company":"Carrefour","location":"Paris","level":"Bac+3","domain":"Job étudiant","source":"HelloWork","description":"Encaissement, orientation client et mise en rayon sur contrat étudiant 20h/semaine.","requirements":["Relation client","Rigueur","Disponibilité week-end"],"duration":"6 mois","url":"https://www.hellowork.com/fr-fr/emplois/123456.html"}]
 
-    IMPORTANT: "url" doit être un lien DIRECT vers la page de l'annonce (pas une page de recherche, pas une liste générale).
-    Génère exactement 12 offres dans ce format, ids de 1 à 12.`;
+      IMPORTANT: "url" doit être un lien DIRECT vers la page de l'annonce (pas une page de recherche, pas une liste générale).
+      Génère exactement 12 offres dans ce format, ids de 1 à 12.`
+        : `Génère 12 offres "${searchType}" informatique réalistes pour la France 2025-2026 dans les villes ${loc1} et ${loc2}, ${levelClause}. 6 offres domaine Dev (web/mobile/logiciel), 6 offres domaine Data (analyst/BI/scientist).${keywordsClause} Utilise des entreprises françaises connues: Capgemini, Sopra Steria, Airbus, CNES, SNCF, Météo-France, Aubay, CGI, Atos, Thales, Mairie de Toulouse, INSEE, La Poste, Crédit Agricole, Engie, Orange, Total, Renault, etc. Alterne les localisations entre ${loc1} et ${loc2}. Source autorisée par offre: ${SOURCES_LIST.join(", ")}.
+
+      Réponds UNIQUEMENT avec le tableau JSON ci-dessous, AUCUN texte avant ou après, AUCUN backtick markdown:
+      [{"id":"1","title":"Développeur Web Full Stack","company":"Capgemini","location":"Toulouse","level":"Bac+3","domain":"Dev","source":"Indeed","description":"Intégration dans une équipe Agile pour développer des applications web en React et Node.js pour des clients grands comptes. Participation aux sprints, code reviews et déploiements CI/CD.","requirements":["JavaScript","React","SQL","Git","HTML/CSS","Agile"],"duration":"24 mois","url":"https://fr.indeed.com/viewjob?jk=abc123"},{"id":"2","title":"Data Analyst","company":"SNCF","location":"Paris","level":"Bac+4","domain":"Data","source":"LinkedIn","description":"Analyse des données de trafic ferroviaire et construction de dashboards Power BI. Automatisation de rapports Python/Pandas et présentation aux équipes métiers.","requirements":["Python","Pandas","SQL","Power BI","Excel","Statistiques"],"duration":"24 mois","url":"https://www.linkedin.com/jobs/view/1234567890"}]
+
+      IMPORTANT: "url" doit être un lien DIRECT vers la page de l'annonce (pas une page de recherche, pas une liste générale).
+      Génère exactement 12 offres dans ce format, ids de 1 à 12.`;
 
   setLoadingMsg("Génération des offres...");
   setSearchProgress(35);
@@ -148,7 +157,19 @@ export default function App() {
 
       setLoadingMsg("Scoring des offres selon ton profil...");
   setSearchProgress(64);
-      const scorePrompt = `Score ces offres de 0 à 100 selon l adéquation avec ce profil étudiant MIASHS polyvalent Dev/Data:
+      const scorePrompt = isStudentJob
+        ? `Score ces offres de job étudiant de 0 à 100 selon l'adéquation avec un étudiant disponible à temps partiel, sérieux, ponctuel, orienté service client et travail en équipe.
+
+    Contexte profil:
+    ${activeProfile}
+
+    Offres à scorer:
+    ${JSON.stringify(found.map(j=>({id:j.id,title:j.title,domain:j.domain,level:j.level,requirements:j.requirements})))}
+
+    Réponds UNIQUEMENT avec le tableau JSON ci-dessous, AUCUN texte avant ou après, AUCUN backtick:
+    [{"id":"1","score":82,"reason":"Disponibilités compatibles avec un contrat étudiant et compétences relation client"}]
+    Un objet par offre, score entre 0 et 100.`
+        : `Score ces offres de 0 à 100 selon l adéquation avec ce profil étudiant MIASHS polyvalent Dev/Data:
 ${activeProfile}
 
 Offres à scorer:
@@ -156,7 +177,7 @@ ${JSON.stringify(found.map(j=>({id:j.id,title:j.title,domain:j.domain,level:j.le
 
 Réponds UNIQUEMENT avec le tableau JSON ci-dessous, AUCUN texte avant ou après, AUCUN backtick:
 [{"id":"1","score":82,"reason":"Python + SQL requis correspondent aux projets data du profil"}]
-Un objet par offre, score entre 0 et 100.`;
+    Un objet par offre, score entre 0 et 100.`;
 
       const r2 = await callClaude([{role:"user",content:scorePrompt}], 1000);
       const scores = safeParseJSON(r2);
