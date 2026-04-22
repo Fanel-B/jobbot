@@ -205,10 +205,9 @@ Réponds UNIQUEMENT avec le tableau JSON ci-dessous, AUCUN texte avant ou après
       const scored = found.map(j => {
         const s = scores.find(sc => String(sc.id)===String(j.id));
         const source = SOURCES_LIST.includes(j.source) ? j.source : SOURCES_LIST[Math.floor(Math.random() * SOURCES_LIST.length)];
-        const offerUrl = normalizeOfferUrl(j.url);
         const searchFallbackUrl = buildSourceSearchUrl(source, j.title, j.company, j.location);
         const publishedAge = PUBLISHED_AGES[Math.floor(Math.random() * PUBLISHED_AGES.length)];
-        return {...j, score: Math.min(100,Math.max(0,s?.score??55)), reason: s?.reason??"", source, offerUrl, searchFallbackUrl, publishedAge};
+        return {...j, score: Math.min(100,Math.max(0,s?.score??55)), reason: s?.reason??"", source, searchFallbackUrl, publishedAge};
       }).sort((a,b)=>b.score-a.score);
 
       setSearchProgress(100);
@@ -310,7 +309,7 @@ Structure obligatoire: PROFIL PROFESSIONNEL · COMPÉTENCES CLÉS (les plus pert
     setTracking(prev => {
       const exists = prev.find(t=>t.title===job.title&&t.company===job.company);
       if (exists) return prev.map(t=>t.title===job.title&&t.company===job.company?{...t,hasCV:t.hasCV||hasCV}:t);
-      return [{id:Date.now(),date:new Date().toLocaleDateString("fr-FR"),title:job.title,company:job.company,location:job.location,domain:job.domain,score:job.score,url:job.offerUrl||job.searchFallbackUrl||"",status:"À envoyer",hasCV},...prev];
+      return [{id:Date.now(),date:new Date().toLocaleDateString("fr-FR"),title:job.title,company:job.company,location:job.location,domain:job.domain,score:job.score,url:job.searchFallbackUrl||"",status:"À envoyer",hasCV},...prev];
     });
   }
 
@@ -505,23 +504,15 @@ Structure obligatoire: PROFIL PROFESSIONNEL · COMPÉTENCES CLÉS (les plus pert
                       <ScorePill score={selected.score}/><DomainBadge domain={selected.domain}/>
                     </div>
                   </div>
-                  {/* NOUVEAU : source + lien + bouton copier */}
+                  {/* NOUVEAU : source + recherche préremplie + bouton copier */}
                   <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,flexWrap:"wrap"}}>
                     <SourceBadge source={selected.source}/>
                     <span style={{fontSize:10,color:muted}}>{formatAge(selected.publishedAge)}</span>
-                    {selected.offerUrl ? <>
-                      <a href={selected.offerUrl} target="_blank" rel="noopener noreferrer" style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,color:"#3b82f6",textDecoration:"none"}}>
-                        <ExternalLink size={9}/>Voir l offre
-                      </a>
-                      <button onClick={()=>copyLink(selected.id, selected.offerUrl)} style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,background:"transparent",border:"none",color:copied===selected.id?"#6ee7b7":muted,cursor:"pointer",padding:0}}>
-                        <Copy size={9}/>{copied===selected.id?"Copié !":"Copier le lien"}
-                      </button>
-                    </> : <span style={{fontSize:10,color:"#fca5a5"}}>Lien direct indisponible (évite les 404).</span>}
-                    <a href={selected.searchFallbackUrl || buildSourceSearchUrl(selected.source, selected.title, selected.company, selected.location)} target="_blank" rel="noopener noreferrer" style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,color:"#93c5fd",textDecoration:"none"}}>
-                      <ExternalLink size={9}/>Recherche sur le site
+                    <a href={selected.searchFallbackUrl || buildSourceSearchUrl(selected.source, selected.title, selected.company, selected.location)} target="_blank" rel="noopener noreferrer" style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,color:"#3b82f6",textDecoration:"none"}}>
+                      <ExternalLink size={9}/>Ouvrir la recherche sur le site
                     </a>
-                    <button onClick={()=>copyLink(selected.id, selected.offerUrl || selected.searchFallbackUrl || buildSourceSearchUrl(selected.source, selected.title, selected.company, selected.location))} style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,background:"transparent",border:"none",color:copied===selected.id?"#6ee7b7":muted,cursor:"pointer",padding:0}}>
-                      <Copy size={9}/>{copied===selected.id?"Copié !":"Copier"}
+                    <button onClick={()=>copyLink(selected.id, selected.searchFallbackUrl || buildSourceSearchUrl(selected.source, selected.title, selected.company, selected.location))} style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,background:"transparent",border:"none",color:copied===selected.id?"#6ee7b7":muted,cursor:"pointer",padding:0}}>
+                      <Copy size={9}/>{copied===selected.id?"Copié !":"Copier la recherche"}
                     </button>
                   </div>
                 </div>
