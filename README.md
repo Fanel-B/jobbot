@@ -1,6 +1,6 @@
 # 🎯 JobBot Alternance
 
-> **⚠️ Projet en pause.** Prototype v1 : les offres affichées sont générées par une IA, pas collectées depuis de vraies sources. Une v2 avec de vraies offres (APIs La Bonne Alternance et France Travail) est envisagée.
+> **⚠️ Projet en amélioration.** Prototype v1 : les offres affichées sont générées par une IA, pas collectées depuis de vraies sources. Une v2 avec de vraies offres (APIs La Bonne Alternance et France Travail) est envisagée.
 
 Bot de recherche d'alternance propulsé par IA — développé par Fanel (MIASHS L2, Toulouse).
 
