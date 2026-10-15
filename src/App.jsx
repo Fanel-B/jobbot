@@ -51,7 +51,7 @@ export default function App() {
           </div>
           <div>
             <div style={{ fontWeight: 600, fontSize: 13, lineHeight: 1.2 }}>JobBot Alternance</div>
-            <div style={{ fontSize: 11, color: muted, fontFamily: "monospace" }}>MIASHS · Bac+3/+4</div>
+            <div style={{ fontSize: 11, color: muted, fontFamily: "monospace" }}>Projet personnel · L3 MIAGE</div>
           </div>
         </div>
 
