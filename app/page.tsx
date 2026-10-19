@@ -4,6 +4,7 @@ import { Bulletin } from "@/components/Bulletin";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import {
   ageJours,
+  lacunesRegroupees,
   meta,
   offresAvecContrat,
   offresSansContrat,
@@ -22,13 +23,8 @@ export default function Home() {
   }).length;
 
   // Ce qui revient le plus souvent dans les offres et qui n'est pas au profil.
-  const compte = new Map<string, number>();
-  for (const o of offresAvecContrat) {
-    for (const m of o.skills?.missing ?? []) {
-      compte.set(m, (compte.get(m) ?? 0) + 1);
-    }
-  }
-  const lacunes = [...compte.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+  // Regroupé par famille : « IA », « intelligence artificielle » et « IA générative » sont une chose.
+  const lacunes = lacunesRegroupees(offresAvecContrat, 8);
 
   const sources = Object.entries(meta.sources).sort((a, b) => b[1] - a[1]);
 
@@ -173,11 +169,11 @@ export default function Home() {
             pas une note sur toi.
           </p>
           <ul className="mt-7 space-y-3">
-            {lacunes.map(([comp, n]) => {
-              const pct = Math.round((n / offresAvecContrat.length) * 100);
+            {lacunes.map((l) => {
+              const pct = Math.round((l.n / offresAvecContrat.length) * 100);
               return (
-                <li key={comp} className="grid grid-cols-[8rem_1fr_4.5rem] items-center gap-4">
-                  <span className="truncate text-sm font-medium text-ink-soft">{comp}</span>
+                <li key={l.label} className="grid grid-cols-[8rem_1fr_4.5rem] items-center gap-4">
+                  <span className="truncate text-sm font-medium text-ink-soft">{l.label}</span>
                   <span className="h-2 overflow-hidden rounded-full bg-paper-deep">
                     <span
                       className="block h-full rounded-full bg-ink/70"
@@ -185,7 +181,7 @@ export default function Home() {
                     />
                   </span>
                   <span className="num text-right text-xs text-muted">
-                    {n} offre{n > 1 ? "s" : ""}
+                    {l.n} offre{l.n > 1 ? "s" : ""}
                   </span>
                 </li>
               );

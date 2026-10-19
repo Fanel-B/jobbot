@@ -230,3 +230,57 @@ export function top(n: number): Offer[] {
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
     .slice(0, n);
 }
+
+/* --------------------------------------------------- lacunes du profil */
+
+/** Minuscules sans accents : « IA générative » et « IA generative » sont la même compétence. */
+export function sansAccents(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Familles de compétences regroupées à l'affichage **uniquement** : les sources écrivent
+ * « IA », « intelligence artificielle », « IA générative » ou « IA generative » pour ce que le
+ * lecteur lit comme une seule chose. Sans ce regroupement, la liste « ce qui te manque » affichait
+ * quatre lignes concurrentes pour la même famille — le contraire d'une information utile.
+ *
+ * Le regroupement est volontairement grossier et limité : on ne fusionne pas « machine learning »
+ * avec « IA générative », ce ne sont pas les mêmes compétences.
+ */
+const FAMILLES_LACUNES: { motif: RegExp; nom: string }[] = [
+  { motif: /^(ia|intelligence artificielle|ia generative|ia gen|genai)\b/, nom: "IA / intelligence artificielle" },
+  { motif: /^(ml|machine learning|deep learning|apprentissage automatique)\b/, nom: "Machine learning" },
+  { motif: /^(ci\/cd|integration continue|deploiement continu)\b/, nom: "CI/CD" },
+  { motif: /^(bdd|base de donnees|bases de donnees|sql\/nosql)\b/, nom: "Bases de données" },
+];
+
+/** Ce qui manque le plus souvent, regroupé par famille. `n` compte des **offres**. */
+export function lacunesRegroupees(
+  source: Offer[],
+  max = 8,
+): { label: string; n: number }[] {
+  const familles = new Map<string, { label: string; offres: Set<number>; formes: Map<string, number> }>();
+
+  for (const o of source) {
+    for (const m of o.skills?.missing ?? []) {
+      const norm = sansAccents(m);
+      const nom = FAMILLES_LACUNES.find((f) => f.motif.test(norm))?.nom ?? m;
+      const entree =
+        familles.get(nom) ?? { label: nom, offres: new Set<number>(), formes: new Map<string, number>() };
+      entree.offres.add(o.id);
+      entree.formes.set(m, (entree.formes.get(m) ?? 0) + 1);
+      familles.set(nom, entree);
+    }
+  }
+
+  return [...familles.values()]
+    .map((f) => ({ label: f.label, n: f.offres.size }))
+    .filter((l) => l.n > 0)
+    .sort((a, b) => b.n - a.n)
+    .slice(0, max);
+}
