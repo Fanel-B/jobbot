@@ -10,7 +10,6 @@ import {
   offresSansContrat,
   sourceLabel,
   top,
-  ZONE_LABEL,
 } from "@/lib/offers";
 
 export default function Home() {
@@ -34,7 +33,7 @@ export default function Home() {
       <section className="border-b border-line">
         <div className="mx-auto max-w-6xl px-5 pb-14 pt-16">
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted">
-            Alternance · Stage · {ZONE_LABEL.toulouse}
+            Alternance · Stage · Toulouse et Île-de-France
           </p>
           <h1 className="font-display mt-4 max-w-3xl text-5xl leading-[1.05] tracking-tight sm:text-6xl">
             Les offres qui te correspondent vraiment.
@@ -53,8 +52,14 @@ export default function Home() {
               Voir les {meta.zones.toulouse} offres à Toulouse
             </Link>
             <Link
-              href="/methode"
+              href="/offres?zone=idf&tri=score"
               className="rounded-lg border border-line-strong bg-surface px-5 py-3 text-sm font-medium text-ink transition hover:border-ink/30"
+            >
+              Île-de-France ({meta.zones.idf})
+            </Link>
+            <Link
+              href="/methode"
+              className="px-2 py-3 text-sm font-medium text-accent underline decoration-accent/30"
             >
               Comment la note est calculée
             </Link>
@@ -63,8 +68,8 @@ export default function Home() {
           <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-6 border-t border-line pt-8 sm:grid-cols-4">
             {[
               { k: "Offres en base", v: meta.count },
-              { k: "À Toulouse et alentours", v: meta.zones.toulouse },
-              { k: "Sources interrogées", v: sources.length },
+              { k: "Toulouse et alentours", v: meta.zones.toulouse },
+              { k: "Île-de-France", v: meta.zones.idf },
               { k: "Vues ces 7 derniers jours", v: vues7j },
             ].map((s) => (
               <div key={s.k}>
@@ -241,7 +246,9 @@ export default function Home() {
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-8">
           <p className="max-w-xl text-sm text-muted">
             Les sources interrogées aujourd&apos;hui :{" "}
-            {sources.map(([s, n]) => `${sourceLabel(s)} (${n})`).join(" · ")}.
+            {sources.map(([s, n]) => `${sourceLabel(s)} (${n})`).join(" · ")}. L&apos;Île-de-France est
+            ouverte sur le site ; la collecte y est encore en cours d&apos;extension, l&apos;essentiel
+            des offres vient aujourd&apos;hui de Toulouse et sa région.
           </p>
           <Link
             href="/offres"
