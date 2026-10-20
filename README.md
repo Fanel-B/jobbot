@@ -22,7 +22,9 @@ produit `data/offers.json`, que le site lit.
 - les offres dont la source ne donne pas le type de contrat sont affichées dans un **bloc séparé**,
   avec un badge distinct — jamais déguisées en stages ;
 - filtres par lieu, type de contrat, source, note minimale et tri, en liens simples : les URL sont
-  partageables et la page fonctionne sans JavaScript.
+  partageables et la page fonctionne sans JavaScript ;
+- **en ligne** sur un serveur personnel : <http://148.113.247.10/> (voir « Déploiement » plus bas) ;
+- les offres sont réexportées et le site reconstruit **automatiquement chaque jour**.
 
 **Reste à faire** (cahier de route, tranches 2 et 3) : comptes et profils, score recalculé selon
 l'utilisateur, dépôt de CV et CV adapté, fit dynamique (« et si tu ajoutais TypeScript ? »).
@@ -81,5 +83,17 @@ data/offers.json           offres réelles exportées par le pipeline
 
 ## Déploiement
 
-Prévu sur Vercel, base PostgreSQL (Neon) et comptes via Auth.js à l'étape suivante. La collecte
-tournera séparément (le site ne déclenche jamais de collecte : les sources publiques ont des quotas).
+**En ligne : <http://148.113.247.10/>** — sur un serveur personnel (VPS), pas sur Vercel.
+
+- **Service** : unité systemd `jobbot-site.service`, qui lance `next start` sur le port 80 en tant
+  qu'utilisateur non privilégié (capacité `CAP_NET_BIND_SERVICE`, redémarrage automatique). L'unité
+  ne contient **aucun secret**.
+- **Fraîcheur** : le script `jobbot-site-refresh.sh` réexporte les offres depuis le pipeline,
+  reconstruit le site et redémarre le service. Il tourne chaque jour après la collecte et **reste
+  silencieux quand tout va bien** : il ne parle qu'en cas de problème.
+- **Pourquoi pas Vercel** : le site est statique et alimenté par des données produites ailleurs ; un
+  service systemd sur le serveur qui fait tourner la collecte évite un aller-retour réseau et garde
+  la chaîne observable d'un seul endroit.
+
+**Étape suivante** : PostgreSQL (Neon) et comptes — voir `db/README.md`. Le site ne déclenche jamais
+de collecte lui-même : les sources publiques ont des quotas, c'est le pipeline qui décide.
