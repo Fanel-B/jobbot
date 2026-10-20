@@ -35,7 +35,7 @@ import db  # noqa: E402
 import eligibility  # noqa: E402
 import priorites  # noqa: E402
 
-DESCRIPTION_MAX = 1500
+DESCRIPTION_MAX = 4000
 EXTRAIT_LARGEUR = 110                      # caractères montrés autour du motif « formation imposée »
 SANS_CONTRAT_MAX = 40                      # offres sans type de contrat affichées (bloc « à vérifier »)
 
