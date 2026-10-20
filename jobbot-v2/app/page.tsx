@@ -6,6 +6,7 @@ import {
   ageJours,
   lacunesRegroupees,
   meta,
+  nbSignalFormation,
   offresAvecContrat,
   offresSansContrat,
   sourceLabel,
@@ -15,7 +16,15 @@ import {
 export default function Home() {
   const meilleures = top(6);
   const reference = meilleures[0];
-  const nbFormation = offresAvecContrat.filter((o) => o.training_flag).length;
+  // Le signal n'est compté que s'il peut citer son extrait : un drapeau sans citation
+  // n'est pas une offre signalée, c'est une donnée incomplète.
+  const nbFormation = nbSignalFormation([...offresAvecContrat, ...offresSansContrat]);
+  const totalCollecte = offresAvecContrat.length + offresSansContrat.length;
+  // Zéro est un résultat, pas un vide : on le dit, plutôt que d'afficher « 0 offre(s) ».
+  const texteFormation =
+    nbFormation === 0
+      ? `Sur les ${totalCollecte} annonces de cette collecte, aucune ne déclenche ce signal.`
+      : `${nbFormation} annonce${nbFormation > 1 ? "s" : ""} le déclenche${nbFormation > 1 ? "nt" : ""} dans cette collecte.`;
   const vues7j = offresAvecContrat.filter((o) => {
     const j = ageJours(o);
     return j !== null && j <= 7;
@@ -203,7 +212,7 @@ export default function Home() {
             {[
               {
                 t: "Le signal « formation imposée »",
-                d: `Un stage publié par un organisme de formation qui impose son école, c'est du sourcing, pas un poste. JobBot le repère et le dit, toujours en citant l'extrait qui a déclenché le signal. ${nbFormation} offre(s) signalée(s) aujourd'hui.`,
+                d: `Un stage publié par un organisme de formation qui impose son école, c'est du sourcing, pas un poste. JobBot le repère et le dit, toujours en citant l'extrait qui a déclenché le signal. ${texteFormation}`,
               },
               {
                 t: "Les règles françaises d'éligibilité",

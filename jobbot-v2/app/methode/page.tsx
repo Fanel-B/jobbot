@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { meta, sourceLabel } from "@/lib/offers";
+import { meta, nbSignalFormation, offers, sourceLabel } from "@/lib/offers";
 
 const SOURCES_DETAIL: Record<string, string> = {
   "sopra-steria": "Site carrière de l'entreprise (interface publique de recrutement).",
@@ -17,6 +17,7 @@ const SOURCES_DETAIL: Record<string, string> = {
 
 export default function Page() {
   const sources = Object.entries(meta.sources).sort((a, b) => b[1] - a[1]);
+  const nbFormation = nbSignalFormation(offers);
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-12">
@@ -131,7 +132,14 @@ export default function Page() {
             <em>Type de contrat non renseigné</em> » et sort du classement principal.
           </li>
           <li>Ajouter une compétence à ton CV parce qu&apos;une offre la demande.</li>
-          <li>Accuser une entreprise : le signal « formation imposée » cite toujours son extrait.</li>
+          <li>
+            Accuser une entreprise : le signal « formation imposée » n&apos;est affiché que
+            lorsqu&apos;il peut citer l&apos;extrait qui l&apos;a déclenché. Sans extrait, pas de
+            signal.{" "}
+            {nbFormation === 0
+              ? `Aucune des ${meta.count} annonces de cette collecte ne le déclenche.`
+              : `${nbFormation} annonce(s) le déclenchent dans cette collecte.`}
+          </li>
           <li>Te faire croire qu&apos;un compte donne accès à de meilleures offres.</li>
         </ul>
       </section>

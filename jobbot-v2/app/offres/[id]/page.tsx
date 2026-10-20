@@ -18,6 +18,7 @@ import {
   fraicheur,
   offers,
   parId,
+  signalFormationCitable,
   sourceLabel,
 } from "@/lib/offers";
 
@@ -84,7 +85,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             <ContractChip offre={offre} />
             <SourceChip source={offre.source} />
             <ZoneChip zone={offre.location_zone} />
-            {offre.training_flag ? <TrainingChip /> : null}
+            {signalFormationCitable(offre) ? <TrainingChip /> : null}
             <FreshnessChip offre={offre} />
             {offre.miage_mentioned ? <InfoChip>MIAGE mentionné</InfoChip> : null}
           </div>
@@ -100,7 +101,8 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             </div>
           ) : null}
 
-          {offre.training_flag ? (
+          {/* Jamais d'accusation sans citation : le bloc n'existe que si l'extrait existe. */}
+          {signalFormationCitable(offre) ? (
             <div className="mt-6 rounded-card border border-warn/30 bg-warn-soft p-5">
               <p className="text-sm font-medium text-warn">
                 ⚠ Offre à vérifier — signaux d&apos;un organisme de formation
@@ -111,7 +113,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                 qui a déclenché le signal.
               </p>
               <blockquote className="mt-3 border-l-2 border-warn/40 pl-3 text-sm italic text-ink-soft">
-                {offre.training_excerpt ?? "extrait non disponible"}
+                {offre.training_excerpt}
               </blockquote>
             </div>
           ) : null}

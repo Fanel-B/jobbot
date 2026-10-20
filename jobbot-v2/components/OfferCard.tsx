@@ -7,7 +7,7 @@ import {
   TrainingChip,
   ZoneChip,
 } from "@/components/Chips";
-import { contratLabel, estNonRenseigne } from "@/lib/offers";
+import { contratLabel, estNonRenseigne, signalFormationCitable } from "@/lib/offers";
 import type { Offer } from "@/lib/offers";
 
 /** Une ligne d'offre : dense, scannable, tout ce qui décide est visible sans cliquer. */
@@ -49,7 +49,7 @@ export function OfferRow({ offre, rang }: { offre: Offer; rang?: number }) {
                 {offre.duration}
               </span>
             ) : null}
-            {offre.training_flag ? <TrainingChip /> : null}
+            {signalFormationCitable(offre) ? <TrainingChip /> : null}
             <FreshnessChip offre={offre} />
           </div>
 
