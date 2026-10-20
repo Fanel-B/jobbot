@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { OfferRow } from "@/components/OfferCard";
 import {
+  compterFamilles,
+  filtrerParContrat,
   offresAvecContrat,
   offresSansContrat,
   sourceLabel,
@@ -27,15 +29,9 @@ function filtrer(offres: Offer[], p: Params): Offer[] {
     out = out.filter((o) => o.location_zone === p.zone);
   }
 
-  const type = (p.type ?? "tous").toLowerCase();
-  if (type === "stage") out = out.filter((o) => (o.contract_kinds ?? []).includes("stage"));
-  if (type === "alternance") {
-    out = out.filter((o) =>
-      (o.contract_kinds ?? []).some((k) => k === "alternance" || k === "apprentissage"),
-    );
-  }
-  // Les offres dont la source ne donne pas le type de contrat : un bloc à part, jamais mélangé.
-  if (type === "non-renseigne") out = out.filter((o) => !o.contract_known);
+  // Une seule porte d'entrée pour le contrat : les familles sont exclusives et couvrent tout,
+  // donc aucune annonce ne peut échapper à l'ensemble des filtres (cf. lib/offers.ts).
+  out = filtrerParContrat(out, p.type);
 
   if (p.source) out = out.filter((o) => o.source === p.source);
 
@@ -83,7 +79,15 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
 
   const sources = [...new Set(offresAvecContrat.map((o) => o.source))].sort();
   const nonRenseigne = (p.type ?? "").toLowerCase() === "non-renseigne";
-  const nbNonRenseigne = offresSansContrat.length;
+
+  // Les comptes affichés sur les filtres de contrat tiennent compte du lieu, de la source et de
+  // la note mini déjà choisis : un compte global mentirait dès qu'un autre filtre est actif.
+  const comptes = compterFamilles(filtrer(toutes, { ...p, type: undefined }));
+  // Le compte sur l'ensemble de la collecte, lui, sert à distinguer « ce filtre-ci ne donne
+  // rien » de « cette collecte ne contient aucune offre de ce type ».
+  const comptesCollecte = compterFamilles(toutes);
+  const nbNonRenseigne = comptes["non-renseigne"];
+  const alternanceVide = (p.type ?? "").toLowerCase() === "alternance" && comptesCollecte.alternance === 0;
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-10">
@@ -126,11 +130,18 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
             Tous
           </Filtre>
           <Filtre actif={p.type === "stage"} href={lien({ ...p, type: "stage" })}>
-            Stage
+            Stage ({comptes.stage})
           </Filtre>
           <Filtre actif={p.type === "alternance"} href={lien({ ...p, type: "alternance" })}>
-            Alternance
+            Alternance ({comptes.alternance})
           </Filtre>
+          {/* « Autre » n'apparaît que s'il y a vraiment un type renseigné hors stage et
+              alternance : un filtre vide en permanence serait du bruit. */}
+          {comptes.autre > 0 ? (
+            <Filtre actif={p.type === "autre"} href={lien({ ...p, type: "autre" })}>
+              Autre type ({comptes.autre})
+            </Filtre>
+          ) : null}
           <Filtre actif={nonRenseigne} href={lien({ ...p, type: "non-renseigne" })}>
             Type non renseigné ({nbNonRenseigne})
           </Filtre>
@@ -182,12 +193,27 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
       ) : null}
 
       {vues.length === 0 ? (
-        <p className="py-16 text-center text-sm text-muted">
-          Aucune offre ne correspond à ces filtres.{" "}
-          <Link href="/offres" className="text-accent underline">
-            Réinitialiser
-          </Link>
-        </p>
+        <div className="py-16 text-center">
+          {alternanceVide ? (
+            /* Une liste vide sans explication laisse croire à une panne. Ici l'absence est une
+               décision, documentée côté pipeline (reference/eligibility.py) — on la dit. */
+            <p className="mx-auto max-w-xl text-sm leading-relaxed text-muted">
+              Aucune offre d&apos;alternance dans cette collecte, et ce n&apos;est pas un défaut
+              d&apos;affichage : la recherche d&apos;alternance est{" "}
+              <strong className="font-medium text-ink-soft">volontairement en pause</strong>. La L3
+              se termine par un stage ; l&apos;alternance reprend en janvier 2027, pour la M1/M2.
+              Le pipeline met ces annonces de côté jusque-là et pourra les réintégrer sans rien
+              recollecter.
+            </p>
+          ) : (
+            <p className="text-sm text-muted">Aucune offre ne correspond à ces filtres.</p>
+          )}
+          <p className="mt-4 text-sm">
+            <Link href="/offres" className="text-accent underline">
+              Réinitialiser les filtres
+            </Link>
+          </p>
+        </div>
       ) : (
         <div className="mt-6 card overflow-hidden">
           {vues.map((o, i) => (

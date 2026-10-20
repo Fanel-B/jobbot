@@ -230,6 +230,110 @@ export function estNonRenseigne(o: Offer): boolean {
   return !o.contract_known;
 }
 
+/* ------------------------------------------------- familles de contrat */
+
+/**
+ * Les quatre familles de contrat. Chaque offre appartient à **une et une seule** d'entre elles :
+ * c'est cette propriété qui garantit qu'aucune annonce ne tombe entre deux filtres.
+ */
+export type FamilleContrat = "stage" | "alternance" | "autre" | "non-renseigne";
+
+export const FAMILLES_CONTRAT: FamilleContrat[] = [
+  "stage",
+  "alternance",
+  "autre",
+  "non-renseigne",
+];
+
+/**
+ * Normalise un type de contrat écrit en clair par la source.
+ *
+ * Les sources n'emploient pas un vocabulaire fermé : « Stage (d'après l'alerte) », « STAGE » et
+ * « Contrat de professionnalisation » désignent ce qu'un lecteur range sous un seul type. On
+ * retire donc les accents, la casse, la ponctuation et les précisions entre parenthèses.
+ *
+ * Le défaut que cette fonction corrige : `["stage (d'après l'alerte)"].includes("stage")` vaut
+ * **faux**, parce que `includes` sur un tableau teste l'égalité exacte de l'élément et non une
+ * sous-chaîne. Deux offres ne ressortaient donc dans aucun filtre de contrat.
+ */
+export function normaliserContrat(brut: string): string {
+  return sansAccents(brut)
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+const MOTS_STAGE = ["stage", "stages", "stagiaire", "stagiaires", "internship", "internships"];
+const MOTS_ALTERNANCE = [
+  "alternance",
+  "alternances",
+  "alternant",
+  "alternante",
+  "apprentissage",
+  "apprentissages",
+  "apprenti",
+  "apprentie",
+  "apprentis",
+  "professionnalisation",
+];
+
+/** Comparaison **mot entier** : « stage » ne doit pas se reconnaître dans « stagerie ». */
+function contientMot(texte: string, mots: string[]): boolean {
+  return texte.split(" ").some((jeton) => jeton !== "" && mots.includes(jeton));
+}
+
+/**
+ * La famille d'une offre. Sans type de contrat connu → « non-renseigne » ; sinon c'est le
+ * vocabulaire de la source qui décide, et « autre » recueille ce qui est renseigné mais ne
+ * rentre dans aucune des deux catégories du site.
+ *
+ * L'alternance l'emporte sur le stage quand une annonce cite les deux : c'est le type le plus
+ * contraignant (rythme, durée, école), celui qu'il faut voir avant de postuler. Aucune offre de
+ * l'export courant ne porte deux types ; la règle existe pour que le classement reste total.
+ */
+export function familleContrat(o: Offer): FamilleContrat {
+  if (!o.contract_known) return "non-renseigne";
+  const formes = [...(o.contract_kinds ?? []), o.contract_type ?? ""].map(normaliserContrat);
+  if (formes.some((f) => contientMot(f, MOTS_ALTERNANCE))) return "alternance";
+  if (formes.some((f) => contientMot(f, MOTS_STAGE))) return "stage";
+  return "autre";
+}
+
+/** Filtre par famille. Une valeur absente, « tous » ou inconnue ne filtre rien. */
+export function filtrerParContrat(offres: Offer[], type: string | undefined): Offer[] {
+  const demande = (type ?? "").toLowerCase() as FamilleContrat;
+  if (!FAMILLES_CONTRAT.includes(demande)) return offres;
+  return offres.filter((o) => familleContrat(o) === demande);
+}
+
+/** Combien d'offres par famille — ce qui permet d'afficher le compte sur chaque filtre. */
+export function compterFamilles(offres: Offer[]): Record<FamilleContrat, number> {
+  const comptes: Record<FamilleContrat, number> = {
+    stage: 0,
+    alternance: 0,
+    autre: 0,
+    "non-renseigne": 0,
+  };
+  for (const o of offres) comptes[familleContrat(o)] += 1;
+  return comptes;
+}
+
+/* ------------------------------------------- signal « formation imposée » */
+
+/**
+ * Le signal n'est affichable que s'il peut être **cité**. C'est la règle 5 du briefing : jamais
+ * d'accusation sans l'extrait qui l'a déclenchée. Un drapeau levé sans extrait est un défaut de
+ * collecte, pas une raison de mettre en cause une entreprise — on n'affiche alors rien.
+ */
+export function signalFormationCitable(o: Offer): boolean {
+  return o.training_flag && (o.training_excerpt ?? "").trim().length > 0;
+}
+
+/** Combien d'annonces portent le signal, extrait à l'appui. Peut valoir zéro, et c'est un fait. */
+export function nbSignalFormation(offres: Offer[]): number {
+  return offres.filter(signalFormationCitable).length;
+}
+
 /* ------------------------------------------------------------- recherche */
 
 export function parId(id: string): Offer | undefined {
