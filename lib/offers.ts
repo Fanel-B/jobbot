@@ -7,6 +7,7 @@
  * tourne en production.
  */
 import raw from "@/data/offers.json";
+import { classer, maintenantDeLExport, ordreDuPipeline } from "./scoring";
 
 export type Breakdown = {
   critere: string;
@@ -67,7 +68,21 @@ type Payload = { meta: Meta; offers: Offer[] };
 const data = raw as unknown as Payload;
 
 export const meta: Meta = data.meta;
-export const offers: Offer[] = data.offers;
+
+/**
+ * La note affichée est recalculée par `lib/scoring.ts`, à l'heure du calcul du pipeline. Ce portage
+ * est vérifié contre l'oracle (`npm run verifier-scoring` : zéro désaccord sur la note, les points et
+ * les libellés) — c'est ce qui permettra plus tard de recalculer pour un autre profil.
+ */
+const recalcul = new Map(
+  classer(ordreDuPipeline(data.offers), maintenantDeLExport(data.meta.generated_at)).map((r) => [r.id, r]),
+);
+
+export const offers: Offer[] = data.offers.map((o) => {
+  const r = recalcul.get(o.id);
+  if (!r) return o;
+  return { ...o, score: r.total, score_breakdown: r.breakdown, score_reasons: r.raisons };
+});
 
 /* ---------------------------------------------------------------- libellés */
 
