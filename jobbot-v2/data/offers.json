@@ -1,19 +1,19 @@
 {
  "meta": {
-  "generated_at": "2026-10-20T02:33:48+00:00",
-  "count": 224,
+  "generated_at": "2026-10-20T10:35:38+00:00",
+  "count": 230,
   "sources": {
-   "airbus": 28,
-   "thales": 23,
+   "airbus": 29,
+   "thales": 27,
    "sopra-steria": 21,
    "sii": 17,
    "atos": 8,
-   "capgemini": 16,
+   "capgemini": 17,
    "cnes": 3,
    "linkedin": 108
   },
   "zones": {
-   "toulouse": 188,
+   "toulouse": 194,
    "idf": 8,
    "remote": 6,
    "autre": 22
@@ -49,7 +49,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16",
    "first_seen_at": "2026-10-16 09:03:42",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 81,
    "score_breakdown": [
@@ -159,7 +159,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15",
    "first_seen_at": "2026-10-15 00:34:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 79,
    "score_breakdown": [
@@ -279,7 +279,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 78,
    "score_breakdown": [
@@ -398,7 +398,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16",
    "first_seen_at": "2026-10-16 10:03:42",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 76,
    "score_breakdown": [
@@ -517,7 +517,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-01",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 75,
    "score_breakdown": [
@@ -628,7 +628,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19",
    "first_seen_at": "2026-10-19 11:04:32",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 74,
    "score_breakdown": [
@@ -734,7 +734,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 74,
    "score_breakdown": [
@@ -979,7 +979,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-29",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 73,
    "score_breakdown": [
@@ -1099,7 +1099,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-16 11:03:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 72,
    "score_breakdown": [
@@ -1231,7 +1231,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19",
    "first_seen_at": "2026-10-19 12:05:26",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 72,
    "score_breakdown": [
@@ -1346,7 +1346,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-30",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 72,
    "score_breakdown": [
@@ -1454,7 +1454,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16",
    "first_seen_at": "2026-10-16 07:03:36",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 71,
    "score_breakdown": [
@@ -1575,7 +1575,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 70,
    "score_breakdown": [
@@ -1695,7 +1695,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 70,
    "score_breakdown": [
@@ -1812,7 +1812,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-16 11:03:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 67,
    "score_breakdown": [
@@ -1931,7 +1931,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15",
    "first_seen_at": "2026-10-17 02:03:45",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 66,
    "score_breakdown": [
@@ -2031,7 +2031,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13 17:10:39",
    "first_seen_at": "2026-10-13 18:01:07",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 65,
    "score_breakdown": [
@@ -2081,7 +2081,7 @@
      "critere": "fraîcheur",
      "points": 5,
      "max": 12,
-     "detail": "il y a 6 j"
+     "detail": "il y a 7 j"
     },
     {
      "critere": "diversité",
@@ -2098,8 +2098,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 6 j)",
-    "⏳ dernier appel : expire dans 1 j",
+    "fraîcheur 5/12 (il y a 7 j)",
+    "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (telys — 1ᵉ place)"
    ],
    "skills": {
@@ -2138,7 +2138,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13 17:10:39",
    "first_seen_at": "2026-10-13 18:01:07",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 65,
    "score_breakdown": [
@@ -2188,7 +2188,7 @@
      "critere": "fraîcheur",
      "points": 5,
      "max": 12,
-     "detail": "il y a 6 j"
+     "detail": "il y a 7 j"
     },
     {
      "critere": "diversité",
@@ -2205,8 +2205,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 6 j)",
-    "⏳ dernier appel : expire dans 1 j",
+    "fraîcheur 5/12 (il y a 7 j)",
+    "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (viveris — 1ᵉ place)"
    ],
    "skills": {
@@ -2246,7 +2246,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 10:36:01",
    "first_seen_at": "2026-10-14 11:01:10",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 65,
    "score_breakdown": [
@@ -2353,7 +2353,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 10:36:01",
    "first_seen_at": "2026-10-14 11:01:10",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 65,
    "score_breakdown": [
@@ -2465,7 +2465,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-16 11:03:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 65,
    "score_breakdown": [
@@ -2580,7 +2580,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-18",
    "first_seen_at": "2026-10-20 02:04:13",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 65,
    "score_breakdown": [
@@ -2680,7 +2680,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19 13:10:41",
    "first_seen_at": "2026-10-19 14:05:33",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 63,
    "score_breakdown": [
@@ -2778,7 +2778,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19 13:10:41",
    "first_seen_at": "2026-10-19 14:05:33",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 63,
    "score_breakdown": [
@@ -2878,7 +2878,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19 13:10:41",
    "first_seen_at": "2026-10-19 14:05:33",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 62,
    "score_breakdown": [
@@ -2987,7 +2987,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 62,
    "score_breakdown": [
@@ -3099,7 +3099,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19 10:36:26",
    "first_seen_at": "2026-10-19 11:04:32",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 62,
    "score_breakdown": [
@@ -3203,7 +3203,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-17 19:10:41",
    "first_seen_at": "2026-10-17 20:03:35",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 60,
    "score_breakdown": [
@@ -3253,7 +3253,7 @@
      "critere": "fraîcheur",
      "points": 9,
      "max": 12,
-     "detail": "il y a 2 j"
+     "detail": "il y a 3 j"
     },
     {
      "critere": "diversité",
@@ -3270,8 +3270,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 9/12 (il y a 2 j)",
-    "fenêtre : 5 j restants",
+    "fraîcheur 9/12 (il y a 3 j)",
+    "fenêtre : 4 j restants",
     "diversité 14/14 (klanik — 1ᵉ place)"
    ],
    "skills": {
@@ -3303,7 +3303,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-17 13:10:42",
    "first_seen_at": "2026-10-17 14:03:50",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 60,
    "score_breakdown": [
@@ -3407,7 +3407,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-21",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 59,
    "score_breakdown": [
@@ -3513,7 +3513,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19 13:10:41",
    "first_seen_at": "2026-10-19 14:05:33",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 58,
    "score_breakdown": [
@@ -3611,7 +3611,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 10:36:37",
    "first_seen_at": "2026-10-16 11:03:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 58,
    "score_breakdown": [
@@ -3709,7 +3709,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15 15:10:41",
    "first_seen_at": "2026-10-15 16:04:08",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 58,
    "score_breakdown": [
@@ -3759,7 +3759,7 @@
      "critere": "fraîcheur",
      "points": 7,
      "max": 12,
-     "detail": "il y a 4 j"
+     "detail": "il y a 5 j"
     },
     {
      "critere": "diversité",
@@ -3776,8 +3776,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 7/12 (il y a 4 j)",
-    "fenêtre : 3 j restants",
+    "fraîcheur 7/12 (il y a 5 j)",
+    "fenêtre : 2 j restants",
     "diversité 14/14 (toulouse hybride — 1ᵉ place)"
    ],
    "skills": {
@@ -3811,7 +3811,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19",
    "first_seen_at": "2026-10-19 13:04:54",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 58,
    "score_breakdown": [
@@ -3924,7 +3924,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15 11:10:40",
    "first_seen_at": "2026-10-15 12:03:43",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 58,
    "score_breakdown": [
@@ -4026,7 +4026,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-06",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 58,
    "score_breakdown": [
@@ -4135,7 +4135,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 11:10:41",
    "first_seen_at": "2026-10-16 12:04:02",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 58,
    "score_breakdown": [
@@ -4237,7 +4237,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-01",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 58,
    "score_breakdown": [
@@ -4352,7 +4352,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16",
    "first_seen_at": "2026-10-16 09:03:42",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 57,
    "score_breakdown": [
@@ -4471,7 +4471,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 10:36:37",
    "first_seen_at": "2026-10-16 11:03:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 57,
    "score_breakdown": [
@@ -4577,7 +4577,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 21:10:40",
    "first_seen_at": "2026-10-16 22:04:02",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 57,
    "score_breakdown": [
@@ -4627,7 +4627,7 @@
      "critere": "fraîcheur",
      "points": 7,
      "max": 12,
-     "detail": "il y a 3 j"
+     "detail": "il y a 4 j"
     },
     {
      "critere": "diversité",
@@ -4644,8 +4644,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 7/12 (il y a 3 j)",
-    "fenêtre : 4 j restants",
+    "fraîcheur 7/12 (il y a 4 j)",
+    "fenêtre : 3 j restants",
     "diversité 14/14 (tohtem — 1ᵉ place)"
    ],
    "skills": {
@@ -4656,6 +4656,347 @@
      "Java"
     ],
     "missing": []
+   }
+  },
+  {
+   "id": 903,
+   "source": "thales",
+   "source_offer_id": "STAGE---Ingnieur-Dveloppement--Intgration-et-Validation-de-services-de-dynamique-du-vol-spatial---F-H_R0344203-2",
+   "canonical_url": "https://thales.wd3.myworkdayjobs.com/fr-FR/Careers/job/Toulouse/STAGE---Ingnieur-Dveloppement--Intgration-et-Validation-de-services-de-dynamique-du-vol-spatial---F-H_R0344203-2",
+   "title": "STAGE - Ingénieur Développement, Intégration et Validation de services de dynamique du vol spatial - F/H",
+   "company": "Thales",
+   "location": "Toulouse",
+   "location_zone": "toulouse",
+   "contract_type": "Stage",
+   "contract_known": true,
+   "contract_kinds": [
+    "stage"
+   ],
+   "duration": null,
+   "start_date": null,
+   "education_required": null,
+   "description": "Lieu : Toulouse, France \n Construisons ensemble un avenir de confiance \n Thales est un leader mondial des hautes technologies spécialisé dans trois secteurs d’activité : Défense & Sécurité, Aéronautique & Spatial, et Cyber & Digital. Il développe des produits et solutions qui contribuent à un monde plus sûr, plus respectueux de l’environnement et plus inclusif. Le Groupe investit près de 4,5 milliards d’euros par an en Recherche & Développement, notamment dans des domaines clés de l’innovation tels que l’IA, la cybersécurité, le quantique, les technologies du cloud et la 6G. Thales compte près de 85 000 collaborateurs dans 65 pays. ​\n Nos engagements, vos avantages Notre savoir-faire technologique\n Notre attention portée à l’équilibre des collaborateurs\n Un environnement inclusif et bienveillant\n Un engagement sociétal et environnemental reconnu (Thales Solidarity, indice CAC 40 ESG…)\n Votre quotidien En rejoignant le site de Toulouse, vous intégrez un site regroupant nos solutions de cyberdéfense souveraines pour faire face aux menaces informatiques croissantes et nos activités de services numériques permettant d’opérer les systèmes d’informations critiques de nos clients et de les accompagner dans leur transformation numérique sécurisée. \n Vous intégrez l’équipe Flight Dynamic System, qui regroupe une dizaine d'ingénieurs métier, et serez encadré par l’un d’entre eux.\n Le FDS est un logiciel opérationnel développé par THALES et utilisé dans des centres de contrôle pour simuler et valider des scénarios liés à la dynamique du vol des missions spatiales.\n L’objectif du stage est de participer à l’évolution future du FDS. Votre contribution portera principalement sur le déploiement et la validation d’algorithmes de dynamique du vol sur une nouvelle plateforme de service.\n Vos principales missions sont :\n Prise en main de l’architecture logicielle cible et les briques de dynamique du vol,\n Participation à l’intégration d’algorithmes de dynamique du vol dans la chaîne logicielle du futur FDS,\n Mise en place et exécution des procédures de validation (comparaison à des références, vérifications de cohérence, analyse des écarts).\n Production d’un rapport clair : documenter le code produit, les procédures de validation, identifier les limitations ainsi que les perspectives.\n Votre profil : \n Vous êtes à la recherche d'un stage de 6 mois? \n Vous effectuez une formation de niveau Bac+5 en école d'Ingénieur ou équivalent à dominante Informatique et Spatial et vous avez des compétences sur : \n Maîtrise d'un langage de programmation orientée objet: JAVA, \n Bases solides en mathématiques appliquées et en algorithmie,\n Connaissances en mécanique du vol spatial et en manœuvres orbitales,\n Notions d’architecture logicielle. \n Autonomie, curiosité, travail en équipe et rigueur sont des atouts que l'on vous reconnait? \n Alors ce poste est fait pour vous ! \nTous nos stages sont conventionnés et soumis à une gratification dont le montant est déterminé selon votre niveau d’études. \nThales, entreprise Handi-Engagée, reconnait tous les talents. La diversité est notre meilleur atout. Postulez et rejoignez nous !",
+   "skills_required": [
+    "Java"
+   ],
+   "training_flag": false,
+   "training_excerpt": null,
+   "published_at": "2026-10-20",
+   "first_seen_at": "2026-10-20 08:04:30",
+   "last_seen_at": "2026-10-20 10:04:48",
+   "miage_mentioned": false,
+   "score": 57,
+   "score_breakdown": [
+    {
+     "critere": "cohérence",
+     "points": 14,
+     "max": 30,
+     "detail": "1/2 exigences + Biblio-Tech"
+    },
+    {
+     "critere": "métier",
+     "points": 12,
+     "max": 12,
+     "detail": "développement full stack"
+    },
+    {
+     "critere": "source",
+     "points": 8,
+     "max": 8,
+     "detail": "site carrière vérifiable"
+    },
+    {
+     "critere": "fiche",
+     "points": 6,
+     "max": 6,
+     "detail": "fiche complète (2 technos)"
+    },
+    {
+     "critere": "calendrier",
+     "points": 3,
+     "max": 8,
+     "detail": "date de début inconnue — à confirmer"
+    },
+    {
+     "critere": "dépôt",
+     "points": 2,
+     "max": 6,
+     "detail": "compte + 8 étapes"
+    },
+    {
+     "critere": "dossier",
+     "points": 0,
+     "max": 4,
+     "detail": "rien de fait"
+    },
+    {
+     "critere": "fraîcheur",
+     "points": 12,
+     "max": 12,
+     "detail": "il y a 0 j"
+    },
+    {
+     "critere": "diversité",
+     "points": 0,
+     "max": 14,
+     "detail": "plafond atteint chez Thales (et Thales Alenia Space)"
+    }
+   ],
+   "score_reasons": [
+    "cohérence 14/30 (1/2 exigences + Biblio-Tech)",
+    "métier 12/12 (développement full stack)",
+    "source 8/8 (site carrière vérifiable)",
+    "fiche 6/6 (fiche complète (2 technos))",
+    "calendrier 3/8 (date de début inconnue — à confirmer)",
+    "dépôt 2/6 (compte + 8 étapes)",
+    "dossier 0/4 (rien de fait)",
+    "fraîcheur 12/12 (il y a 0 j)",
+    "fenêtre : 7 j restants",
+    "diversité 0/14 (plafond atteint chez Thales (et Thales Alenia Space))"
+   ],
+   "skills": {
+    "required": [
+     "Java",
+     "IA"
+    ],
+    "covered": [
+     "Java"
+    ],
+    "missing": [
+     "IA"
+    ]
+   }
+  },
+  {
+   "id": 902,
+   "source": "thales",
+   "source_offer_id": "Stage---Ingnieur-Surveillance-de-l-Espace-et-Analyse-de-Donnes-Spatiales---F-H---F-H_R0344484-1",
+   "canonical_url": "https://thales.wd3.myworkdayjobs.com/fr-FR/Careers/job/Toulouse/Stage---Ingnieur-Surveillance-de-l-Espace-et-Analyse-de-Donnes-Spatiales---F-H---F-H_R0344484-1",
+   "title": "Stage - Ingénieur Surveillance de l'Espace et Analyse de Données Spatiales – F/H - F/H",
+   "company": "Thales",
+   "location": "Toulouse",
+   "location_zone": "toulouse",
+   "contract_type": "Stage",
+   "contract_known": true,
+   "contract_kinds": [
+    "stage"
+   ],
+   "duration": null,
+   "start_date": null,
+   "education_required": null,
+   "description": "Lieu : Toulouse, France \n Construisons ensemble un avenir de confiance \n Thales est un leader mondial des hautes technologies spécialisé dans trois secteurs d’activité : Défense & Sécurité, Aéronautique & Spatial, et Cyber & Digital. Il développe des produits et solutions qui contribuent à un monde plus sûr, plus respectueux de l’environnement et plus inclusif. Le Groupe investit près de 4,5 milliards d’euros par an en Recherche & Développement, notamment dans des domaines clés de l’innovation tels que l’IA, la cybersécurité, le quantique, les technologies du cloud et la 6G. Thales compte près de 85 000 collaborateurs dans 65 pays. ​\n Nos engagements, vos avantages Notre savoir-faire technologique\n Notre attention portée à l’équilibre des collaborateurs\n Un environnement inclusif et bienveillant\n Un engagement sociétal et environnemental reconnu (Thales Solidarity, indice CAC 40 ESG…)\n Votre quotidien Le site de Toulouse Champollion regroupe les activités de l’ingénierie de systèmes satellites, de la conception et réalisation de charges utiles, et du développement et qualification de segments sol. Il intègre également un centre de recherche et un accélérateur industriel de start-up et ventures, ainsi que les activités relevant de la science des très basses températures, avec le développement et la production de refroidisseurs micromécaniques pour des marchés exigeants. \n Thales Alenia Space conçoit et livre des solutions innovantes pour les télécommunications, la navigation, l’observation de la Terre, l’exploration spatiale et les infrastructures orbitales. Vous intégrez le département Système et Segment Sol dédié à l’observation de la Terre. Ce département travaille sur la surveillance de l’espace, notamment en établissant et en maintenant un catalogue des objets spatiaux à partir des données de surveillance. Vous contribuez à la mise au point d’une chaîne de catalogage alimentée par des mesures réelles, au sol et depuis l’espace, en adaptant et en optimisant cette chaîne pour un usage combiné sol/espace.\n Vos missions sont : \n Comprendre le fonctionnement général d’une chaine de catalogage de surveillance de l’espace,\n Caractériser les données de surveillance de l’espace utilisées en entrée de cette chaine (fréquence de leur disponibilité, volume de données disponibles, latence, etc…)\n Adapter la chaine à l’usage de mesures en provenance de l’espace en identifiant et implémentant les modifications/améliorations de cette chaine\n Définir et mettre en place des indices de performance et de reporting sur cette chaine de processing afin de mieux appréhender son fonctionnement et ses performances.\n Tester cette chaine sur des données simulées puis réelles de surveillance de l’espace,\n Le tout afin d’obtenir une chaine de catalogage opérationnelle sur des mesures sol et spatiales en fin de stage. \n Votre profil Votre priorité est d'effectuer un stage de 4 à 6 mois ?\n Vous avez envie de découvrir la surveillance de l’espace / gestion du trafic spatial? \n Vous êtes en bac+4/5 en école d’ingénieur ou équivalent à dominante informatique ?\n Vous avez des compétences en :\n Python\n Bases de données\n Algorithmie (définition, implémentation, performance)\n mécanique spatiale (bases)\n Curiosité, ténacité, esprit d'initiative et travail en équipe sont des atouts que l'on vous reconnaît ?\n Alors ce stage est fait pour vous!\n Le mot de l'équipe \n Pour ce faire, vous serez encadré par des personnes expérimentées en Ingénierie et en Développement logiciel, et vous pourrez gagner en autonomie le long de ce stage. \n Ce stage sera l’opportunité pour vous de travailler en équipe au sein d’une entreprise innovante, de valoriser vos acquis académiques dans un environnement industriel et de développer de nouvelles compétences.\nTous nos stages sont conventionnés et soumis à une gratification dont le montant est déterminé selon votre niveau d’études. \nThales, entreprise Handi-Engagée, reconnait tous les talents. La diversité est notre meilleur atout. Postu",
+   "skills_required": [
+    "Python"
+   ],
+   "training_flag": false,
+   "training_excerpt": null,
+   "published_at": "2026-10-20",
+   "first_seen_at": "2026-10-20 08:04:30",
+   "last_seen_at": "2026-10-20 10:04:48",
+   "miage_mentioned": false,
+   "score": 57,
+   "score_breakdown": [
+    {
+     "critere": "cohérence",
+     "points": 14,
+     "max": 30,
+     "detail": "1/2 exigences + TechScope"
+    },
+    {
+     "critere": "métier",
+     "points": 12,
+     "max": 12,
+     "detail": "data / analyse"
+    },
+    {
+     "critere": "source",
+     "points": 8,
+     "max": 8,
+     "detail": "site carrière vérifiable"
+    },
+    {
+     "critere": "fiche",
+     "points": 6,
+     "max": 6,
+     "detail": "fiche complète (2 technos)"
+    },
+    {
+     "critere": "calendrier",
+     "points": 3,
+     "max": 8,
+     "detail": "date de début inconnue — à confirmer"
+    },
+    {
+     "critere": "dépôt",
+     "points": 2,
+     "max": 6,
+     "detail": "compte + 8 étapes"
+    },
+    {
+     "critere": "dossier",
+     "points": 0,
+     "max": 4,
+     "detail": "rien de fait"
+    },
+    {
+     "critere": "fraîcheur",
+     "points": 12,
+     "max": 12,
+     "detail": "il y a 0 j"
+    },
+    {
+     "critere": "diversité",
+     "points": 0,
+     "max": 14,
+     "detail": "plafond atteint chez Thales (et Thales Alenia Space)"
+    }
+   ],
+   "score_reasons": [
+    "cohérence 14/30 (1/2 exigences + TechScope)",
+    "métier 12/12 (data / analyse)",
+    "source 8/8 (site carrière vérifiable)",
+    "fiche 6/6 (fiche complète (2 technos))",
+    "calendrier 3/8 (date de début inconnue — à confirmer)",
+    "dépôt 2/6 (compte + 8 étapes)",
+    "dossier 0/4 (rien de fait)",
+    "fraîcheur 12/12 (il y a 0 j)",
+    "fenêtre : 7 j restants",
+    "diversité 0/14 (plafond atteint chez Thales (et Thales Alenia Space))"
+   ],
+   "skills": {
+    "required": [
+     "Python",
+     "IA"
+    ],
+    "covered": [
+     "Python"
+    ],
+    "missing": [
+     "IA"
+    ]
+   }
+  },
+  {
+   "id": 905,
+   "source": "airbus",
+   "source_offer_id": "Stage-2027---Stagiaire-en-Dveloppement-d-outils-IA-pour-la-conception-d-crans-de-cockpit--F-H-_JR10443690",
+   "canonical_url": "https://ag.wd3.myworkdayjobs.com/fr-FR/Airbus/job/Toulouse-Area/Stage-2027---Stagiaire-en-Dveloppement-d-outils-IA-pour-la-conception-d-crans-de-cockpit--F-H-_JR10443690",
+   "title": "Stage 2027 - Stagiaire en Développement d'outils IA pour la conception d'écrans de cockpit (F/H)",
+   "company": "Airbus",
+   "location": "Toulouse Area",
+   "location_zone": "toulouse",
+   "contract_type": "Stage",
+   "contract_known": true,
+   "contract_kinds": [
+    "stage"
+   ],
+   "duration": null,
+   "start_date": "2027-01-01",
+   "education_required": null,
+   "description": "Job Description: \n Envie de déployer vos ailes ? Et si votre aventure commençait avec nous ? \n Quel que soit le métier de vos rêves, nous avons peut-être le stage qu’il vous faut ! \n Vous rejoindrez une entreprise reconnue à l’international, implantée sur tous les continents du monde et riche d’une diversité de parcours, d’expertise et de culture. \n Tournée vers le digital, à la pointe de la recherche et de l’innovation, vous avez l’opportunité de faire partie de cette aventure passionnante. \n Opter pour un stage est une occasion unique de combiner savoirs acquis dans le cadre de votre formation et application de ces savoirs sur le terrain dans un environnement professionnel challengeant. L’équipe Airbus vous formera et vous accompagnera dans votre évolution tout au long de votr e période de stage.\n Une offre de stage intitulée « Stagiaire en Développement d'outils IA pour la conception d'écrans de cockpit d'aéronefs (F/H) » vient de s'ouvrir au sein d' Airbus Operations sur son site de Toulouse Saint Martin . \n Vous rejoindrez une équipe internationale (1YAKY) au sein du département « Cockpit Displays and Alerts » en charge du développement des écrans d'affichage et des mécanismes d'alerte pour les pilotes d'aéronefs . Ce stage consistera à : contribuer au développement de prototypes pour permettre l'intégration de tâches automatisées basées sur des modèles d'intelligence artificielle dans l'environnement de développement des systèmes d'affichage et d'alerte. \n Ce stage débutera en janvier á mars 2027 pour une durée de 6 mois . \n Ce poste nécessite une habilitation de sécurité ou nécessite d'être éligible à une habilitation par les autorités reconnues. \n Tâches et responsabilités : \n Encadré(e) par votre tuteur(trice), vous développerez vos compétences en travaillant sur les activités suivantes : \n Adaptation des agents IA : Explorer les adaptations possibles des agents IA dans la chaîne DevOps existante pour soutenir les activités de conception de systèmes.\n Prototypage d'agents : Développer des prototypes d'agents conformes à l'état de l'art DevOps.\n Intégration de pipelines : Développer des pipelines automatiques et les intégrer dans l'environnement de développement utilisé.\n Compétences & Prérequis : \n Vous préparez actuellement un diplôme de niveau Bac +5 (ou équivalent) dans le domaine de l'Ingénierie aéronautique ou logicielle pour un stage d’une durée de 6 mois . \n Vous avez les connaissances et compétences techniques (Hard Skills) suivantes : \n Développement logiciel : Python, JavaScript, Node.js \n Compréhension de l'écosystème DevOps et des outils associés : GitHub, Jira, Jenkins, Google Cloud Platform (GCP) \n Connaissance du processus de conception de systèmes avioniques et de la gestion des exigences en ingénierie système \n Développement d'environnements et d'outils liés à l'ingénierie système \n Vous vous reconnaissez dans ces qualités (Soft Skills) : \n Esprit d'équipe et capacité d'intégration au sein d'une équipe système intégrée \n Curiosité et proactivité \n Autonomie et capacité d'adaptation \n Compétences linguistiques : \n Anglais : Avancé \n Français : Avancé \n Vous pourrez, selon les offres proposées, être amené(e) à vous déplacer. \n Notre processus de sélection : \n L’étude des candidatures est réalisée par un recruteur. \n Si votre candidature est validée par le recruteur, vous serez invité(e) à réaliser un entretien vidéo différé. Cet entretien vidéo sera visionné par le recruteur. Si votre candidature est présélectionnée à l’issue de cette étape, elle sera transmise au/à la manager du poste. \n Le/la manager (et/ou tuteur(trice)) organisera des entretiens avec les candidat(e)s présélectionné(e) s avant de choisir le/la candidat(e) final(e) retenu(e) sur le poste. \n Avantages liés à l’entreprise : \n Notre engagement en faveur du bien-être de nos employés s'étend à la fois à leur vie professionnelle et à leur vie personnelle. \n Qu'il s'agisse de rémunérations compétitives ou de régimes de soins de santé complet",
+   "skills_required": [
+    "Python",
+    "JavaScript",
+    "Node.js",
+    "GitHub",
+    "GCP"
+   ],
+   "training_flag": false,
+   "training_excerpt": null,
+   "published_at": "2026-10-20",
+   "first_seen_at": "2026-10-20 09:04:37",
+   "last_seen_at": "2026-10-20 10:04:48",
+   "miage_mentioned": false,
+   "score": 57,
+   "score_breakdown": [
+    {
+     "critere": "cohérence",
+     "points": 17,
+     "max": 30,
+     "detail": "3/7 exigences + TechScope"
+    },
+    {
+     "critere": "métier",
+     "points": 12,
+     "max": 12,
+     "detail": "développement full stack"
+    },
+    {
+     "critere": "source",
+     "points": 8,
+     "max": 8,
+     "detail": "site carrière vérifiable"
+    },
+    {
+     "critere": "fiche",
+     "points": 6,
+     "max": 6,
+     "detail": "fiche complète (7 technos)"
+    },
+    {
+     "critere": "calendrier",
+     "points": 0,
+     "max": 8,
+     "detail": "⚠️ démarre le 2027-01-01 — tu es encore en cours"
+    },
+    {
+     "critere": "dépôt",
+     "points": 2,
+     "max": 6,
+     "detail": "compte + 8 étapes"
+    },
+    {
+     "critere": "dossier",
+     "points": 0,
+     "max": 4,
+     "detail": "rien de fait"
+    },
+    {
+     "critere": "fraîcheur",
+     "points": 12,
+     "max": 12,
+     "detail": "il y a 0 j"
+    },
+    {
+     "critere": "diversité",
+     "points": 0,
+     "max": 14,
+     "detail": "plafond atteint chez Airbus (et Airbus Protect, ATR, Atlantic)"
+    }
+   ],
+   "score_reasons": [
+    "cohérence 17/30 (3/7 exigences + TechScope)",
+    "métier 12/12 (développement full stack)",
+    "source 8/8 (site carrière vérifiable)",
+    "fiche 6/6 (fiche complète (7 technos))",
+    "calendrier 0/8 (⚠️ démarre le 2027-01-01 — tu es encore en cours)",
+    "dépôt 2/6 (compte + 8 étapes)",
+    "dossier 0/4 (rien de fait)",
+    "fraîcheur 12/12 (il y a 0 j)",
+    "fenêtre : 7 j restants",
+    "diversité 0/14 (plafond atteint chez Airbus (et Airbus Protect, ATR, Atlantic))"
+   ],
+   "skills": {
+    "required": [
+     "Python",
+     "JavaScript",
+     "Node.js",
+     "GCP",
+     "IA",
+     "intelligence artificielle",
+     "Jenkins"
+    ],
+    "covered": [
+     "Python",
+     "JavaScript",
+     "Node.js"
+    ],
+    "missing": [
+     "GCP",
+     "IA",
+     "intelligence artificielle",
+     "Jenkins"
+    ]
    }
   },
   {
@@ -4679,7 +5020,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 10:36:01",
    "first_seen_at": "2026-10-14 11:01:10",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 56,
    "score_breakdown": [
@@ -4777,7 +5118,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 17:10:40",
    "first_seen_at": "2026-10-14 18:01:27",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 56,
    "score_breakdown": [
@@ -4827,7 +5168,7 @@
      "critere": "fraîcheur",
      "points": 5,
      "max": 12,
-     "detail": "il y a 5 j"
+     "detail": "il y a 6 j"
     },
     {
      "critere": "diversité",
@@ -4844,8 +5185,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 5 j)",
-    "⏳ expire dans 2 j",
+    "fraîcheur 5/12 (il y a 6 j)",
+    "⏳ expire dans 1 j",
     "diversité 14/14 (viasante mutuelle — 1ᵉ place)"
    ],
    "skills": {
@@ -4875,7 +5216,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 17:10:40",
    "first_seen_at": "2026-10-14 18:01:27",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 56,
    "score_breakdown": [
@@ -4925,7 +5266,7 @@
      "critere": "fraîcheur",
      "points": 5,
      "max": 12,
-     "detail": "il y a 5 j"
+     "detail": "il y a 6 j"
     },
     {
      "critere": "diversité",
@@ -4942,8 +5283,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 5 j)",
-    "⏳ expire dans 2 j",
+    "fraîcheur 5/12 (il y a 6 j)",
+    "⏳ expire dans 1 j",
     "diversité 14/14 (labege — 1ᵉ place)"
    ],
    "skills": {
@@ -4973,7 +5314,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13 13:10:41",
    "first_seen_at": "2026-10-13 14:01:15",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 56,
    "score_breakdown": [
@@ -5075,7 +5416,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19",
    "first_seen_at": "2026-10-19 15:04:44",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 56,
    "score_breakdown": [
@@ -5192,7 +5533,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 13:10:40",
    "first_seen_at": "2026-10-14 14:01:11",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 56,
    "score_breakdown": [
@@ -5296,7 +5637,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19",
    "first_seen_at": "2026-10-19 09:04:14",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 56,
    "score_breakdown": [
@@ -5405,7 +5746,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13 15:10:39",
    "first_seen_at": "2026-10-13 16:01:13",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 56,
    "score_breakdown": [
@@ -5455,7 +5796,7 @@
      "critere": "fraîcheur",
      "points": 5,
      "max": 12,
-     "detail": "il y a 6 j"
+     "detail": "il y a 7 j"
     },
     {
      "critere": "diversité",
@@ -5472,8 +5813,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 6 j)",
-    "⏳ dernier appel : expire dans 1 j",
+    "fraîcheur 5/12 (il y a 7 j)",
+    "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (viseo — 1ᵉ place)"
    ],
    "skills": {
@@ -5507,7 +5848,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19",
    "first_seen_at": "2026-10-19 15:04:44",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 56,
    "score_breakdown": [
@@ -5612,7 +5953,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 10:36:01",
    "first_seen_at": "2026-10-14 11:01:10",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 56,
    "score_breakdown": [
@@ -5690,106 +6031,6 @@
    }
   },
   {
-   "id": 682,
-   "source": "linkedin",
-   "source_offer_id": "4320128495",
-   "canonical_url": "https://www.linkedin.com/jobs/view/4320128495",
-   "title": "[STAGE] Développeur Full Stack H/F",
-   "company": "SOCOTEC",
-   "location": null,
-   "location_zone": "autre",
-   "contract_type": "Stage",
-   "contract_known": true,
-   "contract_kinds": [
-    "stage"
-   ],
-   "duration": null,
-   "start_date": null,
-   "education_required": null,
-   "description": null,
-   "skills_required": [],
-   "training_flag": false,
-   "training_excerpt": null,
-   "published_at": "2026-10-13 07:10:41",
-   "first_seen_at": "2026-10-13 08:01:06",
-   "last_seen_at": "2026-10-20 02:04:13",
-   "miage_mentioned": false,
-   "score": 56,
-   "score_breakdown": [
-    {
-     "critere": "cohérence",
-     "points": 15,
-     "max": 30,
-     "detail": "0/0 exigences + Biblio-Tech"
-    },
-    {
-     "critere": "métier",
-     "points": 12,
-     "max": 12,
-     "detail": "développement full stack"
-    },
-    {
-     "critere": "source",
-     "points": 2,
-     "max": 8,
-     "detail": "alerte non vérifiable"
-    },
-    {
-     "critere": "fiche",
-     "points": 1,
-     "max": 6,
-     "detail": "fiche vide — ouvrir la page avant de postuler"
-    },
-    {
-     "critere": "calendrier",
-     "points": 3,
-     "max": 8,
-     "detail": "date de début inconnue — à confirmer"
-    },
-    {
-     "critere": "dépôt",
-     "points": 4,
-     "max": 6,
-     "detail": "alerte — il faut retrouver l'offre d'origine"
-    },
-    {
-     "critere": "dossier",
-     "points": 0,
-     "max": 4,
-     "detail": "rien de fait"
-    },
-    {
-     "critere": "fraîcheur",
-     "points": 5,
-     "max": 12,
-     "detail": "il y a 7 j"
-    },
-    {
-     "critere": "diversité",
-     "points": 14,
-     "max": 14,
-     "detail": "socotec — 1ᵉ place"
-    }
-   ],
-   "score_reasons": [
-    "cohérence 15/30 (0/0 exigences + Biblio-Tech)",
-    "métier 12/12 (développement full stack)",
-    "source 2/8 (alerte non vérifiable)",
-    "fiche 1/6 (fiche vide — ouvrir la page avant de postuler)",
-    "calendrier 3/8 (date de début inconnue — à confirmer)",
-    "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
-    "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 7 j)",
-    "⏳ dernier appel : expire dans 0 j",
-    "diversité 14/14 (socotec — 1ᵉ place)"
-   ],
-   "skills": {
-    "required": [],
-    "covered": [],
-    "missing": []
-   }
-  },
-  {
    "id": 837,
    "source": "airbus",
    "source_offer_id": "ATR---Internship---Flight-Data-Analysis-and-IA_JR10450784",
@@ -5817,7 +6058,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16",
    "first_seen_at": "2026-10-16 11:03:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 55,
    "score_breakdown": [
@@ -5934,7 +6175,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 23:10:41",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 55,
    "score_breakdown": [
@@ -6039,111 +6280,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 17:10:40",
    "first_seen_at": "2026-10-14 18:01:27",
-   "last_seen_at": "2026-10-20 02:04:13",
-   "miage_mentioned": false,
-   "score": 55,
-   "score_breakdown": [
-    {
-     "critere": "cohérence",
-     "points": 14,
-     "max": 30,
-     "detail": "1/1 exigences + Biblio-Tech"
-    },
-    {
-     "critere": "métier",
-     "points": 12,
-     "max": 12,
-     "detail": "développement full stack"
-    },
-    {
-     "critere": "source",
-     "points": 2,
-     "max": 8,
-     "detail": "alerte non vérifiable"
-    },
-    {
-     "critere": "fiche",
-     "points": 1,
-     "max": 6,
-     "detail": "fiche vide — ouvrir la page avant de postuler"
-    },
-    {
-     "critere": "calendrier",
-     "points": 3,
-     "max": 8,
-     "detail": "date de début inconnue — à confirmer"
-    },
-    {
-     "critere": "dépôt",
-     "points": 4,
-     "max": 6,
-     "detail": "alerte — il faut retrouver l'offre d'origine"
-    },
-    {
-     "critere": "dossier",
-     "points": 0,
-     "max": 4,
-     "detail": "rien de fait"
-    },
-    {
-     "critere": "fraîcheur",
-     "points": 5,
-     "max": 12,
-     "detail": "il y a 5 j"
-    },
-    {
-     "critere": "diversité",
-     "points": 14,
-     "max": 14,
-     "detail": "step up — 1ᵉ place"
-    }
-   ],
-   "score_reasons": [
-    "cohérence 14/30 (1/1 exigences + Biblio-Tech)",
-    "métier 12/12 (développement full stack)",
-    "source 2/8 (alerte non vérifiable)",
-    "fiche 1/6 (fiche vide — ouvrir la page avant de postuler)",
-    "calendrier 3/8 (date de début inconnue — à confirmer)",
-    "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
-    "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 5 j)",
-    "⏳ expire dans 2 j",
-    "diversité 14/14 (step up — 1ᵉ place)"
-   ],
-   "skills": {
-    "required": [
-     "Java"
-    ],
-    "covered": [
-     "Java"
-    ],
-    "missing": []
-   }
-  },
-  {
-   "id": 694,
-   "source": "linkedin",
-   "source_offer_id": "4478540353",
-   "canonical_url": "https://www.linkedin.com/jobs/view/4478540353",
-   "title": "Ingénieur conception et développement logiciel JAVA/JNI - Défense H/F",
-   "company": "Viveris",
-   "location": "Le Plessis-Robinson (Sur site)",
-   "location_zone": "autre",
-   "contract_type": null,
-   "contract_known": false,
-   "contract_kinds": null,
-   "duration": null,
-   "start_date": null,
-   "education_required": null,
-   "description": null,
-   "skills_required": [
-    "Java"
-   ],
-   "training_flag": false,
-   "training_excerpt": null,
-   "published_at": "2026-10-13 17:10:39",
-   "first_seen_at": "2026-10-13 18:01:07",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 55,
    "score_breakdown": [
@@ -6199,7 +6336,7 @@
      "critere": "diversité",
      "points": 14,
      "max": 14,
-     "detail": "viveris — 2ᵉ place"
+     "detail": "step up — 1ᵉ place"
     }
    ],
    "score_reasons": [
@@ -6211,7 +6348,111 @@
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
     "fraîcheur 5/12 (il y a 6 j)",
-    "⏳ dernier appel : expire dans 1 j",
+    "⏳ expire dans 1 j",
+    "diversité 14/14 (step up — 1ᵉ place)"
+   ],
+   "skills": {
+    "required": [
+     "Java"
+    ],
+    "covered": [
+     "Java"
+    ],
+    "missing": []
+   }
+  },
+  {
+   "id": 694,
+   "source": "linkedin",
+   "source_offer_id": "4478540353",
+   "canonical_url": "https://www.linkedin.com/jobs/view/4478540353",
+   "title": "Ingénieur conception et développement logiciel JAVA/JNI - Défense H/F",
+   "company": "Viveris",
+   "location": "Le Plessis-Robinson (Sur site)",
+   "location_zone": "autre",
+   "contract_type": null,
+   "contract_known": false,
+   "contract_kinds": null,
+   "duration": null,
+   "start_date": null,
+   "education_required": null,
+   "description": null,
+   "skills_required": [
+    "Java"
+   ],
+   "training_flag": false,
+   "training_excerpt": null,
+   "published_at": "2026-10-13 17:10:39",
+   "first_seen_at": "2026-10-13 18:01:07",
+   "last_seen_at": "2026-10-20 10:04:48",
+   "miage_mentioned": false,
+   "score": 55,
+   "score_breakdown": [
+    {
+     "critere": "cohérence",
+     "points": 14,
+     "max": 30,
+     "detail": "1/1 exigences + Biblio-Tech"
+    },
+    {
+     "critere": "métier",
+     "points": 12,
+     "max": 12,
+     "detail": "développement full stack"
+    },
+    {
+     "critere": "source",
+     "points": 2,
+     "max": 8,
+     "detail": "alerte non vérifiable"
+    },
+    {
+     "critere": "fiche",
+     "points": 1,
+     "max": 6,
+     "detail": "fiche vide — ouvrir la page avant de postuler"
+    },
+    {
+     "critere": "calendrier",
+     "points": 3,
+     "max": 8,
+     "detail": "date de début inconnue — à confirmer"
+    },
+    {
+     "critere": "dépôt",
+     "points": 4,
+     "max": 6,
+     "detail": "alerte — il faut retrouver l'offre d'origine"
+    },
+    {
+     "critere": "dossier",
+     "points": 0,
+     "max": 4,
+     "detail": "rien de fait"
+    },
+    {
+     "critere": "fraîcheur",
+     "points": 5,
+     "max": 12,
+     "detail": "il y a 7 j"
+    },
+    {
+     "critere": "diversité",
+     "points": 14,
+     "max": 14,
+     "detail": "viveris — 2ᵉ place"
+    }
+   ],
+   "score_reasons": [
+    "cohérence 14/30 (1/1 exigences + Biblio-Tech)",
+    "métier 12/12 (développement full stack)",
+    "source 2/8 (alerte non vérifiable)",
+    "fiche 1/6 (fiche vide — ouvrir la page avant de postuler)",
+    "calendrier 3/8 (date de début inconnue — à confirmer)",
+    "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
+    "dossier 0/4 (rien de fait)",
+    "fraîcheur 5/12 (il y a 7 j)",
+    "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (viveris — 2ᵉ place)"
    ],
    "skills": {
@@ -6251,7 +6492,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16",
    "first_seen_at": "2026-10-16 14:04:19",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 55,
    "score_breakdown": [
@@ -6346,6 +6587,119 @@
    }
   },
   {
+   "id": 904,
+   "source": "thales",
+   "source_offer_id": "STAGE---Ingnieur-traitement-de-donnes-spatiales---F-H_R0344757-1",
+   "canonical_url": "https://thales.wd3.myworkdayjobs.com/fr-FR/Careers/job/Toulouse/STAGE---Ingnieur-traitement-de-donnes-spatiales---F-H_R0344757-1",
+   "title": "STAGE – Ingénieur informatique quantique | Traitement de données spatiales – F/H",
+   "company": "Thales",
+   "location": "Toulouse",
+   "location_zone": "toulouse",
+   "contract_type": "Stage",
+   "contract_known": true,
+   "contract_kinds": [
+    "stage"
+   ],
+   "duration": null,
+   "start_date": null,
+   "education_required": null,
+   "description": "Lieu : Toulouse, France \n Construisons ensemble un avenir de confiance \n Thales est un leader mondial des hautes technologies spécialisé dans trois secteurs d’activité : Défense & Sécurité, Aéronautique & Spatial, et Cyber & Digital. Il développe des produits et solutions qui contribuent à un monde plus sûr, plus respectueux de l’environnement et plus inclusif. Le Groupe investit près de 4,5 milliards d’euros par an en Recherche & Développement, notamment dans des domaines clés de l’innovation tels que l’IA, la cybersécurité, le quantique, les technologies du cloud et la 6G. Thales compte près de 85 000 collaborateurs dans 65 pays. ​\n Nos engagements, vos avantages Notre savoir-faire technologique\n Notre attention portée à l’équilibre des collaborateurs\n Un environnement inclusif et bienveillant\n Un engagement sociétal et environnemental reconnu (Thales Solidarity, indice CAC 40 ESG…)\n Votre quotidien En rejoignant le site de Toulouse, vous intégrez un site regroupant nos solutions de cyberdéfense souveraines pour faire face aux menaces informatiques croissantes et nos activités de services numériques permettant d’opérer les systèmes d’informations critiques de nos clients et de les accompagner dans leur transformation numérique sécurisée. \n L’informatique quantique ouvre de nouvelles perspectives pour la résolution de problèmes complexes, notamment dans les domaines de l’optimisation, de l’intelligence artificielle ou du traitement de données. Dans ce contexte, nous menons actuellement une réflexion visant à identifier des cas d’usage dans le domaine du traitement de données spatiales susceptibles de bénéficier des apports du calcul quantique.\n Intégré à la cellule de traitement d’images de Labège, vous participez au développement de briques technologiques innovantes visant à identifier les domaines dans lesquels les approches quantiques ou hybrides quantique-classique pourraient, à terme, apporter une valeur ajoutée par rapport aux méthodes classiques.\n En nous rejoignant, vos missions sont : \n Design et prototypage de l’algorithme,\n Entraînement des réseaux de neurones,\n Evaluation des résultats dans différents contextes.\n Votre profil : \n Vous êtes à la recherche d'un stage de 6 mois? \n Vous intégrez une formation de niveau Bac+5 en Mathématiques Appliquées ou Physique Quantique et vous avez des compétences sur : \n Maîtrise en programmation python,\n Connaissances en informatique quantique,\n Connaissances dans le domaine du spatial.\n Rigueur, autonomie, curiosité et dynamisme sont des atouts que l'on vous reconnait? \n Alors ce poste est fait pour vous !\nTous nos stages sont conventionnés et soumis à une gratification dont le montant est déterminé selon votre niveau d’études. \nThales, entreprise Handi-Engagée, reconnait tous les talents. La diversité est notre meilleur atout. Postulez et rejoignez nous !",
+   "skills_required": [
+    "Python"
+   ],
+   "training_flag": false,
+   "training_excerpt": null,
+   "published_at": "2026-10-20",
+   "first_seen_at": "2026-10-20 08:04:30",
+   "last_seen_at": "2026-10-20 10:04:48",
+   "miage_mentioned": false,
+   "score": 55,
+   "score_breakdown": [
+    {
+     "critere": "cohérence",
+     "points": 12,
+     "max": 30,
+     "detail": "1/4 exigences + Biblio-Tech"
+    },
+    {
+     "critere": "métier",
+     "points": 12,
+     "max": 12,
+     "detail": "data / analyse"
+    },
+    {
+     "critere": "source",
+     "points": 8,
+     "max": 8,
+     "detail": "site carrière vérifiable"
+    },
+    {
+     "critere": "fiche",
+     "points": 6,
+     "max": 6,
+     "detail": "fiche complète (4 technos)"
+    },
+    {
+     "critere": "calendrier",
+     "points": 3,
+     "max": 8,
+     "detail": "date de début inconnue — à confirmer"
+    },
+    {
+     "critere": "dépôt",
+     "points": 2,
+     "max": 6,
+     "detail": "compte + 8 étapes"
+    },
+    {
+     "critere": "dossier",
+     "points": 0,
+     "max": 4,
+     "detail": "rien de fait"
+    },
+    {
+     "critere": "fraîcheur",
+     "points": 12,
+     "max": 12,
+     "detail": "il y a 0 j"
+    },
+    {
+     "critere": "diversité",
+     "points": 0,
+     "max": 14,
+     "detail": "plafond atteint chez Thales (et Thales Alenia Space)"
+    }
+   ],
+   "score_reasons": [
+    "cohérence 12/30 (1/4 exigences + Biblio-Tech)",
+    "métier 12/12 (data / analyse)",
+    "source 8/8 (site carrière vérifiable)",
+    "fiche 6/6 (fiche complète (4 technos))",
+    "calendrier 3/8 (date de début inconnue — à confirmer)",
+    "dépôt 2/6 (compte + 8 étapes)",
+    "dossier 0/4 (rien de fait)",
+    "fraîcheur 12/12 (il y a 0 j)",
+    "fenêtre : 7 j restants",
+    "diversité 0/14 (plafond atteint chez Thales (et Thales Alenia Space))"
+   ],
+   "skills": {
+    "required": [
+     "Python",
+     "IA",
+     "intelligence artificielle",
+     "réseaux de neurones"
+    ],
+    "covered": [
+     "Python"
+    ],
+    "missing": [
+     "IA",
+     "intelligence artificielle",
+     "réseaux de neurones"
+    ]
+   }
+  },
+  {
    "id": 883,
    "source": "thales",
    "source_offer_id": "STAGE---Ingnieur-Dveloppement-d-un-agent-IA-pour-l-analyse-d-vnements-GNSS---F-H_R0344314-1",
@@ -6370,7 +6724,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19",
    "first_seen_at": "2026-10-19 09:04:14",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 54,
    "score_breakdown": [
@@ -6481,7 +6835,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15 15:10:41",
    "first_seen_at": "2026-10-15 16:04:08",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 53,
    "score_breakdown": [
@@ -6531,7 +6885,7 @@
      "critere": "fraîcheur",
      "points": 7,
      "max": 12,
-     "detail": "il y a 4 j"
+     "detail": "il y a 5 j"
     },
     {
      "critere": "diversité",
@@ -6548,8 +6902,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 7/12 (il y a 4 j)",
-    "fenêtre : 3 j restants",
+    "fraîcheur 7/12 (il y a 5 j)",
+    "fenêtre : 2 j restants",
     "diversité 14/14 (urban linker — 1ᵉ place)"
    ],
    "skills": {
@@ -6593,7 +6947,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-23",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 53,
    "score_breakdown": [
@@ -6701,7 +7055,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19",
    "first_seen_at": "2026-10-19 10:04:30",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 52,
    "score_breakdown": [
@@ -6792,6 +7146,117 @@
    }
   },
   {
+   "id": 907,
+   "source": "thales",
+   "source_offer_id": "STAGE---Ingnieur-IA-pour-la-Vrification-de-Logiciels-Critiques---F-H_R0344353-1",
+   "canonical_url": "https://thales.wd3.myworkdayjobs.com/fr-FR/Careers/job/Toulouse/STAGE---Ingnieur-IA-pour-la-Vrification-de-Logiciels-Critiques---F-H_R0344353-1",
+   "title": "STAGE - Ingénieur IA pour la Vérification de Logiciels Critiques – F/H",
+   "company": "Thales",
+   "location": "Toulouse",
+   "location_zone": "toulouse",
+   "contract_type": "Stage",
+   "contract_known": true,
+   "contract_kinds": [
+    "stage"
+   ],
+   "duration": null,
+   "start_date": null,
+   "education_required": null,
+   "description": "Lieu : Toulouse, France \n Construisons ensemble un avenir de confiance \n Thales est un leader mondial des hautes technologies spécialisé dans trois secteurs d’activité : Défense & Sécurité, Aéronautique & Spatial, et Cyber & Digital. Il développe des produits et solutions qui contribuent à un monde plus sûr, plus respectueux de l’environnement et plus inclusif. Le Groupe investit près de 4,5 milliards d’euros par an en Recherche & Développement, notamment dans des domaines clés de l’innovation tels que l’IA, la cybersécurité, le quantique, les technologies du cloud et la 6G. Thales compte près de 85 000 collaborateurs dans 65 pays. ​\n Nos engagements, vos avantages Notre savoir-faire technologique\n Notre attention portée à l’équilibre des collaborateurs\n Un environnement inclusif et bienveillant\n Un engagement sociétal et environnemental reconnu (Thales Solidarity, indice CAC 40 ESG…)\n Votre quotidien Votre destination pour une maîtrise totale du ciel ! De la conception à l'installation, nous créons des systèmes de contrôle aérien de pointe ! Nous rendons l'accès à l'espace aérien fluide, équitable et durable. \n Vous rejoignez une équipe qui développe des solutions logicielles pour les calculateurs avioniques embarqués. Votre mission consiste à contribuer à l'amélioration des activités de vérification de logiciels temps réel critiques en développant des assistants d'aide à la validation basés sur les exigences du système.\n Vos missions sont les suivantes :\n Évaluer la qualité et la cohérence des exigences à l'aide de checklists de vérification.\n Définir et analyser des cas de tests à partir des spécifications du logiciel.\n Développer des assistants permettant de faciliter les activités de vérification.\n Mettre en œuvre et évaluer des procédures de test au sein du framework de test de l'équipe.\n Analyser les résultats obtenus et proposer des améliorations pour renforcer l'efficacité des activités de validation.\n Votre profil \n Votre priorité est d'effectuer un stage de 3 à 5 mois ?\n Vous avez envie de découvrir l'environnement des calculateurs avioniques ?\n Vous êtes en bac+4 en école d’ingénieur ou équivalent en informatique à dominante IA ?\n Vous avez des compétences/ connaissances en :\n algorithmes mettant en œuvre de l’IA\n programmation (Python, …)\n en processus de développement logiciel et en particulier les tests de vérification\n aéronautique\n Force de proposition, capacité d'adaptation, relationnel et communication sont des atouts que l'on vous reconnait ?\n Alors ce poste est fait pour vous !\n Le mot de l'équipe \n Vous serez intégré à l’équipe de développement de nos produits de calculateur et serez aussi en interaction avec nos experts métier en intelligence artificielle, qui seront en support de votre stage.\nTous nos stages sont conventionnés et soumis à une gratification dont le montant est déterminé selon votre niveau d’études. \nThales, entreprise Handi-Engagée, reconnait tous les talents. La diversité est notre meilleur atout. Postulez et rejoignez nous !",
+   "skills_required": [
+    "Python"
+   ],
+   "training_flag": false,
+   "training_excerpt": null,
+   "published_at": "2026-10-20",
+   "first_seen_at": "2026-10-20 10:04:48",
+   "last_seen_at": "2026-10-20 10:04:48",
+   "miage_mentioned": false,
+   "score": 52,
+   "score_breakdown": [
+    {
+     "critere": "cohérence",
+     "points": 14,
+     "max": 30,
+     "detail": "1/3 exigences + Biblio-Tech"
+    },
+    {
+     "critere": "métier",
+     "points": 7,
+     "max": 12,
+     "detail": "tests / validation"
+    },
+    {
+     "critere": "source",
+     "points": 8,
+     "max": 8,
+     "detail": "site carrière vérifiable"
+    },
+    {
+     "critere": "fiche",
+     "points": 6,
+     "max": 6,
+     "detail": "fiche complète (3 technos)"
+    },
+    {
+     "critere": "calendrier",
+     "points": 3,
+     "max": 8,
+     "detail": "date de début inconnue — à confirmer"
+    },
+    {
+     "critere": "dépôt",
+     "points": 2,
+     "max": 6,
+     "detail": "compte + 8 étapes"
+    },
+    {
+     "critere": "dossier",
+     "points": 0,
+     "max": 4,
+     "detail": "rien de fait"
+    },
+    {
+     "critere": "fraîcheur",
+     "points": 12,
+     "max": 12,
+     "detail": "il y a 0 j"
+    },
+    {
+     "critere": "diversité",
+     "points": 0,
+     "max": 14,
+     "detail": "plafond atteint chez Thales (et Thales Alenia Space)"
+    }
+   ],
+   "score_reasons": [
+    "cohérence 14/30 (1/3 exigences + Biblio-Tech)",
+    "métier 7/12 (tests / validation)",
+    "source 8/8 (site carrière vérifiable)",
+    "fiche 6/6 (fiche complète (3 technos))",
+    "calendrier 3/8 (date de début inconnue — à confirmer)",
+    "dépôt 2/6 (compte + 8 étapes)",
+    "dossier 0/4 (rien de fait)",
+    "fraîcheur 12/12 (il y a 0 j)",
+    "fenêtre : 7 j restants",
+    "diversité 0/14 (plafond atteint chez Thales (et Thales Alenia Space))"
+   ],
+   "skills": {
+    "required": [
+     "Python",
+     "IA",
+     "intelligence artificielle"
+    ],
+    "covered": [
+     "Python"
+    ],
+    "missing": [
+     "IA",
+     "intelligence artificielle"
+    ]
+   }
+  },
+  {
    "id": 774,
    "source": "linkedin",
    "source_offer_id": "4308596669",
@@ -6815,7 +7280,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 23:10:41",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -7120,7 +7585,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13 17:10:39",
    "first_seen_at": "2026-10-13 18:01:07",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -7170,7 +7635,7 @@
      "critere": "fraîcheur",
      "points": 5,
      "max": 12,
-     "detail": "il y a 6 j"
+     "detail": "il y a 7 j"
     },
     {
      "critere": "diversité",
@@ -7187,8 +7652,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 6 j)",
-    "⏳ dernier appel : expire dans 1 j",
+    "fraîcheur 5/12 (il y a 7 j)",
+    "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (cegedim sante — 1ᵉ place)"
    ],
    "skills": {
@@ -7220,7 +7685,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13 13:10:41",
    "first_seen_at": "2026-10-13 14:01:15",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -7321,7 +7786,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 17:10:40",
    "first_seen_at": "2026-10-14 18:01:27",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -7371,7 +7836,7 @@
      "critere": "fraîcheur",
      "points": 5,
      "max": 12,
-     "detail": "il y a 5 j"
+     "detail": "il y a 6 j"
     },
     {
      "critere": "diversité",
@@ -7388,8 +7853,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 5 j)",
-    "⏳ expire dans 2 j",
+    "fraîcheur 5/12 (il y a 6 j)",
+    "⏳ expire dans 1 j",
     "diversité 14/14 (toulouse — 1ᵉ place)"
    ],
    "skills": {
@@ -7426,7 +7891,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 10:36:01",
    "first_seen_at": "2026-10-14 11:01:10",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -7528,7 +7993,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 23:10:41",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -7626,7 +8091,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 23:10:41",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -7724,7 +8189,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 23:10:41",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -7824,7 +8289,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10 01:10:39",
    "first_seen_at": "2026-10-10 02:01:20",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 07:04:20",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -8029,7 +8494,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13",
    "first_seen_at": "2026-10-14 20:37:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -8145,7 +8610,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14",
    "first_seen_at": "2026-10-15 00:34:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 07:04:20",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -8262,7 +8727,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19 10:36:26",
    "first_seen_at": "2026-10-19 11:04:32",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -8469,7 +8934,7 @@
    "training_excerpt": null,
    "published_at": "2026-07-31",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 51,
    "score_breakdown": [
@@ -8732,7 +9197,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 10 j"
+     "detail": "il y a 11 j"
     },
     {
      "critere": "diversité",
@@ -8749,7 +9214,7 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 10 j)",
+    "fraîcheur 0/12 (il y a 11 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (lyra — 1ᵉ place)"
    ],
@@ -8932,7 +9397,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 9 j"
+     "detail": "il y a 10 j"
     },
     {
      "critere": "diversité",
@@ -8949,7 +9414,7 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 9 j)",
+    "fraîcheur 0/12 (il y a 10 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (lyra — 3ᵉ place)"
    ],
@@ -9032,7 +9497,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 12 j"
+     "detail": "il y a 13 j"
     },
     {
      "critere": "diversité",
@@ -9049,7 +9514,7 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 12 j)",
+    "fraîcheur 0/12 (il y a 13 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (zelin — 1ᵉ place)"
    ],
@@ -9560,6 +10025,106 @@
    }
   },
   {
+   "id": 682,
+   "source": "linkedin",
+   "source_offer_id": "4320128495",
+   "canonical_url": "https://www.linkedin.com/jobs/view/4320128495",
+   "title": "[STAGE] Développeur Full Stack H/F",
+   "company": "SOCOTEC",
+   "location": null,
+   "location_zone": "autre",
+   "contract_type": "Stage",
+   "contract_known": true,
+   "contract_kinds": [
+    "stage"
+   ],
+   "duration": null,
+   "start_date": null,
+   "education_required": null,
+   "description": null,
+   "skills_required": [],
+   "training_flag": false,
+   "training_excerpt": null,
+   "published_at": "2026-10-13 07:10:41",
+   "first_seen_at": "2026-10-13 08:01:06",
+   "last_seen_at": "2026-10-20 07:04:20",
+   "miage_mentioned": false,
+   "score": 51,
+   "score_breakdown": [
+    {
+     "critere": "cohérence",
+     "points": 15,
+     "max": 30,
+     "detail": "0/0 exigences + Biblio-Tech"
+    },
+    {
+     "critere": "métier",
+     "points": 12,
+     "max": 12,
+     "detail": "développement full stack"
+    },
+    {
+     "critere": "source",
+     "points": 2,
+     "max": 8,
+     "detail": "alerte non vérifiable"
+    },
+    {
+     "critere": "fiche",
+     "points": 1,
+     "max": 6,
+     "detail": "fiche vide — ouvrir la page avant de postuler"
+    },
+    {
+     "critere": "calendrier",
+     "points": 3,
+     "max": 8,
+     "detail": "date de début inconnue — à confirmer"
+    },
+    {
+     "critere": "dépôt",
+     "points": 4,
+     "max": 6,
+     "detail": "alerte — il faut retrouver l'offre d'origine"
+    },
+    {
+     "critere": "dossier",
+     "points": 0,
+     "max": 4,
+     "detail": "rien de fait"
+    },
+    {
+     "critere": "fraîcheur",
+     "points": 0,
+     "max": 12,
+     "detail": "il y a 7 j"
+    },
+    {
+     "critere": "diversité",
+     "points": 14,
+     "max": 14,
+     "detail": "socotec — 1ᵉ place"
+    }
+   ],
+   "score_reasons": [
+    "cohérence 15/30 (0/0 exigences + Biblio-Tech)",
+    "métier 12/12 (développement full stack)",
+    "source 2/8 (alerte non vérifiable)",
+    "fiche 1/6 (fiche vide — ouvrir la page avant de postuler)",
+    "calendrier 3/8 (date de début inconnue — à confirmer)",
+    "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
+    "dossier 0/4 (rien de fait)",
+    "fraîcheur 0/12 (il y a 7 j)",
+    "⏳ dernier appel : expire dans 0 j",
+    "diversité 14/14 (socotec — 1ᵉ place)"
+   ],
+   "skills": {
+    "required": [],
+    "covered": [],
+    "missing": []
+   }
+  },
+  {
    "id": 783,
    "source": "thales",
    "source_offer_id": "STAGE-Ingnieur-Dveloppement-simulateur-de-charge-utile-de-navigation---F-H_R0342225-1",
@@ -9585,7 +10150,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15",
    "first_seen_at": "2026-10-15 00:34:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 50,
    "score_breakdown": [
@@ -9696,7 +10261,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15",
    "first_seen_at": "2026-10-15 13:03:58",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 50,
    "score_breakdown": [
@@ -9803,7 +10368,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16",
    "first_seen_at": "2026-10-16 09:03:42",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 49,
    "score_breakdown": [
@@ -9917,7 +10482,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-24",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 49,
    "score_breakdown": [
@@ -10027,7 +10592,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-21",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": true,
    "score": 49,
    "score_breakdown": [
@@ -10135,7 +10700,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19 13:10:41",
    "first_seen_at": "2026-10-19 14:05:33",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 48,
    "score_breakdown": [
@@ -10243,7 +10808,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-01",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 48,
    "score_breakdown": [
@@ -10474,7 +11039,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 21:10:40",
    "first_seen_at": "2026-10-16 22:04:02",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 47,
    "score_breakdown": [
@@ -10524,7 +11089,7 @@
      "critere": "fraîcheur",
      "points": 7,
      "max": 12,
-     "detail": "il y a 3 j"
+     "detail": "il y a 4 j"
     },
     {
      "critere": "diversité",
@@ -10541,8 +11106,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 7/12 (il y a 3 j)",
-    "fenêtre : 4 j restants",
+    "fraîcheur 7/12 (il y a 4 j)",
+    "fenêtre : 3 j restants",
     "diversité 14/14 (davidson consulting — 1ᵉ place)"
    ],
    "skills": {
@@ -10583,7 +11148,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-15 02:03:37",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 47,
    "score_breakdown": [
@@ -10706,7 +11271,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-18",
    "first_seen_at": "2026-10-20 02:04:13",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 47,
    "score_breakdown": [
@@ -10938,7 +11503,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16",
    "first_seen_at": "2026-10-16 12:04:02",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 47,
    "score_breakdown": [
@@ -11058,7 +11623,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-12",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 47,
    "score_breakdown": [
@@ -11182,7 +11747,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-22",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 47,
    "score_breakdown": [
@@ -11295,7 +11860,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-01",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 47,
    "score_breakdown": [
@@ -11445,7 +12010,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 9 j"
+     "detail": "il y a 10 j"
     },
     {
      "critere": "diversité",
@@ -11462,7 +12027,7 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 9 j)",
+    "fraîcheur 0/12 (il y a 10 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (aumovio — 2ᵉ place)"
    ],
@@ -11606,7 +12171,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-06",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 46,
    "score_breakdown": [
@@ -11710,7 +12275,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-29",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 46,
    "score_breakdown": [
@@ -11816,7 +12381,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-01",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 46,
    "score_breakdown": [
@@ -11927,7 +12492,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-17 17:21:41",
    "first_seen_at": "2026-10-17 18:03:38",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 46,
    "score_breakdown": [
@@ -11977,7 +12542,7 @@
      "critere": "fraîcheur",
      "points": 9,
      "max": 12,
-     "detail": "il y a 2 j"
+     "detail": "il y a 3 j"
     },
     {
      "critere": "diversité",
@@ -11994,8 +12559,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 9/12 (il y a 2 j)",
-    "fenêtre : 5 j restants",
+    "fraîcheur 9/12 (il y a 3 j)",
+    "fenêtre : 4 j restants",
     "diversité 0/14 (plafond atteint chez Thales (et Thales Alenia Space))"
    ],
    "skills": {
@@ -12027,7 +12592,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-06 17:10:39",
    "first_seen_at": "2026-10-06 18:01:23",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 46,
    "score_breakdown": [
@@ -12077,7 +12642,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 13 j"
+     "detail": "il y a 14 j"
     },
     {
      "critere": "diversité",
@@ -12094,7 +12659,7 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 13 j)",
+    "fraîcheur 0/12 (il y a 14 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (alstom — 1ᵉ place)"
    ],
@@ -12127,7 +12692,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-03 23:10:40",
    "first_seen_at": "2026-10-08 19:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 46,
    "score_breakdown": [
@@ -12229,7 +12794,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-01",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 46,
    "score_breakdown": [
@@ -12335,7 +12900,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-05",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 46,
    "score_breakdown": [
@@ -12439,7 +13004,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13",
    "first_seen_at": "2026-10-14 20:37:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 46,
    "score_breakdown": [
@@ -12640,7 +13205,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-17 19:10:41",
    "first_seen_at": "2026-10-17 20:03:35",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 45,
    "score_breakdown": [
@@ -12690,7 +13255,7 @@
      "critere": "fraîcheur",
      "points": 9,
      "max": 12,
-     "detail": "il y a 2 j"
+     "detail": "il y a 3 j"
     },
     {
      "critere": "diversité",
@@ -12707,8 +13272,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 9/12 (il y a 2 j)",
-    "fenêtre : 5 j restants",
+    "fraîcheur 9/12 (il y a 3 j)",
+    "fenêtre : 4 j restants",
     "diversité 14/14 (astek — 1ᵉ place)"
    ],
    "skills": {
@@ -12747,7 +13312,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-16 11:03:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 45,
    "score_breakdown": [
@@ -12857,7 +13422,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-16 11:03:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 45,
    "score_breakdown": [
@@ -12966,7 +13531,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13",
    "first_seen_at": "2026-10-15 00:34:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 45,
    "score_breakdown": [
@@ -13073,7 +13638,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16",
    "first_seen_at": "2026-10-16 10:03:42",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 45,
    "score_breakdown": [
@@ -13227,7 +13792,7 @@
      "critere": "fraîcheur",
      "points": 7,
      "max": 12,
-     "detail": "il y a 4 j"
+     "detail": "il y a 5 j"
     },
     {
      "critere": "diversité",
@@ -13244,8 +13809,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 7/12 (il y a 4 j)",
-    "fenêtre : 3 j restants",
+    "fraîcheur 7/12 (il y a 5 j)",
+    "fenêtre : 2 j restants",
     "diversité 0/14 (plafond atteint chez Thales (et Thales Alenia Space))"
    ],
    "skills": {
@@ -13281,7 +13846,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14",
    "first_seen_at": "2026-10-15 00:34:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 44,
    "score_breakdown": [
@@ -13398,7 +13963,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 11:10:41",
    "first_seen_at": "2026-10-16 12:04:02",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 44,
    "score_breakdown": [
@@ -13498,7 +14063,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 11:10:41",
    "first_seen_at": "2026-10-16 12:04:02",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 44,
    "score_breakdown": [
@@ -13728,7 +14293,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 44,
    "score_breakdown": [
@@ -13856,7 +14421,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 21:10:40",
    "first_seen_at": "2026-10-16 22:04:02",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 43,
    "score_breakdown": [
@@ -13906,7 +14471,7 @@
      "critere": "fraîcheur",
      "points": 7,
      "max": 12,
-     "detail": "il y a 3 j"
+     "detail": "il y a 4 j"
     },
     {
      "critere": "diversité",
@@ -13923,8 +14488,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 7/12 (il y a 3 j)",
-    "fenêtre : 4 j restants",
+    "fraîcheur 7/12 (il y a 4 j)",
+    "fenêtre : 3 j restants",
     "diversité 14/14 (norsk hydro — 1ᵉ place)"
    ],
    "skills": {
@@ -13965,7 +14530,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-16",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 43,
    "score_breakdown": [
@@ -14168,306 +14733,6 @@
    }
   },
   {
-   "id": 680,
-   "source": "linkedin",
-   "source_offer_id": "4473187071",
-   "canonical_url": "https://www.linkedin.com/jobs/view/4473187071",
-   "title": "Développeur full stack - Stage - F/H",
-   "company": "Atos",
-   "location": null,
-   "location_zone": "autre",
-   "contract_type": "Stage",
-   "contract_known": true,
-   "contract_kinds": [
-    "stage"
-   ],
-   "duration": null,
-   "start_date": null,
-   "education_required": null,
-   "description": null,
-   "skills_required": [],
-   "training_flag": false,
-   "training_excerpt": null,
-   "published_at": "2026-10-13 07:10:41",
-   "first_seen_at": "2026-10-13 08:01:06",
-   "last_seen_at": "2026-10-20 02:04:13",
-   "miage_mentioned": false,
-   "score": 42,
-   "score_breakdown": [
-    {
-     "critere": "cohérence",
-     "points": 15,
-     "max": 30,
-     "detail": "0/0 exigences + Biblio-Tech"
-    },
-    {
-     "critere": "métier",
-     "points": 12,
-     "max": 12,
-     "detail": "développement full stack"
-    },
-    {
-     "critere": "source",
-     "points": 2,
-     "max": 8,
-     "detail": "alerte non vérifiable"
-    },
-    {
-     "critere": "fiche",
-     "points": 1,
-     "max": 6,
-     "detail": "fiche vide — ouvrir la page avant de postuler"
-    },
-    {
-     "critere": "calendrier",
-     "points": 3,
-     "max": 8,
-     "detail": "date de début inconnue — à confirmer"
-    },
-    {
-     "critere": "dépôt",
-     "points": 4,
-     "max": 6,
-     "detail": "alerte — il faut retrouver l'offre d'origine"
-    },
-    {
-     "critere": "dossier",
-     "points": 0,
-     "max": 4,
-     "detail": "rien de fait"
-    },
-    {
-     "critere": "fraîcheur",
-     "points": 5,
-     "max": 12,
-     "detail": "il y a 7 j"
-    },
-    {
-     "critere": "diversité",
-     "points": 0,
-     "max": 14,
-     "detail": "plafond atteint chez Atos"
-    }
-   ],
-   "score_reasons": [
-    "cohérence 15/30 (0/0 exigences + Biblio-Tech)",
-    "métier 12/12 (développement full stack)",
-    "source 2/8 (alerte non vérifiable)",
-    "fiche 1/6 (fiche vide — ouvrir la page avant de postuler)",
-    "calendrier 3/8 (date de début inconnue — à confirmer)",
-    "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
-    "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 7 j)",
-    "⏳ dernier appel : expire dans 0 j",
-    "diversité 0/14 (plafond atteint chez Atos)"
-   ],
-   "skills": {
-    "required": [],
-    "covered": [],
-    "missing": []
-   }
-  },
-  {
-   "id": 683,
-   "source": "linkedin",
-   "source_offer_id": "4466697319",
-   "canonical_url": "https://www.linkedin.com/jobs/view/4466697319",
-   "title": "Développeur full stack - Stage - F/H",
-   "company": "Atos",
-   "location": null,
-   "location_zone": "autre",
-   "contract_type": "Stage",
-   "contract_known": true,
-   "contract_kinds": [
-    "stage"
-   ],
-   "duration": null,
-   "start_date": null,
-   "education_required": null,
-   "description": null,
-   "skills_required": [],
-   "training_flag": false,
-   "training_excerpt": null,
-   "published_at": "2026-10-13 07:10:41",
-   "first_seen_at": "2026-10-13 08:01:06",
-   "last_seen_at": "2026-10-20 02:04:13",
-   "miage_mentioned": false,
-   "score": 42,
-   "score_breakdown": [
-    {
-     "critere": "cohérence",
-     "points": 15,
-     "max": 30,
-     "detail": "0/0 exigences + Biblio-Tech"
-    },
-    {
-     "critere": "métier",
-     "points": 12,
-     "max": 12,
-     "detail": "développement full stack"
-    },
-    {
-     "critere": "source",
-     "points": 2,
-     "max": 8,
-     "detail": "alerte non vérifiable"
-    },
-    {
-     "critere": "fiche",
-     "points": 1,
-     "max": 6,
-     "detail": "fiche vide — ouvrir la page avant de postuler"
-    },
-    {
-     "critere": "calendrier",
-     "points": 3,
-     "max": 8,
-     "detail": "date de début inconnue — à confirmer"
-    },
-    {
-     "critere": "dépôt",
-     "points": 4,
-     "max": 6,
-     "detail": "alerte — il faut retrouver l'offre d'origine"
-    },
-    {
-     "critere": "dossier",
-     "points": 0,
-     "max": 4,
-     "detail": "rien de fait"
-    },
-    {
-     "critere": "fraîcheur",
-     "points": 5,
-     "max": 12,
-     "detail": "il y a 7 j"
-    },
-    {
-     "critere": "diversité",
-     "points": 0,
-     "max": 14,
-     "detail": "plafond atteint chez Atos"
-    }
-   ],
-   "score_reasons": [
-    "cohérence 15/30 (0/0 exigences + Biblio-Tech)",
-    "métier 12/12 (développement full stack)",
-    "source 2/8 (alerte non vérifiable)",
-    "fiche 1/6 (fiche vide — ouvrir la page avant de postuler)",
-    "calendrier 3/8 (date de début inconnue — à confirmer)",
-    "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
-    "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 7 j)",
-    "⏳ dernier appel : expire dans 0 j",
-    "diversité 0/14 (plafond atteint chez Atos)"
-   ],
-   "skills": {
-    "required": [],
-    "covered": [],
-    "missing": []
-   }
-  },
-  {
-   "id": 677,
-   "source": "linkedin",
-   "source_offer_id": "4475359895",
-   "canonical_url": "https://www.linkedin.com/jobs/view/4475359895",
-   "title": "Développeuse / Développeur Fullstack - Stage",
-   "company": "Capgemini",
-   "location": null,
-   "location_zone": "autre",
-   "contract_type": "Stage",
-   "contract_known": true,
-   "contract_kinds": [
-    "stage"
-   ],
-   "duration": null,
-   "start_date": null,
-   "education_required": null,
-   "description": null,
-   "skills_required": [],
-   "training_flag": false,
-   "training_excerpt": null,
-   "published_at": "2026-10-13 07:10:41",
-   "first_seen_at": "2026-10-13 08:01:06",
-   "last_seen_at": "2026-10-20 02:04:13",
-   "miage_mentioned": false,
-   "score": 42,
-   "score_breakdown": [
-    {
-     "critere": "cohérence",
-     "points": 15,
-     "max": 30,
-     "detail": "0/0 exigences + Biblio-Tech"
-    },
-    {
-     "critere": "métier",
-     "points": 12,
-     "max": 12,
-     "detail": "développement full stack"
-    },
-    {
-     "critere": "source",
-     "points": 2,
-     "max": 8,
-     "detail": "alerte non vérifiable"
-    },
-    {
-     "critere": "fiche",
-     "points": 1,
-     "max": 6,
-     "detail": "fiche vide — ouvrir la page avant de postuler"
-    },
-    {
-     "critere": "calendrier",
-     "points": 3,
-     "max": 8,
-     "detail": "date de début inconnue — à confirmer"
-    },
-    {
-     "critere": "dépôt",
-     "points": 4,
-     "max": 6,
-     "detail": "alerte — il faut retrouver l'offre d'origine"
-    },
-    {
-     "critere": "dossier",
-     "points": 0,
-     "max": 4,
-     "detail": "rien de fait"
-    },
-    {
-     "critere": "fraîcheur",
-     "points": 5,
-     "max": 12,
-     "detail": "il y a 7 j"
-    },
-    {
-     "critere": "diversité",
-     "points": 0,
-     "max": 14,
-     "detail": "plafond atteint chez Capgemini"
-    }
-   ],
-   "score_reasons": [
-    "cohérence 15/30 (0/0 exigences + Biblio-Tech)",
-    "métier 12/12 (développement full stack)",
-    "source 2/8 (alerte non vérifiable)",
-    "fiche 1/6 (fiche vide — ouvrir la page avant de postuler)",
-    "calendrier 3/8 (date de début inconnue — à confirmer)",
-    "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
-    "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 7 j)",
-    "⏳ dernier appel : expire dans 0 j",
-    "diversité 0/14 (plafond atteint chez Capgemini)"
-   ],
-   "skills": {
-    "required": [],
-    "covered": [],
-    "missing": []
-   }
-  },
-  {
    "id": 756,
    "source": "linkedin",
    "source_offer_id": "4478782673",
@@ -14488,105 +14753,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 21:10:41",
    "first_seen_at": "2026-10-14 22:01:41",
-   "last_seen_at": "2026-10-20 02:04:13",
-   "miage_mentioned": false,
-   "score": 42,
-   "score_breakdown": [
-    {
-     "critere": "cohérence",
-     "points": 15,
-     "max": 30,
-     "detail": "0/0 exigences + Biblio-Tech"
-    },
-    {
-     "critere": "métier",
-     "points": 12,
-     "max": 12,
-     "detail": "développement full stack"
-    },
-    {
-     "critere": "source",
-     "points": 2,
-     "max": 8,
-     "detail": "alerte non vérifiable"
-    },
-    {
-     "critere": "fiche",
-     "points": 1,
-     "max": 6,
-     "detail": "fiche vide — ouvrir la page avant de postuler"
-    },
-    {
-     "critere": "calendrier",
-     "points": 3,
-     "max": 8,
-     "detail": "date de début inconnue — à confirmer"
-    },
-    {
-     "critere": "dépôt",
-     "points": 4,
-     "max": 6,
-     "detail": "alerte — il faut retrouver l'offre d'origine"
-    },
-    {
-     "critere": "dossier",
-     "points": 0,
-     "max": 4,
-     "detail": "rien de fait"
-    },
-    {
-     "critere": "fraîcheur",
-     "points": 5,
-     "max": 12,
-     "detail": "il y a 5 j"
-    },
-    {
-     "critere": "diversité",
-     "points": 0,
-     "max": 14,
-     "detail": "plafond atteint chez Groupe SII"
-    }
-   ],
-   "score_reasons": [
-    "cohérence 15/30 (0/0 exigences + Biblio-Tech)",
-    "métier 12/12 (développement full stack)",
-    "source 2/8 (alerte non vérifiable)",
-    "fiche 1/6 (fiche vide — ouvrir la page avant de postuler)",
-    "calendrier 3/8 (date de début inconnue — à confirmer)",
-    "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
-    "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 5 j)",
-    "⏳ expire dans 2 j",
-    "diversité 0/14 (plafond atteint chez Groupe SII)"
-   ],
-   "skills": {
-    "required": [],
-    "covered": [],
-    "missing": []
-   }
-  },
-  {
-   "id": 696,
-   "source": "linkedin",
-   "source_offer_id": "4478727254",
-   "canonical_url": "https://www.linkedin.com/jobs/view/4478727254",
-   "title": "Ingénieur développement logiciel temps-réel - ADA & C F.H",
-   "company": "Thales",
-   "location": null,
-   "location_zone": "autre",
-   "contract_type": null,
-   "contract_known": false,
-   "contract_kinds": null,
-   "duration": null,
-   "start_date": null,
-   "education_required": null,
-   "description": null,
-   "skills_required": [],
-   "training_flag": false,
-   "training_excerpt": null,
-   "published_at": "2026-10-13 17:10:39",
-   "first_seen_at": "2026-10-13 18:01:07",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 42,
    "score_breakdown": [
@@ -14642,7 +14809,7 @@
      "critere": "diversité",
      "points": 0,
      "max": 14,
-     "detail": "plafond atteint chez Thales (et Thales Alenia Space)"
+     "detail": "plafond atteint chez Groupe SII"
     }
    ],
    "score_reasons": [
@@ -14654,7 +14821,105 @@
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
     "fraîcheur 5/12 (il y a 6 j)",
-    "⏳ dernier appel : expire dans 1 j",
+    "⏳ expire dans 1 j",
+    "diversité 0/14 (plafond atteint chez Groupe SII)"
+   ],
+   "skills": {
+    "required": [],
+    "covered": [],
+    "missing": []
+   }
+  },
+  {
+   "id": 696,
+   "source": "linkedin",
+   "source_offer_id": "4478727254",
+   "canonical_url": "https://www.linkedin.com/jobs/view/4478727254",
+   "title": "Ingénieur développement logiciel temps-réel - ADA & C F.H",
+   "company": "Thales",
+   "location": null,
+   "location_zone": "autre",
+   "contract_type": null,
+   "contract_known": false,
+   "contract_kinds": null,
+   "duration": null,
+   "start_date": null,
+   "education_required": null,
+   "description": null,
+   "skills_required": [],
+   "training_flag": false,
+   "training_excerpt": null,
+   "published_at": "2026-10-13 17:10:39",
+   "first_seen_at": "2026-10-13 18:01:07",
+   "last_seen_at": "2026-10-20 10:04:48",
+   "miage_mentioned": false,
+   "score": 42,
+   "score_breakdown": [
+    {
+     "critere": "cohérence",
+     "points": 15,
+     "max": 30,
+     "detail": "0/0 exigences + Biblio-Tech"
+    },
+    {
+     "critere": "métier",
+     "points": 12,
+     "max": 12,
+     "detail": "développement full stack"
+    },
+    {
+     "critere": "source",
+     "points": 2,
+     "max": 8,
+     "detail": "alerte non vérifiable"
+    },
+    {
+     "critere": "fiche",
+     "points": 1,
+     "max": 6,
+     "detail": "fiche vide — ouvrir la page avant de postuler"
+    },
+    {
+     "critere": "calendrier",
+     "points": 3,
+     "max": 8,
+     "detail": "date de début inconnue — à confirmer"
+    },
+    {
+     "critere": "dépôt",
+     "points": 4,
+     "max": 6,
+     "detail": "alerte — il faut retrouver l'offre d'origine"
+    },
+    {
+     "critere": "dossier",
+     "points": 0,
+     "max": 4,
+     "detail": "rien de fait"
+    },
+    {
+     "critere": "fraîcheur",
+     "points": 5,
+     "max": 12,
+     "detail": "il y a 7 j"
+    },
+    {
+     "critere": "diversité",
+     "points": 0,
+     "max": 14,
+     "detail": "plafond atteint chez Thales (et Thales Alenia Space)"
+    }
+   ],
+   "score_reasons": [
+    "cohérence 15/30 (0/0 exigences + Biblio-Tech)",
+    "métier 12/12 (développement full stack)",
+    "source 2/8 (alerte non vérifiable)",
+    "fiche 1/6 (fiche vide — ouvrir la page avant de postuler)",
+    "calendrier 3/8 (date de début inconnue — à confirmer)",
+    "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
+    "dossier 0/4 (rien de fait)",
+    "fraîcheur 5/12 (il y a 7 j)",
+    "⏳ dernier appel : expire dans 0 j",
     "diversité 0/14 (plafond atteint chez Thales (et Thales Alenia Space))"
    ],
    "skills": {
@@ -14686,7 +14951,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13 11:10:41",
    "first_seen_at": "2026-10-13 12:01:13",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 42,
    "score_breakdown": [
@@ -14786,7 +15051,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 21:10:41",
    "first_seen_at": "2026-10-14 22:01:41",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 42,
    "score_breakdown": [
@@ -14836,7 +15101,7 @@
      "critere": "fraîcheur",
      "points": 5,
      "max": 12,
-     "detail": "il y a 5 j"
+     "detail": "il y a 6 j"
     },
     {
      "critere": "diversité",
@@ -14853,8 +15118,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 5 j)",
-    "⏳ expire dans 2 j",
+    "fraîcheur 5/12 (il y a 6 j)",
+    "⏳ expire dans 1 j",
     "diversité 0/14 (plafond atteint chez Thales (et Thales Alenia Space))"
    ],
    "skills": {
@@ -14886,7 +15151,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 13:10:40",
    "first_seen_at": "2026-10-14 14:01:11",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 42,
    "score_breakdown": [
@@ -14994,7 +15259,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-17 02:03:45",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 41,
    "score_breakdown": [
@@ -15117,7 +15382,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-17 19:10:41",
    "first_seen_at": "2026-10-17 20:03:35",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 41,
    "score_breakdown": [
@@ -15167,7 +15432,7 @@
      "critere": "fraîcheur",
      "points": 9,
      "max": 12,
-     "detail": "il y a 2 j"
+     "detail": "il y a 3 j"
     },
     {
      "critere": "diversité",
@@ -15184,8 +15449,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 9/12 (il y a 2 j)",
-    "fenêtre : 5 j restants",
+    "fraîcheur 9/12 (il y a 3 j)",
+    "fenêtre : 4 j restants",
     "diversité 0/14 (plafond atteint chez Groupe SII)"
    ],
    "skills": {
@@ -15223,7 +15488,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-17 11:10:41",
    "first_seen_at": "2026-10-17 12:03:35",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 41,
    "score_breakdown": [
@@ -15332,7 +15597,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-17 15:10:42",
    "first_seen_at": "2026-10-17 16:03:33",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 41,
    "score_breakdown": [
@@ -15382,7 +15647,7 @@
      "critere": "fraîcheur",
      "points": 9,
      "max": 12,
-     "detail": "il y a 2 j"
+     "detail": "il y a 3 j"
     },
     {
      "critere": "diversité",
@@ -15399,8 +15664,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 9/12 (il y a 2 j)",
-    "fenêtre : 5 j restants",
+    "fraîcheur 9/12 (il y a 3 j)",
+    "fenêtre : 4 j restants",
     "diversité 0/14 (plafond atteint chez Capgemini)"
    ],
    "skills": {
@@ -15441,7 +15706,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-16 11:03:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 41,
    "score_breakdown": [
@@ -15558,7 +15823,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15",
    "first_seen_at": "2026-10-15 16:04:08",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 07:04:20",
    "miage_mentioned": false,
    "score": 41,
    "score_breakdown": [
@@ -15786,7 +16051,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14",
    "first_seen_at": "2026-10-14 20:37:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 41,
    "score_breakdown": [
@@ -15888,7 +16153,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-19",
    "first_seen_at": "2026-10-19 08:04:27",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 41,
    "score_breakdown": [
@@ -15996,7 +16261,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-16 11:03:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 40,
    "score_breakdown": [
@@ -16113,7 +16378,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15",
    "first_seen_at": "2026-10-15 00:34:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 40,
    "score_breakdown": [
@@ -16225,7 +16490,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15",
    "first_seen_at": "2026-10-15 00:34:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 40,
    "score_breakdown": [
@@ -16334,7 +16599,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14",
    "first_seen_at": "2026-10-15 00:34:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 40,
    "score_breakdown": [
@@ -16447,7 +16712,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14",
    "first_seen_at": "2026-10-14 20:37:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 40,
    "score_breakdown": [
@@ -16566,7 +16831,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13",
    "first_seen_at": "2026-10-14 20:37:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 09:04:37",
    "miage_mentioned": false,
    "score": 40,
    "score_breakdown": [
@@ -16670,7 +16935,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-23",
    "first_seen_at": "2026-10-18 17:04:13",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 40,
    "score_breakdown": [
@@ -16884,7 +17149,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16",
    "first_seen_at": "2026-10-16 13:04:43",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 39,
    "score_breakdown": [
@@ -16990,7 +17255,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 11:10:41",
    "first_seen_at": "2026-10-16 12:04:02",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 39,
    "score_breakdown": [
@@ -17090,7 +17355,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 17:47:41",
    "first_seen_at": "2026-10-16 18:03:56",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 39,
    "score_breakdown": [
@@ -17140,7 +17405,7 @@
      "critere": "fraîcheur",
      "points": 7,
      "max": 12,
-     "detail": "il y a 3 j"
+     "detail": "il y a 4 j"
     },
     {
      "critere": "diversité",
@@ -17157,8 +17422,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 7/12 (il y a 3 j)",
-    "fenêtre : 4 j restants",
+    "fraîcheur 7/12 (il y a 4 j)",
+    "fenêtre : 3 j restants",
     "diversité 0/14 (plafond atteint chez Groupe SII)"
    ],
    "skills": {
@@ -17192,7 +17457,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-10",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 39,
    "score_breakdown": [
@@ -17300,7 +17565,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-29",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 39,
    "score_breakdown": [
@@ -17419,7 +17684,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-16 11:03:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 38,
    "score_breakdown": [
@@ -17540,7 +17805,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14",
    "first_seen_at": "2026-10-14 20:37:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 38,
    "score_breakdown": [
@@ -17644,7 +17909,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15",
    "first_seen_at": "2026-10-15 00:34:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 38,
    "score_breakdown": [
@@ -17798,7 +18063,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 13 j"
+     "detail": "il y a 14 j"
     },
     {
      "critere": "diversité",
@@ -17815,9 +18080,309 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 13 j)",
+    "fraîcheur 0/12 (il y a 14 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 0/14 (plafond atteint chez Airbus (et Airbus Protect, ATR, Atlantic))"
+   ],
+   "skills": {
+    "required": [],
+    "covered": [],
+    "missing": []
+   }
+  },
+  {
+   "id": 680,
+   "source": "linkedin",
+   "source_offer_id": "4473187071",
+   "canonical_url": "https://www.linkedin.com/jobs/view/4473187071",
+   "title": "Développeur full stack - Stage - F/H",
+   "company": "Atos",
+   "location": null,
+   "location_zone": "autre",
+   "contract_type": "Stage",
+   "contract_known": true,
+   "contract_kinds": [
+    "stage"
+   ],
+   "duration": null,
+   "start_date": null,
+   "education_required": null,
+   "description": null,
+   "skills_required": [],
+   "training_flag": false,
+   "training_excerpt": null,
+   "published_at": "2026-10-13 07:10:41",
+   "first_seen_at": "2026-10-13 08:01:06",
+   "last_seen_at": "2026-10-20 07:04:20",
+   "miage_mentioned": false,
+   "score": 37,
+   "score_breakdown": [
+    {
+     "critere": "cohérence",
+     "points": 15,
+     "max": 30,
+     "detail": "0/0 exigences + Biblio-Tech"
+    },
+    {
+     "critere": "métier",
+     "points": 12,
+     "max": 12,
+     "detail": "développement full stack"
+    },
+    {
+     "critere": "source",
+     "points": 2,
+     "max": 8,
+     "detail": "alerte non vérifiable"
+    },
+    {
+     "critere": "fiche",
+     "points": 1,
+     "max": 6,
+     "detail": "fiche vide — ouvrir la page avant de postuler"
+    },
+    {
+     "critere": "calendrier",
+     "points": 3,
+     "max": 8,
+     "detail": "date de début inconnue — à confirmer"
+    },
+    {
+     "critere": "dépôt",
+     "points": 4,
+     "max": 6,
+     "detail": "alerte — il faut retrouver l'offre d'origine"
+    },
+    {
+     "critere": "dossier",
+     "points": 0,
+     "max": 4,
+     "detail": "rien de fait"
+    },
+    {
+     "critere": "fraîcheur",
+     "points": 0,
+     "max": 12,
+     "detail": "il y a 7 j"
+    },
+    {
+     "critere": "diversité",
+     "points": 0,
+     "max": 14,
+     "detail": "plafond atteint chez Atos"
+    }
+   ],
+   "score_reasons": [
+    "cohérence 15/30 (0/0 exigences + Biblio-Tech)",
+    "métier 12/12 (développement full stack)",
+    "source 2/8 (alerte non vérifiable)",
+    "fiche 1/6 (fiche vide — ouvrir la page avant de postuler)",
+    "calendrier 3/8 (date de début inconnue — à confirmer)",
+    "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
+    "dossier 0/4 (rien de fait)",
+    "fraîcheur 0/12 (il y a 7 j)",
+    "⏳ dernier appel : expire dans 0 j",
+    "diversité 0/14 (plafond atteint chez Atos)"
+   ],
+   "skills": {
+    "required": [],
+    "covered": [],
+    "missing": []
+   }
+  },
+  {
+   "id": 683,
+   "source": "linkedin",
+   "source_offer_id": "4466697319",
+   "canonical_url": "https://www.linkedin.com/jobs/view/4466697319",
+   "title": "Développeur full stack - Stage - F/H",
+   "company": "Atos",
+   "location": null,
+   "location_zone": "autre",
+   "contract_type": "Stage",
+   "contract_known": true,
+   "contract_kinds": [
+    "stage"
+   ],
+   "duration": null,
+   "start_date": null,
+   "education_required": null,
+   "description": null,
+   "skills_required": [],
+   "training_flag": false,
+   "training_excerpt": null,
+   "published_at": "2026-10-13 07:10:41",
+   "first_seen_at": "2026-10-13 08:01:06",
+   "last_seen_at": "2026-10-20 07:04:20",
+   "miage_mentioned": false,
+   "score": 37,
+   "score_breakdown": [
+    {
+     "critere": "cohérence",
+     "points": 15,
+     "max": 30,
+     "detail": "0/0 exigences + Biblio-Tech"
+    },
+    {
+     "critere": "métier",
+     "points": 12,
+     "max": 12,
+     "detail": "développement full stack"
+    },
+    {
+     "critere": "source",
+     "points": 2,
+     "max": 8,
+     "detail": "alerte non vérifiable"
+    },
+    {
+     "critere": "fiche",
+     "points": 1,
+     "max": 6,
+     "detail": "fiche vide — ouvrir la page avant de postuler"
+    },
+    {
+     "critere": "calendrier",
+     "points": 3,
+     "max": 8,
+     "detail": "date de début inconnue — à confirmer"
+    },
+    {
+     "critere": "dépôt",
+     "points": 4,
+     "max": 6,
+     "detail": "alerte — il faut retrouver l'offre d'origine"
+    },
+    {
+     "critere": "dossier",
+     "points": 0,
+     "max": 4,
+     "detail": "rien de fait"
+    },
+    {
+     "critere": "fraîcheur",
+     "points": 0,
+     "max": 12,
+     "detail": "il y a 7 j"
+    },
+    {
+     "critere": "diversité",
+     "points": 0,
+     "max": 14,
+     "detail": "plafond atteint chez Atos"
+    }
+   ],
+   "score_reasons": [
+    "cohérence 15/30 (0/0 exigences + Biblio-Tech)",
+    "métier 12/12 (développement full stack)",
+    "source 2/8 (alerte non vérifiable)",
+    "fiche 1/6 (fiche vide — ouvrir la page avant de postuler)",
+    "calendrier 3/8 (date de début inconnue — à confirmer)",
+    "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
+    "dossier 0/4 (rien de fait)",
+    "fraîcheur 0/12 (il y a 7 j)",
+    "⏳ dernier appel : expire dans 0 j",
+    "diversité 0/14 (plafond atteint chez Atos)"
+   ],
+   "skills": {
+    "required": [],
+    "covered": [],
+    "missing": []
+   }
+  },
+  {
+   "id": 677,
+   "source": "linkedin",
+   "source_offer_id": "4475359895",
+   "canonical_url": "https://www.linkedin.com/jobs/view/4475359895",
+   "title": "Développeuse / Développeur Fullstack - Stage",
+   "company": "Capgemini",
+   "location": null,
+   "location_zone": "autre",
+   "contract_type": "Stage",
+   "contract_known": true,
+   "contract_kinds": [
+    "stage"
+   ],
+   "duration": null,
+   "start_date": null,
+   "education_required": null,
+   "description": null,
+   "skills_required": [],
+   "training_flag": false,
+   "training_excerpt": null,
+   "published_at": "2026-10-13 07:10:41",
+   "first_seen_at": "2026-10-13 08:01:06",
+   "last_seen_at": "2026-10-20 07:04:20",
+   "miage_mentioned": false,
+   "score": 37,
+   "score_breakdown": [
+    {
+     "critere": "cohérence",
+     "points": 15,
+     "max": 30,
+     "detail": "0/0 exigences + Biblio-Tech"
+    },
+    {
+     "critere": "métier",
+     "points": 12,
+     "max": 12,
+     "detail": "développement full stack"
+    },
+    {
+     "critere": "source",
+     "points": 2,
+     "max": 8,
+     "detail": "alerte non vérifiable"
+    },
+    {
+     "critere": "fiche",
+     "points": 1,
+     "max": 6,
+     "detail": "fiche vide — ouvrir la page avant de postuler"
+    },
+    {
+     "critere": "calendrier",
+     "points": 3,
+     "max": 8,
+     "detail": "date de début inconnue — à confirmer"
+    },
+    {
+     "critere": "dépôt",
+     "points": 4,
+     "max": 6,
+     "detail": "alerte — il faut retrouver l'offre d'origine"
+    },
+    {
+     "critere": "dossier",
+     "points": 0,
+     "max": 4,
+     "detail": "rien de fait"
+    },
+    {
+     "critere": "fraîcheur",
+     "points": 0,
+     "max": 12,
+     "detail": "il y a 7 j"
+    },
+    {
+     "critere": "diversité",
+     "points": 0,
+     "max": 14,
+     "detail": "plafond atteint chez Capgemini"
+    }
+   ],
+   "score_reasons": [
+    "cohérence 15/30 (0/0 exigences + Biblio-Tech)",
+    "métier 12/12 (développement full stack)",
+    "source 2/8 (alerte non vérifiable)",
+    "fiche 1/6 (fiche vide — ouvrir la page avant de postuler)",
+    "calendrier 3/8 (date de début inconnue — à confirmer)",
+    "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
+    "dossier 0/4 (rien de fait)",
+    "fraîcheur 0/12 (il y a 7 j)",
+    "⏳ dernier appel : expire dans 0 j",
+    "diversité 0/14 (plafond atteint chez Capgemini)"
    ],
    "skills": {
     "required": [],
@@ -17846,7 +18411,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14 21:10:41",
    "first_seen_at": "2026-10-16 02:03:25",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 37,
    "score_breakdown": [
@@ -17896,7 +18461,7 @@
      "critere": "fraîcheur",
      "points": 5,
      "max": 12,
-     "detail": "il y a 5 j"
+     "detail": "il y a 6 j"
     },
     {
      "critere": "diversité",
@@ -17913,8 +18478,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 5/12 (il y a 5 j)",
-    "⏳ expire dans 2 j",
+    "fraîcheur 5/12 (il y a 6 j)",
+    "⏳ expire dans 1 j",
     "diversité 0/14 (plafond atteint chez Groupe SII)"
    ],
    "skills": {
@@ -17996,7 +18561,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 11 j"
+     "detail": "il y a 12 j"
     },
     {
      "critere": "diversité",
@@ -18013,7 +18578,7 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 11 j)",
+    "fraîcheur 0/12 (il y a 12 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 0/14 (plafond atteint chez Airbus (et Airbus Protect, ATR, Atlantic))"
    ],
@@ -18249,7 +18814,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-01",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 37,
    "score_breakdown": [
@@ -18472,7 +19037,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 36,
    "score_breakdown": [
@@ -18572,7 +19137,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-30",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 36,
    "score_breakdown": [
@@ -18676,7 +19241,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-30",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 36,
    "score_breakdown": [
@@ -18780,7 +19345,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-17 13:10:42",
    "first_seen_at": "2026-10-17 14:03:50",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 35,
    "score_breakdown": [
@@ -18884,7 +19449,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-17 11:10:41",
    "first_seen_at": "2026-10-17 12:03:35",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 35,
    "score_breakdown": [
@@ -18988,7 +19553,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-07",
    "first_seen_at": "2026-10-18 17:04:13",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 35,
    "score_breakdown": [
@@ -19094,7 +19659,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 11:10:41",
    "first_seen_at": "2026-10-16 12:04:02",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 35,
    "score_breakdown": [
@@ -19201,7 +19766,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 34,
    "score_breakdown": [
@@ -19357,7 +19922,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 14 j"
+     "detail": "il y a 15 j"
     },
     {
      "critere": "diversité",
@@ -19374,7 +19939,7 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 14 j)",
+    "fraîcheur 0/12 (il y a 15 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (gmv — 1ᵉ place)"
    ],
@@ -19409,7 +19974,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14",
    "first_seen_at": "2026-10-14 20:37:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": true,
    "score": 34,
    "score_breakdown": [
@@ -19516,7 +20081,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-09",
    "first_seen_at": "2026-10-15 00:34:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 33,
    "score_breakdown": [
@@ -19623,7 +20188,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13",
    "first_seen_at": "2026-10-15 00:34:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 33,
    "score_breakdown": [
@@ -19734,7 +20299,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 15:10:41",
    "first_seen_at": "2026-10-16 16:04:31",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 33,
    "score_breakdown": [
@@ -19784,7 +20349,7 @@
      "critere": "fraîcheur",
      "points": 7,
      "max": 12,
-     "detail": "il y a 3 j"
+     "detail": "il y a 4 j"
     },
     {
      "critere": "diversité",
@@ -19801,8 +20366,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 7/12 (il y a 3 j)",
-    "fenêtre : 4 j restants",
+    "fraîcheur 7/12 (il y a 4 j)",
+    "fenêtre : 3 j restants",
     "diversité 0/14 (plafond atteint chez Groupe SII)"
    ],
    "skills": {
@@ -19838,7 +20403,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-01",
    "first_seen_at": "2026-10-16 02:01:21",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 33,
    "score_breakdown": [
@@ -19952,7 +20517,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16",
    "first_seen_at": "2026-10-16 10:03:42",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 33,
    "score_breakdown": [
@@ -20138,6 +20703,116 @@
    }
   },
   {
+   "id": 906,
+   "source": "capgemini",
+   "source_offer_id": "1449313433",
+   "canonical_url": "https://careers.capgemini.com/job/Blagnac-Ing%C3%A9nieure-Ing%C3%A9nieur-Qualit%C3%A9-IA-Stage/1449313433",
+   "title": "Ingénieure / Ingénieur Qualité IA - Stage",
+   "company": "Capgemini",
+   "location": "Toulouse, FR",
+   "location_zone": "toulouse",
+   "contract_type": "Stage",
+   "contract_known": true,
+   "contract_kinds": [
+    "stage"
+   ],
+   "duration": null,
+   "start_date": null,
+   "education_required": null,
+   "description": "Capgemini Engineering, leader mondial des services d'ingénierie , rassemble des équipes d'ingénieurs , de scientifiques et d'architectes pour aider les entreprises les plus innovantes dans le monde à libérer leur potentiel . Des voitures autonomes aux robots qui sauvent des vies, nos experts en technologies digitales et logicielles sortent des sentiers battus en fournissant des services uniques de R&D et d'ingénierie dans tous les secteurs d'activité . Rejoignez nous pour une carrière pleine d'opportunités , où vous pouvez faire la différence et où aucun jour ne se ressemble\n Vos missions \r Au sein de notre équipe experte en qualité, vous accompagnerez nos clients dans l'amélioration continue de leurs processus industriels. \n Vos responsabilités seront les suivantes : favoriser et faciliter l'implatantion de l'IA au sein du traitement opérationnel des projets : \n Identification de Use case \n Proposition de prompts \n Vérification des robustesses \n Mesure de la performance \n Reporting et déploiement multi-projet \n Les périmètres projets abordés seront ceux de la Qualité Industrielle ou Système de Management de la Qualité \n - La gestion des activités curatives et correctives pour l'éradication des non-conformités \n - La réalisation et déploiement des activités en support à l'industrialisation (FAI/LAI/DVI/PPAP) \n - L'élaboration des plans de contrôle et déploiement de la méthodologie APQP \n - La qualification des procédés industriels et des personnels de production \n - La contribution aux analyses de risques (DFMEA/PFMEA/AMDEC) \n -La convergence maturité des Processus clients et leur déploiement-La gestion documentaire de référence \n -L'assistance dans l'activté d'audit \n Votre profil \r \n Vous préparez un Diplôme d'ingénieur ou un Master (Bac+5) dans le domaine Industriel ou Mécanique \n Niveau d'anglais courant requis\n Compréhension de l'approche processus ISO 9001\n Lecture et interprétation de la documentation qualité\n Maîtrise des outils bureautiques\n Première expérience de prompting en environnement entreprise ou scolaire\n Curieux\n Pédagogue\n Pro-actif / esprit d'initiative\n Quelques raisons de nous rejoindre \r \n Qualité de vie au travail : profitez d’un équilibre entre vie professionnelle et personnelle, d’une possibilité de télétravailler (en France et à l’international), ainsi que des dispositifs de santé et bien-être (ligne d'écoute, plateforme dédiée...).\n Happy Trainees : notre engagement envers les jeunes talents est reconnu dans le classement HappyTrainees, preuve que chez nous, les stagiaires et alternants ne viennent pas juste apprendre… ils viennent s’épanouir !\n Formation continue et accélérée : dès votre arrivée, suivez un parcours structuré et certifiant via l’Engineering Academy et les campus digitaux. En vous immergeant dans notre culture de l’ingénierie augmentée, vous développez une expertise technique et sectorielle à la croisée des technologies digitales et physiques, et en lien avec les enjeux industriels actuels et futurs.\n Capgemini, partenaire de la transformation business et technologique de ses clients, les accompagne dans leur transition vers un monde plus digital et durable, tout en créant un impact positif pour la société. Le Groupe, responsable et multiculturel, rassemble 340 000 collaborateurs dans plus de 50 pays. Depuis plus de 55 ans, ses clients lui font confiance pour répondre à l'ensemble de leurs besoins grâce à la technologie. Capgemini propose des services et solutions de bout en bout, allant de la stratégie et du design jusqu'à l'ingénierie, en tirant parti de ses compétences de pointe en intelligence artificielle et IA générative, en cloud, et en data, ainsi que de son expertise sectorielle et de son écosystème de partenaires. \n Code de référence: \n 580095\n Date: \n 20 oct. 2026\n Niveau d'expérience: \n Etudiants/ Jeunes diplômés\n Type de contrat: \n Stage\n Ville: \n Blagnac, FR\n Toulouse, FR\n Marques: \n Capgemini Engineering\n Communautés professionnelles: \n Administration Support\n Postule",
+   "skills_required": [],
+   "training_flag": false,
+   "training_excerpt": null,
+   "published_at": "2026-10-17",
+   "first_seen_at": "2026-10-20 09:04:37",
+   "last_seen_at": "2026-10-20 10:04:48",
+   "miage_mentioned": false,
+   "score": 32,
+   "score_breakdown": [
+    {
+     "critere": "cohérence",
+     "points": 4,
+     "max": 30,
+     "detail": "0/4 exigences + Analyse Insertion Pro MIAGE"
+    },
+    {
+     "critere": "métier",
+     "points": 2,
+     "max": 12,
+     "detail": "industrie / mécanique"
+    },
+    {
+     "critere": "source",
+     "points": 5,
+     "max": 8,
+     "detail": "source capgemini"
+    },
+    {
+     "critere": "fiche",
+     "points": 6,
+     "max": 6,
+     "detail": "fiche complète (4 technos)"
+    },
+    {
+     "critere": "calendrier",
+     "points": 3,
+     "max": 8,
+     "detail": "date de début inconnue — à confirmer"
+    },
+    {
+     "critere": "dépôt",
+     "points": 5,
+     "max": 6,
+     "detail": "formulaire du site"
+    },
+    {
+     "critere": "dossier",
+     "points": 0,
+     "max": 4,
+     "detail": "rien de fait"
+    },
+    {
+     "critere": "fraîcheur",
+     "points": 7,
+     "max": 12,
+     "detail": "il y a 3 j"
+    },
+    {
+     "critere": "diversité",
+     "points": 0,
+     "max": 14,
+     "detail": "plafond atteint chez Capgemini"
+    }
+   ],
+   "score_reasons": [
+    "cohérence 4/30 (0/4 exigences + Analyse Insertion Pro MIAGE)",
+    "métier 2/12 (industrie / mécanique)",
+    "source 5/8 (source capgemini)",
+    "fiche 6/6 (fiche complète (4 technos))",
+    "calendrier 3/8 (date de début inconnue — à confirmer)",
+    "dépôt 5/6 (formulaire du site)",
+    "dossier 0/4 (rien de fait)",
+    "fraîcheur 7/12 (il y a 3 j)",
+    "fenêtre : 4 j restants",
+    "diversité 0/14 (plafond atteint chez Capgemini)"
+   ],
+   "skills": {
+    "required": [
+     "IA",
+     "intelligence artificielle",
+     "IA générative",
+     "IA generative"
+    ],
+    "covered": [],
+    "missing": [
+     "IA",
+     "intelligence artificielle",
+     "IA générative",
+     "IA generative"
+    ]
+   }
+  },
+  {
    "id": 627,
    "source": "linkedin",
    "source_offer_id": "4477440382",
@@ -20160,7 +20835,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10 01:10:39",
    "first_seen_at": "2026-10-10 02:01:20",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 32,
    "score_breakdown": [
@@ -20512,7 +21187,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 15 j"
+     "detail": "il y a 16 j"
     },
     {
      "critere": "diversité",
@@ -20529,7 +21204,7 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 15 j)",
+    "fraîcheur 0/12 (il y a 16 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 0/14 (plafond atteint chez Sopra Steria)"
    ],
@@ -20666,7 +21341,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-17 11:10:41",
    "first_seen_at": "2026-10-17 12:03:35",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 31,
    "score_breakdown": [
@@ -20770,7 +21445,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16",
    "first_seen_at": "2026-10-16 10:03:42",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 31,
    "score_breakdown": [
@@ -20874,7 +21549,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-15 11:10:40",
    "first_seen_at": "2026-10-15 12:03:43",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 31,
    "score_breakdown": [
@@ -20982,7 +21657,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14",
    "first_seen_at": "2026-10-15 00:34:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 30,
    "score_breakdown": [
@@ -21090,7 +21765,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-12",
    "first_seen_at": "2026-10-14 20:37:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 29,
    "score_breakdown": [
@@ -21196,7 +21871,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13",
    "first_seen_at": "2026-10-14 20:37:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 29,
    "score_breakdown": [
@@ -21409,7 +22084,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-14",
    "first_seen_at": "2026-10-14 20:37:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 28,
    "score_breakdown": [
@@ -21519,7 +22194,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-06",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 27,
    "score_breakdown": [
@@ -21838,7 +22513,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-12",
    "first_seen_at": "2026-10-14 20:37:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 25,
    "score_breakdown": [
@@ -21945,7 +22620,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 24,
    "score_breakdown": [
@@ -22045,7 +22720,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 24,
    "score_breakdown": [
@@ -22145,7 +22820,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 24,
    "score_breakdown": [
@@ -22245,7 +22920,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 24,
    "score_breakdown": [
@@ -22345,7 +23020,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 24,
    "score_breakdown": [
@@ -22445,7 +23120,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10",
    "first_seen_at": "2026-10-14 23:22:29",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 24,
    "score_breakdown": [
@@ -22547,7 +23222,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-15",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 24,
    "score_breakdown": [
@@ -22701,7 +23376,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 14 j"
+     "detail": "il y a 15 j"
     },
     {
      "critere": "diversité",
@@ -22718,7 +23393,7 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 14 j)",
+    "fraîcheur 0/12 (il y a 15 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (cs group — 1ᵉ place)"
    ],
@@ -22755,7 +23430,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-13",
    "first_seen_at": "2026-10-14 20:37:52",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 24,
    "score_breakdown": [
@@ -22905,7 +23580,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 8 j"
+     "detail": "il y a 9 j"
     },
     {
      "critere": "diversité",
@@ -22922,7 +23597,7 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 8 j)",
+    "fraîcheur 0/12 (il y a 9 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (nxp semiconductors — 2ᵉ place)"
    ],
@@ -23009,7 +23684,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 14 j"
+     "detail": "il y a 15 j"
     },
     {
      "critere": "diversité",
@@ -23026,7 +23701,7 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 14 j)",
+    "fraîcheur 0/12 (il y a 15 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 14/14 (cs group — 2ᵉ place)"
    ],
@@ -23169,7 +23844,7 @@
    "training_excerpt": null,
    "published_at": "2026-09-30",
    "first_seen_at": "2026-10-14 20:40:46",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 22,
    "score_breakdown": [
@@ -23273,7 +23948,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-16 15:10:41",
    "first_seen_at": "2026-10-16 16:04:31",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 21,
    "score_breakdown": [
@@ -23323,7 +23998,7 @@
      "critere": "fraîcheur",
      "points": 7,
      "max": 12,
-     "detail": "il y a 3 j"
+     "detail": "il y a 4 j"
     },
     {
      "critere": "diversité",
@@ -23340,8 +24015,8 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 7/12 (il y a 3 j)",
-    "fenêtre : 4 j restants",
+    "fraîcheur 7/12 (il y a 4 j)",
+    "fenêtre : 3 j restants",
     "diversité 0/14 (plafond atteint chez Groupe SII)"
    ],
    "skills": {
@@ -23377,7 +24052,7 @@
    "training_excerpt": null,
    "published_at": "2026-10-10 17:10:39",
    "first_seen_at": "2026-10-10 18:01:05",
-   "last_seen_at": "2026-10-20 02:04:13",
+   "last_seen_at": "2026-10-20 10:04:48",
    "miage_mentioned": false,
    "score": 20,
    "score_breakdown": [
@@ -23427,7 +24102,7 @@
      "critere": "fraîcheur",
      "points": 0,
      "max": 12,
-     "detail": "il y a 9 j"
+     "detail": "il y a 10 j"
     },
     {
      "critere": "diversité",
@@ -23444,7 +24119,7 @@
     "calendrier 3/8 (date de début inconnue — à confirmer)",
     "dépôt 4/6 (alerte — il faut retrouver l'offre d'origine)",
     "dossier 0/4 (rien de fait)",
-    "fraîcheur 0/12 (il y a 9 j)",
+    "fraîcheur 0/12 (il y a 10 j)",
     "⏳ dernier appel : expire dans 0 j",
     "diversité 0/14 (plafond atteint chez Thales (et Thales Alenia Space))"
    ],
