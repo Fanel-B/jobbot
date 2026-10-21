@@ -26,3 +26,7 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Fichiers compilés Python (collecteur, et toute lecture de reference/)
+__pycache__/
+*.pyc
