@@ -21,14 +21,14 @@ export default function Page() {
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-12">
-      <h1 className="font-display text-4xl">Méthode</h1>
+      <h1 className="titre-page">Méthode</h1>
       <p className="mt-4 text-base leading-relaxed text-ink-soft">
         JobBot n&apos;a rien d&apos;une boîte noire : voici d&apos;où viennent les offres, comment la
         note est fabriquée, et ce que le site refuse de faire.
       </p>
 
       <section className="mt-12">
-        <h2 className="font-display text-2xl">D&apos;où viennent les offres</h2>
+        <h2 className="titre-section">D&apos;où viennent les offres</h2>
         <p className="mt-3 text-sm leading-relaxed text-muted">
           Collecte du {new Date(meta.generated_at).toLocaleString("fr-FR")} — {meta.count} offres en
           base. Toutes proviennent d&apos;interfaces publiques ou d&apos;alertes que l&apos;utilisateur
@@ -58,7 +58,7 @@ export default function Page() {
       </section>
 
       <section className="mt-12">
-        <h2 className="font-display text-2xl">Nos règles de collecte</h2>
+        <h2 className="titre-section">Nos règles de collecte</h2>
         <ul className="mt-4 space-y-3 text-sm leading-relaxed text-ink-soft">
           <li className="flex gap-3">
             <span className="text-good" aria-hidden>
@@ -103,7 +103,7 @@ export default function Page() {
       </section>
 
       <section className="mt-12">
-        <h2 className="font-display text-2xl">Comment la note est fabriquée</h2>
+        <h2 className="titre-section">Comment la note est fabriquée</h2>
         <p className="mt-3 text-sm leading-relaxed text-ink-soft">
           La note est calculée par du <strong className="font-medium">code déterministe</strong>, pas
           par un modèle de langage. Neuf critères, chacun avec un maximum de points, additionnés sur
@@ -123,7 +123,7 @@ export default function Page() {
       </section>
 
       <section className="mt-12">
-        <h2 className="font-display text-2xl">Ce que le site refuse de faire</h2>
+        <h2 className="titre-section">Ce que le site refuse de faire</h2>
         <ul className="mt-4 space-y-3 text-sm leading-relaxed text-ink-soft">
           <li>Inventer une donnée absente : on écrit « non précisé ».</li>
           <li>

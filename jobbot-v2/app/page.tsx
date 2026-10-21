@@ -56,11 +56,11 @@ export default function Home() {
     <div>
       {/* ------------------------------------------------------------ ouverture */}
       <section className="border-b border-line">
-        <div className="mx-auto max-w-6xl px-5 pb-14 pt-16">
-          <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted">
+        <div className="apparait mx-auto max-w-6xl px-5 pb-16 pt-20 sm:pt-24">
+          <p className="label">
             Alternance · Stage · Toulouse et Île-de-France
           </p>
-          <h1 className="font-display mt-4 max-w-3xl text-5xl leading-[1.05] tracking-tight sm:text-6xl">
+          <h1 className="titre-geant mt-5 max-w-4xl">
             Les offres qui te correspondent vraiment.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-ink-soft">
@@ -98,8 +98,8 @@ export default function Home() {
               { k: "Vues ces 7 derniers jours", v: vues7j },
             ].map((s) => (
               <div key={s.k}>
-                <dd className="num font-display text-3xl leading-none">{s.v}</dd>
-                <dt className="mt-2 text-xs uppercase tracking-wide text-muted">{s.k}</dt>
+                <dd className="num font-display text-4xl leading-none tracking-tight">{s.v}</dd>
+                <dt className="mt-2 label">{s.k}</dt>
               </div>
             ))}
           </dl>
@@ -114,7 +114,7 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-5 py-14">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="font-display text-3xl">Le haut du classement aujourd&apos;hui</h2>
+            <h2 className="titre-section">Le haut du classement aujourd&apos;hui</h2>
             <p className="mt-1.5 text-sm text-muted">
               Six offres, six notes, et pour chacune le détail qui les justifie.
             </p>
@@ -136,7 +136,7 @@ export default function Home() {
         <section className="border-y border-line bg-paper-deep/50">
           <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 lg:grid-cols-[1.1fr_1fr]">
             <div>
-              <h2 className="font-display text-3xl">Une note, neuf raisons</h2>
+              <h2 className="titre-section">Une note, neuf raisons</h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-soft">
                 La note n&apos;est pas une impression : elle additionne neuf critères calculés par du
                 code, tous reproductibles. Chaque offre porte son bulletin, y compris quand un
@@ -169,7 +169,7 @@ export default function Home() {
             </div>
 
             <div className="card p-6">
-              <p className="text-xs uppercase tracking-wide text-muted">
+              <p className="label">
                 Exemple réel — bulletin complet
               </p>
               <h3 className="mt-2 text-[15px] font-medium leading-snug">
@@ -192,7 +192,7 @@ export default function Home() {
       {/* ------------------------------------------------------------ les lacunes */}
       {lacunes.length > 0 ? (
         <section className="mx-auto max-w-6xl px-5 py-14">
-          <h2 className="font-display text-3xl">Ce qui revient dans les offres, et pas ton CV</h2>
+          <h2 className="titre-section">Ce qui revient dans les offres, et pas ton CV</h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
             Compté sur les {offresAvecContrat.length} offres classées, en reprenant les compétences
             explicitement demandées par les annonces. Ces chiffres disent quoi travailler en premier —
@@ -224,7 +224,7 @@ export default function Home() {
       {leviers.length > 0 ? (
         <section className="border-t border-line bg-paper-deep/50">
           <div className="mx-auto max-w-6xl px-5 py-14">
-            <h2 className="font-display text-3xl">Et si tu apprenais une de ces compétences ?</h2>
+            <h2 className="titre-section">Et si tu apprenais une de ces compétences ?</h2>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
               Chaque ligne est la collecte entière reclassée avec cette compétence en plus, par le
               moteur qui calcule déjà les notes affichées. Aucune estimation, aucun modèle : le même
@@ -270,7 +270,7 @@ export default function Home() {
       {/* -------------------------------------------------------- différenciateurs */}
       <section className="border-t border-line bg-paper-deep/50">
         <div className="mx-auto max-w-6xl px-5 py-14">
-          <h2 className="font-display text-3xl">Ce que les outils américains ne peuvent pas faire</h2>
+          <h2 className="titre-section">Ce que les outils américains ne peuvent pas faire</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {[
               {
@@ -299,14 +299,14 @@ export default function Home() {
       <section className="mx-auto max-w-6xl px-5 py-14">
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="card p-6">
-            <p className="text-xs uppercase tracking-wide text-muted">Sans compte</p>
+            <p className="label">Sans compte</p>
             <p className="mt-2 text-sm leading-relaxed text-ink-soft">
               Toutes les offres, triées par date, avec la source et la date de collecte. Le lien vers
               l&apos;annonce d&apos;origine est toujours là.
             </p>
           </div>
           <div className="card p-6">
-            <p className="text-xs uppercase tracking-wide text-muted">Avec un compte</p>
+            <p className="label">Avec un compte</p>
             <p className="mt-2 text-sm leading-relaxed text-ink-soft">
               Les <strong className="font-medium">mêmes offres</strong>, triées par ce qui te
               correspond — le détail de la note, les compétences qui manquent, et la version de CV à

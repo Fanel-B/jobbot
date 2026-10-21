@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Inter, Outfit } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 import { meta } from "@/lib/offers";
@@ -10,9 +10,11 @@ const inter = Inter({
   display: "swap",
 });
 
-const display = Instrument_Serif({
+// Outfit : grotesque géométrique à grande hauteur d'x. C'est l'équivalent libre le plus proche
+// du Gotham de la référence, qui est sous licence et ne peut pas être repris.
+const display = Outfit({
   subsets: ["latin"],
-  weight: "400",
+  weight: ["500", "600", "700"],
   variable: "--font-display-latin",
   display: "swap",
 });

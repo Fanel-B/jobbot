@@ -2,34 +2,64 @@
 
 /* ---------------------------------------------------------------------------
    JobBot — identité visuelle
-   Un outil, pas une vitrine : fond papier chaud, encre franche, un seul accent,
-   et des couleurs sémantiques réservées à la note. Aucune couleur décorative.
+
+   Noir et blanc, et des gris strictement neutres. La couleur ne sert qu'à deux
+   choses : signaler la qualité d'une note, et marquer une action. Rien de
+   décoratif — c'est un outil, pas une vitrine.
+
+   Inspirée de hamishw.com (HamishMW/portfolio), dont trois idées sont reprises
+   et adaptées à un fond clair :
+     · un fond gris neutre plutôt que blanc pur, et le blanc réservé aux cartes,
+       ce qui les fait exister sans ombre ni bordure appuyée ;
+     · une seule encre déclinée en trois opacités (90 % titres, 75 % texte,
+       55 % secondaire) au lieu de quatre gris choisis à la main ;
+     · des titres très grands, serrés, en interlignage 1.1, contre un corps de
+       texte à 1.6.
+
+   Son accent cyan clair (oklch 84 %) est illisible sur fond clair : il est
+   repris en teinte (202°) mais descendu à 47 % de luminance, ce qui lui donne
+   un contraste d'environ 4,8:1 sur blanc.
    --------------------------------------------------------------------------- */
 @theme {
-  --color-paper: #fbfaf7;
-  --color-paper-deep: #f4f2ec;
+  /* Surfaces — gris neutres, aucune chaleur */
+  --color-paper: oklch(96.5% 0 0);
+  --color-paper-deep: oklch(93.2% 0 0);
   --color-surface: #ffffff;
-  --color-ink: #14161a;
-  --color-ink-soft: #3d434d;
-  --color-muted: #6b7280;
-  --color-line: #e6e3db;
-  --color-line-strong: #d6d2c7;
 
-  --color-accent: #2f5fe0;
-  --color-accent-ink: #1e3fa8;
-  --color-accent-soft: #eef2fe;
+  /* Encre — une seule couleur, trois niveaux de présence */
+  --color-ink: oklch(16% 0 0);
+  --color-ink-soft: oklch(38% 0 0);
+  --color-muted: oklch(52% 0 0);
 
-  --color-good: #1b8a5a;
-  --color-good-soft: #e7f5ee;
-  --color-warn: #a15c09;
-  --color-warn-soft: #fdf3e2;
-  --color-bad: #b3261e;
-  --color-bad-soft: #fdecea;
+  --color-line: oklch(88.5% 0 0);
+  --color-line-strong: oklch(80% 0 0);
+
+  /* Accent — la teinte de la référence, assombrie pour rester lisible */
+  --color-accent: oklch(47% 0.105 205);
+  --color-accent-ink: oklch(38% 0.09 205);
+  --color-accent-soft: oklch(96.5% 0.022 205);
+
+  /* Sémantique — réservée à la note et aux compétences */
+  --color-good: oklch(48% 0.12 155);
+  --color-good-soft: oklch(96% 0.03 155);
+  --color-warn: oklch(52% 0.11 70);
+  --color-warn-soft: oklch(96% 0.035 80);
+  --color-bad: oklch(50% 0.17 27);
+  --color-bad-soft: oklch(96% 0.03 27);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-display-latin), Georgia, serif;
+  --font-display: var(--font-display-latin), var(--font-inter), ui-sans-serif, sans-serif;
+  /* Mono : la pile du système, comme la référence. Aucune police à télécharger. */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 
-  --radius-card: 14px;
+  --radius-card: 8px;
+
+  /* Mouvement — courbe et durées de la référence */
+  --ease-doux: cubic-bezier(0.4, 0, 0.2, 1);
+  --duree-courte: 200ms;
+  --duree-moyenne: 400ms;
+  --duree-longue: 600ms;
 }
 
 @layer base {
@@ -42,6 +72,16 @@
     background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    line-height: 1.6;
+  }
+
+  /* Les titres sont la signature : serrés, interlignage 1.1. */
+  h1,
+  h2,
+  h3 {
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
 
   /* Les chiffres d'un score doivent s'aligner : c'est un bulletin, pas une affiche. */
@@ -51,8 +91,15 @@
   }
 
   ::selection {
-    background: var(--color-accent);
-    color: white;
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  /* Un seul anneau de focus pour tout le site, visible sur fond clair. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 3px;
   }
 }
 
@@ -60,9 +107,75 @@
   .hairline {
     border: 1px solid var(--color-line);
   }
+
+  /* La carte : blanc sur gris. C'est le contraste de surface qui la détache,
+     pas une ombre — le site reste plat et net. */
   .card {
     background: var(--color-surface);
     border: 1px solid var(--color-line);
     border-radius: var(--radius-card);
+  }
+
+  /* Micro-libellé : capitales, mono, très espacé. Sert à nommer une zone sans
+     peser autant qu'un titre. */
+  .label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  /* Les deux tailles de titre qui portent la page d'accueil. */
+  .titre-geant {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.75rem, 7vw, 5.5rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+
+  .titre-page {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.25rem, 4.5vw, 3.25rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+
+  .titre-section {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  /* Apparition discrète au chargement. Décorative : elle se coupe dès que la
+     personne a demandé moins d'animations. */
+  .apparait {
+    animation: apparait var(--duree-longue) var(--ease-doux) both;
+  }
+
+  @keyframes apparait {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .apparait {
+      animation: none;
+    }
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+    }
   }
 }

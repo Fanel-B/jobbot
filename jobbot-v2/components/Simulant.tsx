@@ -28,7 +28,7 @@ export async function Simulant({
   if (manquants.length === 0) {
     return (
       <section className="mt-9">
-        <h2 className="text-xs font-medium uppercase tracking-wide text-muted">
+        <h2 className="label">
           Et si tu apprenais…
         </h2>
         <p className="mt-4 text-sm leading-relaxed text-muted">
@@ -55,7 +55,7 @@ export async function Simulant({
 
   return (
     <section className="mt-9">
-      <h2 className="text-xs font-medium uppercase tracking-wide text-muted">
+      <h2 className="label">
         Et si tu apprenais…
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
@@ -93,7 +93,7 @@ export async function Simulant({
         <div className="mt-5 rounded-card border border-line bg-paper-deep/50 p-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted">
+              <p className="label">
                 {critereLabel("cohérence")}
               </p>
               <p className="num mt-1 text-2xl">
@@ -118,7 +118,7 @@ export async function Simulant({
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-wide text-muted">Note de l&apos;offre</p>
+              <p className="label">Note de l&apos;offre</p>
               <p className="num mt-1 text-2xl">
                 <span className="text-muted">{effet.totalAvant}</span>
                 <span className="mx-2 text-muted" aria-hidden>

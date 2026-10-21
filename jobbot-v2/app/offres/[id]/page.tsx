@@ -81,7 +81,7 @@ export default async function Page({
       <div className="mt-6 grid gap-10 lg:grid-cols-[1.35fr_1fr]">
         {/* --------------------------------------------------------------- colonne */}
         <div className="min-w-0">
-          <h1 className="font-display text-4xl leading-tight">
+          <h1 className="titre-page">
             {offre.title ?? "Intitulé non communiqué"}
           </h1>
           <p className="mt-3 text-base text-ink-soft">
@@ -130,7 +130,7 @@ export default async function Page({
 
           {/* Détails concrets */}
           <section className="mt-8">
-            <h2 className="text-xs font-medium uppercase tracking-wide text-muted">
+            <h2 className="label">
               Ce que dit l&apos;annonce
             </h2>
             <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
@@ -174,7 +174,7 @@ export default async function Page({
           {/* Compétences */}
           {exigences.length > 0 ? (
             <section className="mt-9">
-              <h2 className="text-xs font-medium uppercase tracking-wide text-muted">
+              <h2 className="label">
                 Ce que l&apos;offre demande, face à ton profil
               </h2>
               <ul className="mt-4 space-y-2">
@@ -222,7 +222,7 @@ export default async function Page({
 
           {/* Description réelle */}
           <section className="mt-9">
-            <h2 className="text-xs font-medium uppercase tracking-wide text-muted">
+            <h2 className="label">
               L&apos;annonce
             </h2>
             {offre.description ? (
@@ -243,7 +243,7 @@ export default async function Page({
           <div className="card p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-wide text-muted">Note pour ton profil</p>
+                <p className="label">Note pour ton profil</p>
                 <p className="mt-1 text-sm text-ink-soft">
                   L3 MIAGE · alternance et stage · Toulouse
                 </p>
@@ -256,7 +256,7 @@ export default async function Page({
             </div>
 
             <div className="mt-6 border-t border-line pt-5">
-              <p className="text-xs uppercase tracking-wide text-muted">Version de CV conseillée</p>
+              <p className="label">Version de CV conseillée</p>
               <p className="mt-1 text-sm font-medium">{cvRecommande}</p>
               <p className="mt-1 text-xs text-muted">
                 Décidée par le type de contrat de l&apos;offre — pas par une impression.

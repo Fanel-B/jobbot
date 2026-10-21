@@ -91,7 +91,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-10">
-      <h1 className="font-display text-4xl leading-tight">
+      <h1 className="titre-page">
         {nonRenseigne ? "Offres sans type de contrat renseigné" : "Les offres du moment"}
       </h1>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
@@ -113,7 +113,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
       {/* Filtres : de vrais liens, donc partageables et sans JavaScript. */}
       <div className="mt-7 space-y-3 border-y border-line py-5">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-xs font-medium uppercase tracking-wide text-muted">Lieu</span>
+          <span className="mr-1 label">Lieu</span>
           <Filtre actif={!p.zone} href={lien({ ...p, zone: undefined })}>
             Partout
           </Filtre>
@@ -125,7 +125,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-xs font-medium uppercase tracking-wide text-muted">Contrat</span>
+          <span className="mr-1 label">Contrat</span>
           <Filtre actif={!p.type || p.type === "tous"} href={lien({ ...p, type: undefined })}>
             Tous
           </Filtre>
@@ -148,7 +148,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-xs font-medium uppercase tracking-wide text-muted">Source</span>
+          <span className="mr-1 label">Source</span>
           <Filtre actif={!p.source} href={lien({ ...p, source: undefined })}>
             Toutes
           </Filtre>
@@ -160,7 +160,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="mr-1 text-xs font-medium uppercase tracking-wide text-muted">Tri</span>
+          <span className="mr-1 label">Tri</span>
           <Filtre actif={(p.tri ?? "score") === "score"} href={lien({ ...p, tri: "score" })}>
             Note
           </Filtre>
@@ -168,7 +168,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
             Date de publication
           </Filtre>
           <span className="mx-1 h-4 w-px bg-line" />
-          <span className="mr-1 text-xs font-medium uppercase tracking-wide text-muted">
+          <span className="mr-1 label">
             Note mini
           </span>
           {[0, 60, 70, 80].map((m) => (
