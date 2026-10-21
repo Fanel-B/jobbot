@@ -34,16 +34,33 @@
   --color-line: oklch(88.5% 0 0);
   --color-line-strong: oklch(80% 0 0);
 
-  /* Accent — la teinte de la référence, assombrie pour rester lisible */
-  --color-accent: oklch(47% 0.105 205);
-  --color-accent-ink: oklch(38% 0.09 205);
-  --color-accent-soft: oklch(96.5% 0.022 205);
+  /* Trois couleurs, trois rôles. Le fond reste noir et blanc : elles ne servent
+     qu'à dire quelque chose, jamais à décorer.
+       bleu  — les liens, et tout ce qui est tracé (barres, points) ;
+       vert  — ce qui est acquis, ce qui monte ;
+       jaune — ce qui demande une vérification, et le surlignage. */
 
-  /* Sémantique — réservée à la note et aux compétences */
-  --color-good: oklch(48% 0.12 155);
-  --color-good-soft: oklch(96% 0.03 155);
-  --color-warn: oklch(52% 0.11 70);
-  --color-warn-soft: oklch(96% 0.035 80);
+  /* Bleu — accent et liens */
+  --color-accent: oklch(48% 0.17 258);
+  --color-accent-ink: oklch(38% 0.14 258);
+  --color-accent-soft: oklch(96.5% 0.028 258);
+
+  /* Bleu — les tracés. Deux nuances d'une seule teinte : la règle du avant/après. */
+  --color-trace: oklch(62% 0.15 258);
+  --color-trace-fort: oklch(44% 0.17 258);
+  --color-trace-pale: oklch(93% 0.04 258);
+
+  /* Vert — acquis */
+  --color-good: oklch(50% 0.14 150);
+  --color-good-soft: oklch(95.5% 0.04 150);
+
+  /* Jaune — attention. Deux valeurs : une sombre qui tient comme texte,
+     une franche qui ne sert que de fond, avec de l'encre par-dessus. */
+  --color-warn: oklch(50% 0.11 78);
+  --color-warn-soft: oklch(95% 0.065 95);
+  --color-jaune: oklch(88% 0.17 95);
+
+  /* Rouge — ce qui manque */
   --color-bad: oklch(50% 0.17 27);
   --color-bad-soft: oklch(96% 0.03 27);
 
@@ -149,6 +166,17 @@
     font-size: clamp(1.75rem, 3.2vw, 2.5rem);
     line-height: 1.1;
     letter-spacing: -0.025em;
+  }
+
+  /* Surlignage au marqueur. Le jaune passe derrière le texte, qui reste encre :
+     13,5:1 de contraste, donc il décore sans jamais gêner la lecture. */
+  .surligne {
+    background-image: linear-gradient(
+      transparent 56%,
+      var(--color-jaune) 56%,
+      var(--color-jaune) 93%,
+      transparent 93%
+    );
   }
 
   /* Apparition discrète au chargement. Décorative : elle se coupe dès que la

@@ -42,11 +42,17 @@ export async function generateMetadata({
   };
 }
 
-/** « Non précisé » plutôt qu'une valeur inventée : la règle vaut pour tous les champs. */
-function NonPrecise({ quoi }: { quoi: string }) {
+/**
+ * « Non précisé » plutôt qu'une valeur inventée : la règle vaut pour tous les champs.
+ *
+ * L'accord suit le mot : « Durée non précisée », « Niveau non précisé ». Le libellé est déjà
+ * au-dessus dans la liste de définitions, donc on n'affiche que la mention — la répéter donnait
+ * « Durée · Durée non précisé par l'annonce ».
+ */
+function NonPrecise({ genre = "m" }: { genre?: "m" | "f" }) {
   return (
-    <span className="text-muted">
-      {quoi} <span className="italic">non précisé par l&apos;annonce</span>
+    <span className="italic text-muted">
+      non précisé{genre === "f" ? "e" : ""} par l&apos;annonce
     </span>
   );
 }
@@ -141,13 +147,13 @@ export default async function Page({
               <div>
                 <dt className="text-xs text-muted">Durée</dt>
                 <dd className="mt-1 text-sm">
-                  {offre.duration ? offre.duration : <NonPrecise quoi="Durée" />}
+                  {offre.duration ? offre.duration : <NonPrecise genre="f" />}
                 </dd>
               </div>
               <div>
                 <dt className="text-xs text-muted">Début</dt>
                 <dd className="mt-1 text-sm">
-                  {offre.start_date ? offre.start_date : <NonPrecise quoi="Date de début" />}
+                  {offre.start_date ? offre.start_date : <NonPrecise genre="f" />}
                 </dd>
               </div>
               <div>
@@ -156,7 +162,7 @@ export default async function Page({
                   {offre.education_required ? (
                     offre.education_required
                   ) : (
-                    <NonPrecise quoi="Niveau" />
+                    <NonPrecise />
                   )}
                 </dd>
               </div>

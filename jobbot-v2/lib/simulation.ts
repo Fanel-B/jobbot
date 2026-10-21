@@ -191,6 +191,13 @@ export function competencesSimulables(max = 6): Competence[] {
     .slice(0, max);
 }
 
+/** Combien d'offres sont aujourd'hui au-dessus du seuil — le point de départ du graphique. */
+export function offresAuDessus(seuil: number = SEUIL_BONNE_PISTE): number {
+  let n = 0;
+  for (const r of classementSimule([]).values()) if (r.total >= seuil) n += 1;
+  return n;
+}
+
 /** Y a-t-il assez d'offres pour qu'un comptage veuille dire quelque chose ? */
 export function volumeSuffisant(): boolean {
   return offers.length >= VOLUME_MINIMAL;

@@ -56,14 +56,24 @@ function lien(params: Record<string, string | undefined>): string {
   return s ? `/offres?${s}` : "/offres";
 }
 
+/** Une rangée de la barre : son libellé à gauche, ses choix à droite, toujours au même endroit. */
+function Groupe({ titre, children }: { titre: string; children: React.ReactNode }) {
+  return (
+    <div className="grid gap-x-6 gap-y-2 border-b border-line px-5 py-3.5 last:border-b-0 sm:grid-cols-[6.5rem_1fr] sm:items-center">
+      <span className="label">{titre}</span>
+      <div className="flex flex-wrap gap-1.5">{children}</div>
+    </div>
+  );
+}
+
 function Filtre({ actif, href, children }: { actif: boolean; href: string; children: React.ReactNode }) {
   return (
     <Link
       href={href}
-      className={`rounded-full border px-3 py-1 text-xs transition ${
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ${
         actif
-          ? "border-ink bg-ink text-paper"
-          : "border-line bg-surface text-ink-soft hover:border-line-strong"
+          ? "border-ink bg-ink font-medium text-paper"
+          : "border-line bg-surface text-ink-soft hover:border-ink/40 hover:text-ink"
       }`}
     >
       {children}
@@ -86,6 +96,19 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
   // Le compte sur l'ensemble de la collecte, lui, sert à distinguer « ce filtre-ci ne donne
   // rien » de « cette collecte ne contient aucune offre de ce type ».
   const comptesCollecte = compterFamilles(toutes);
+
+  // Comptes par zone et par source, calculés sans le filtre qu'ils annoncent : une puce
+  // doit dire combien d'offres elle donnerait, pas combien il y en a en tout.
+  const baseZone = filtrer(toutes, { ...p, zone: undefined });
+  const comptesZone = Object.fromEntries(
+    ZONES.map((z) => [z, baseZone.filter((o) => o.location_zone === z).length]),
+  ) as Record<Zone, number>;
+  const baseSource = filtrer(toutes, { ...p, source: undefined });
+  const comptesSource = baseSource.reduce<Record<string, number>>((acc, o) => {
+    acc[o.source] = (acc[o.source] ?? 0) + 1;
+    return acc;
+  }, {});
+  const filtresActifs = [p.zone, p.type, p.source, p.min, p.tri].filter(Boolean).length;
   const nbNonRenseigne = comptes["non-renseigne"];
   const alternanceVide = (p.type ?? "").toLowerCase() === "alternance" && comptesCollecte.alternance === 0;
 
@@ -103,79 +126,123 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
           </>
         ) : (
           <>
-            {liste.length} offre{liste.length > 1 ? "s" : ""} correspondant à ces filtres. Le
-            classement par défaut est la note calculée pour ton profil — le détail est sur chaque
-            offre.
+            Le classement par défaut est la note calculée pour ton profil : chaque offre montre
+            son bulletin, critère par critère.
           </>
         )}
       </p>
 
-      {/* Filtres : de vrais liens, donc partageables et sans JavaScript. */}
-      <div className="mt-7 space-y-3 border-y border-line py-5">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="mr-1 label">Lieu</span>
+      {/* Filtres : de vrais liens, donc partageables et utilisables sans JavaScript.
+          Une rangée par critère, libellé toujours à la même place : on balaie la colonne
+          de gauche pour trouver le réglage, au lieu de chercher dans une grappe de puces. */}
+      <div className="card mt-7 overflow-hidden">
+        <Groupe titre="Lieu">
           <Filtre actif={!p.zone} href={lien({ ...p, zone: undefined })}>
             Partout
           </Filtre>
           {ZONES.map((z) => (
             <Filtre key={z} actif={p.zone === z} href={lien({ ...p, zone: z })}>
               {ZONE_LABEL[z]}
+              <span className={`num ${p.zone === z ? "text-paper/60" : "text-muted"}`}>
+                {comptesZone[z]}
+              </span>
             </Filtre>
           ))}
-        </div>
+        </Groupe>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="mr-1 label">Contrat</span>
+        <Groupe titre="Contrat">
           <Filtre actif={!p.type || p.type === "tous"} href={lien({ ...p, type: undefined })}>
             Tous
           </Filtre>
           <Filtre actif={p.type === "stage"} href={lien({ ...p, type: "stage" })}>
-            Stage ({comptes.stage})
+            Stage
+            <span className={`num ${p.type === "stage" ? "text-paper/60" : "text-muted"}`}>
+              {comptes.stage}
+            </span>
           </Filtre>
           <Filtre actif={p.type === "alternance"} href={lien({ ...p, type: "alternance" })}>
-            Alternance ({comptes.alternance})
+            Alternance
+            <span className={`num ${p.type === "alternance" ? "text-paper/60" : "text-muted"}`}>
+              {comptes.alternance}
+            </span>
           </Filtre>
           {/* « Autre » n'apparaît que s'il y a vraiment un type renseigné hors stage et
               alternance : un filtre vide en permanence serait du bruit. */}
           {comptes.autre > 0 ? (
             <Filtre actif={p.type === "autre"} href={lien({ ...p, type: "autre" })}>
-              Autre type ({comptes.autre})
+              Autre type
+              <span className={`num ${p.type === "autre" ? "text-paper/60" : "text-muted"}`}>
+                {comptes.autre}
+              </span>
             </Filtre>
           ) : null}
           <Filtre actif={nonRenseigne} href={lien({ ...p, type: "non-renseigne" })}>
-            Type non renseigné ({nbNonRenseigne})
+            Non renseigné
+            <span className={`num ${nonRenseigne ? "text-paper/60" : "text-muted"}`}>
+              {nbNonRenseigne}
+            </span>
           </Filtre>
-        </div>
+        </Groupe>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="mr-1 label">Source</span>
+        <Groupe titre="Source">
           <Filtre actif={!p.source} href={lien({ ...p, source: undefined })}>
             Toutes
           </Filtre>
           {sources.map((s) => (
             <Filtre key={s} actif={p.source === s} href={lien({ ...p, source: s })}>
               {sourceLabel(s)}
+              <span className={`num ${p.source === s ? "text-paper/60" : "text-muted"}`}>
+                {comptesSource[s] ?? 0}
+              </span>
             </Filtre>
           ))}
-        </div>
+        </Groupe>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="mr-1 label">Tri</span>
-          <Filtre actif={(p.tri ?? "score") === "score"} href={lien({ ...p, tri: "score" })}>
-            Note
+        <Groupe titre="Classement">
+          <Filtre actif={(p.tri ?? "score") === "score"} href={lien({ ...p, tri: undefined })}>
+            Par note
           </Filtre>
           <Filtre actif={p.tri === "date"} href={lien({ ...p, tri: "date" })}>
-            Date de publication
+            Par date de publication
           </Filtre>
-          <span className="mx-1 h-4 w-px bg-line" />
-          <span className="mr-1 label">
-            Note mini
-          </span>
-          {[0, 60, 70, 80].map((m) => (
-            <Filtre key={m} actif={(p.min ?? "0") === String(m)} href={lien({ ...p, min: m ? String(m) : undefined })}>
-              {m === 0 ? "Toutes" : `${m}+`}
+        </Groupe>
+
+        <Groupe titre="Note minimale">
+          {[0, 50, 60, 70].map((m) => (
+            <Filtre
+              key={m}
+              actif={(p.min ?? "0") === String(m)}
+              href={lien({ ...p, min: m ? String(m) : undefined })}
+            >
+              {m === 0 ? "Aucune" : `${m} et plus`}
             </Filtre>
           ))}
+        </Groupe>
+
+        {/* Le résultat se lit au pied des réglages, là où on vient de cliquer. */}
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 bg-paper-deep/60 px-5 py-3">
+          <p className="text-sm text-ink-soft">
+            <span className="num font-semibold text-ink">{liste.length}</span> offre
+            {liste.length > 1 ? "s" : ""}
+            {liste.length > vues.length ? (
+              <span className="text-muted">
+                {" "}
+                · <span className="num">{vues.length}</span> affichées
+              </span>
+            ) : null}
+            {filtresActifs > 0 ? (
+              <span className="text-muted">
+                {" "}
+                · {filtresActifs} filtre{filtresActifs > 1 ? "s" : ""} actif
+                {filtresActifs > 1 ? "s" : ""}
+              </span>
+            ) : null}
+          </p>
+          {filtresActifs > 0 ? (
+            <Link href="/offres" className="text-xs text-accent underline underline-offset-2">
+              Tout réinitialiser
+            </Link>
+          ) : null}
         </div>
       </div>
 
@@ -224,7 +291,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
 
       {liste.length > vues.length ? (
         <p className="mt-4 text-center text-xs text-muted">
-          {vues.length} offres affichées sur {liste.length} — affine les filtres pour voir le reste.
+          Les {vues.length} premières sur {liste.length} — affine les filtres pour voir le reste.
         </p>
       ) : null}
 

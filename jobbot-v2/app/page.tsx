@@ -2,14 +2,17 @@ import Link from "next/link";
 import { OfferMini } from "@/components/OfferCard";
 import { Bulletin } from "@/components/Bulletin";
 import { ScoreBadge } from "@/components/ScoreBadge";
+import { Barres, Dumbbell } from "@/components/Graphes";
 import {
   SEUIL_BONNE_PISTE,
   competencesSimulables,
   effetGlobal,
+  offresAuDessus,
   volumeSuffisant,
 } from "@/lib/simulation";
 import {
   ageJours,
+  offers,
   lacunesRegroupees,
   meta,
   nbSignalFormation,
@@ -31,20 +34,26 @@ export default function Home() {
     nbFormation === 0
       ? `Sur les ${totalCollecte} annonces de cette collecte, aucune ne déclenche ce signal.`
       : `${nbFormation} annonce${nbFormation > 1 ? "s" : ""} le déclenche${nbFormation > 1 ? "nt" : ""} dans cette collecte.`;
-  const vues7j = offresAvecContrat.filter((o) => {
+  // Compté sur la collecte entière, comme les trois autres chiffres de la même rangée.
+  // Le restreindre aux offres classées donnait 86 à côté d'un « 230 en base » : deux
+  // dénominateurs dans la même phrase, donc un chiffre qui ne veut rien dire.
+  const vues7j = offers.filter((o) => {
     const j = ageJours(o);
     return j !== null && j <= 7;
   }).length;
 
   // Ce qui revient le plus souvent dans les offres et qui n'est pas au profil.
   // Regroupé par famille : « IA », « intelligence artificielle » et « IA générative » sont une chose.
-  const lacunes = lacunesRegroupees(offresAvecContrat, 8);
+  // Sur la collecte entière : le simulant compte sur 230, et afficher « IA : 92 offres »
+  // ici à côté de « demandée par 93 offres » plus bas serait la même chose comptée deux fois.
+  const lacunes = lacunesRegroupees(offers, 8);
 
   const sources = Object.entries(meta.sources).sort((a, b) => b[1] - a[1]);
 
   // Le simulant, vu d'ensemble : ce que chaque compétence manquante changerait sur la collecte.
   // Garde-fou du cahier de route — on n'annonce un comptage que si la base en contient assez,
   // sinon « 14 offres s'ouvriraient » n'a aucun sens statistique.
+  const dejaBonnes = offresAuDessus();
   const leviers = volumeSuffisant()
     ? competencesSimulables(4)
         .map((c) => ({ competence: c, effet: effetGlobal(c) }))
@@ -61,7 +70,7 @@ export default function Home() {
             Alternance · Stage · Toulouse et Île-de-France
           </p>
           <h1 className="titre-geant mt-5 max-w-4xl">
-            Les offres qui te correspondent vraiment.
+            Les offres qui te correspondent <span className="surligne">vraiment</span>.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-ink-soft">
             JobBot lit les annonces publiées par les entreprises et les sources officielles, puis
@@ -194,29 +203,16 @@ export default function Home() {
         <section className="mx-auto max-w-6xl px-5 py-14">
           <h2 className="titre-section">Ce qui revient dans les offres, et pas ton CV</h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-            Compté sur les {offresAvecContrat.length} offres classées, en reprenant les compétences
+            Compté sur les {offers.length} offres de la collecte, en reprenant les compétences
             explicitement demandées par les annonces. Ces chiffres disent quoi travailler en premier —
             pas une note sur toi.
           </p>
-          <ul className="mt-7 space-y-3">
-            {lacunes.map((l) => {
-              const pct = Math.round((l.n / offresAvecContrat.length) * 100);
-              return (
-                <li key={l.label} className="grid grid-cols-[8rem_1fr_4.5rem] items-center gap-4">
-                  <span className="truncate text-sm font-medium text-ink-soft">{l.label}</span>
-                  <span className="h-2 overflow-hidden rounded-full bg-paper-deep">
-                    <span
-                      className="block h-full rounded-full bg-ink/70"
-                      style={{ width: `${Math.max(pct, 3)}%` }}
-                    />
-                  </span>
-                  <span className="num text-right text-xs text-muted">
-                    {l.n} offre{l.n > 1 ? "s" : ""}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+          <div className="mt-8">
+            <Barres
+              donnees={lacunes.map((l) => ({ label: l.label, valeur: l.n }))}
+              total={offers.length}
+            />
+          </div>
         </section>
       ) : null}
 
@@ -230,35 +226,31 @@ export default function Home() {
               moteur qui calcule déjà les notes affichées. Aucune estimation, aucun modèle : le même
               calcul, avec une case cochée en plus.
             </p>
-            <ul className="mt-7 space-y-3">
-              {leviers.map(({ competence, effet }) => (
-                <li key={competence.label} className="card p-5">
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                    <h3 className="text-[15px] font-medium">{competence.label}</h3>
-                    <span className="num text-xs text-muted">
-                      demandée par {competence.demandee} offre{competence.demandee > 1 ? "s" : ""}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                    {effet.franchissent > 0 ? (
-                      <>
-                        <strong className="num font-semibold text-ink">
-                          {effet.franchissent} offre{effet.franchissent > 1 ? "s" : ""}
-                        </strong>{" "}
-                        passerai{effet.franchissent > 1 ? "ent" : "t"} au-dessus de{" "}
-                        <span className="num">{SEUIL_BONNE_PISTE}</span>.{" "}
-                      </>
-                    ) : (
-                      <>Aucune offre ne franchirait le seuil de {SEUIL_BONNE_PISTE}, mais{" "}</>
-                    )}
-                    <span className="num">{effet.montent}</span> note
-                    {effet.montent > 1 ? "s" : ""} monterai{effet.montent > 1 ? "ent" : "t"}, de{" "}
-                    <span className="num">{effet.gainMoyen}</span> point
-                    {effet.gainMoyen > 1 ? "s" : ""} en moyenne.
-                  </p>
-                </li>
-              ))}
-            </ul>
+            <div className="mt-9 card p-6 sm:p-7">
+              <p className="text-sm text-ink-soft">
+                Aujourd&apos;hui,{" "}
+                <strong className="num font-semibold text-ink">{dejaBonnes} offres</strong> sont
+                au-dessus de <span className="num">{SEUIL_BONNE_PISTE}</span> sur{" "}
+                <span className="num">{offers.length}</span>. Voilà où chaque compétence
+                emmènerait ce chiffre.
+              </p>
+              <div className="mt-6">
+                <Dumbbell
+                  legendeAvant="Aujourd'hui"
+                  legendeApres="Avec la compétence"
+                  donnees={leviers.map(({ competence, effet }) => ({
+                    label: competence.label,
+                    avant: dejaBonnes,
+                    apres: dejaBonnes + effet.franchissent,
+                    detail:
+                      `${competence.label} — demandée par ${competence.demandee} offres. ` +
+                      `${effet.franchissent} franchiraient ${SEUIL_BONNE_PISTE} ; ` +
+                      `${effet.montent} notes monteraient, de ${effet.gainMoyen} points en moyenne.`,
+                  }))}
+                />
+              </div>
+            </div>
+
             <p className="mt-5 max-w-2xl text-xs leading-relaxed text-muted">
               Le détail offre par offre est sur chaque fiche : coche la compétence, la note est
               recalculée et le critère qui bouge est nommé.
