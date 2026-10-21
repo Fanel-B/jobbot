@@ -18,6 +18,8 @@ export type OffreAScorer = {
   company: string | null;
   description: string | null;
   skills_required: string[] | null;
+  /** Compétences souhaitées : le pipeline les compte aussi parmi les exigences. */
+  skills_optional?: string[] | null;
   start_date: string | null;
   published_at: string | null;
   first_seen_at: string | null;
@@ -55,6 +57,10 @@ const MES_ATOUTS: [string, string][] = [
   ["pandas", "Pandas"], ["matplotlib", "Matplotlib"], ["excel", "Excel"], ["html", "HTML"],
   ["css", "CSS"], ["api rest", "API REST"], ["rest", "API REST"],
   ["javascript/typescript", "JavaScript"], ["json", "JSON"], ["scrum", "Scrum"], ["agile", "Agile"],
+  // Ajoutés le 20/10/2026 côté Python (mise en ligne de JobBot V2) puis portés ici le 21/10/2026 : sans
+  // ces trois entrées, le site ne comptait pas « tests unitaires » comme couvert et affichait 4 exigences
+  // couvertes là où le pipeline en compte 5 (constaté sur l'offre #796 chez Capgemini).
+  ["typescript", "TypeScript"], ["tests unitaires", "tests unitaires"], ["vitest", "Vitest"],
 ];
 
 // Familles : une exigence proche compte comme couverte (SQL ↔ MySQL/PostgreSQL/SQLite…).
@@ -104,7 +110,10 @@ const DEPOTS: [number, string[], string][] = [
   [3, ["linkedin.com", "indeed"], "alerte — il faut retrouver l'offre d'origine"],
 ];
 
-const PLAFOND_GROUPE = 3;
+// Plafond par groupe : **retiré le 21/10/2026** (« on s'en fout du plafond, enlève-moi les plafonds »).
+// Il valait 3 et retirait 14 points à chaque offre au-delà de la troisième d'un même groupe. Le critère
+// reste affiché (comptage des places) mais ne retire plus rien. Valeur historique : 3.
+const PLAFOND_GROUPE: number | null = null;
 const GROUPES: [string, string][] = [
   ["airbus", "Airbus (et Airbus Protect, ATR, Atlantic)"],
   ["atr", "Airbus (et Airbus Protect, ATR, Atlantic)"],
@@ -130,6 +139,13 @@ const PROJETS: [string, string[]][] = [
   ["Biblio-Tech — application web full stack (Next.js, Node, API, JWT, IoT simulé)",
     ["web", "front", "react", "next", "javascript", "application", "interface", "api", "full stack",
       "fullstack", "développement logiciel", "site"]],
+  // Ajouté le 20/10/2026 (même date que côté Python) : JobBot V2 est en ligne. Ce qui le rend crédible
+  // sur une offre, ce n'est pas « un site », c'est le TypeScript, le portage d'un moteur Python et les
+  // tests qui le tiennent. Sans cette entrée, le site ne créditait pas le projet que le pipeline crédite
+  // → 26 désaccords constatés le 21/10/2026 dans verifier-scoring.
+  ["JobBot V2 — site Next.js/TypeScript, moteur de scoring porté de Python, 88 tests, PostgreSQL",
+    ["typescript", "tests", "test unitaire", "postgresql", "déploiement", "mise en production",
+      "modèle de données", "algorithme", "veille", "collecte", "automatisé", "qualité de code"]],
   ["Analyse Insertion Pro MIAGE — analyse de données emploi, tableaux de bord",
     ["données", "data", "tableaux de bord", "dashboard", "power bi", "analyse", "statistique",
       "reporting", "kpi", "indicateurs", "visualisation"]],
@@ -198,8 +214,8 @@ function skillsCommeEnBase(skills: string[] | null): string {
  * qui le signale en comparant avec `skills.required`).
  */
 export function exigences(o: OffreAScorer): string[] {
-  const texte = norm([o.title ?? "", o.description ?? "", skillsCommeEnBase(o.skills_required), ""]
-    .join(" "));
+  const texte = norm([o.title ?? "", o.description ?? "", skillsCommeEnBase(o.skills_required),
+    skillsCommeEnBase(o.skills_optional ?? null)].join(" "));
   const trouvees: string[] = [];
   for (const mot of VOCABULAIRE) {
     const motif = new RegExp("(?<![a-z0-9])" + echapper(norm(mot)) + "(?![a-z0-9])");
@@ -426,12 +442,14 @@ export function classer(
   }
 
   // Deuxième passe : plafond par groupe. `sort` est stable : à égalité, l'ordre d'entrée tient.
-  const ordonnes = [...premiere].sort((a, b) => b.prio - a.prio);
+  // Départage par identifiant, comme le Python : à égalité de note, l'ordre ne doit pas dépendre de
+  // l'ordre d'entrée, sinon les « nᵉ place » de la diversité divergent entre le pipeline et le site.
+  const ordonnes = [...premiere].sort((a, b) => b.prio - a.prio || a.o.id - b.o.id);
   const vus = new Map<string, number>();
   const finaux = ordonnes.map((r) => {
     let points: number, pourquoi: string;
     const deja = vus.get(r.groupe) ?? 0;
-    if (deja < PLAFOND_GROUPE) {
+    if (PLAFOND_GROUPE === null || deja < PLAFOND_GROUPE) {
       vus.set(r.groupe, deja + 1);
       [points, pourquoi] = [14, `${r.groupe} — ${deja + 1}ᵉ place`];
     } else {
@@ -447,7 +465,7 @@ export function classer(
       manquants: r.manquants,
     };
   });
-  return finaux.sort((a, b) => b.total - a.total);
+  return finaux.sort((a, b) => b.total - a.total || a.id - b.id);
 }
 
 /**
