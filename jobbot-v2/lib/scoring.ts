@@ -208,9 +208,20 @@ export function exigences(o: OffreAScorer): string[] {
   return trouvees;
 }
 
-/** `_couverte` : nom de l'atout qui couvre l'exigence (comparaison en minuscules, accents gardés). */
-function couverte(exigence: string): string | null {
+/**
+ * `_couverte` : nom de l'atout qui couvre l'exigence (comparaison en minuscules, accents gardés).
+ *
+ * `ajouts` est la liste des compétences **simulées** — celles que l'on n'a pas encore et dont on
+ * veut mesurer l'effet (« et si j'apprenais TypeScript ? »). Vide par défaut : le calcul rend alors
+ * exactement ce que rend le pipeline, et `npm run verifier-scoring` le vérifie sur chaque offre.
+ * Les ajouts sont examinés en premier, avec la même règle de correspondance que les atouts réels.
+ */
+function couverte(exigence: string, ajouts: readonly string[] = []): string | null {
   const e = exigence.toLowerCase();
+  for (const brut of ajouts) {
+    const cle = brut.toLowerCase().trim();
+    if (cle && (e.includes(cle) || cle.includes(e))) return brut;
+  }
   for (const [cle, nom] of MES_ATOUTS) {
     if (e.includes(cle) || cle.includes(e)) return nom;
   }
@@ -381,16 +392,24 @@ export function maintenantDeLExport(generatedAt: string, fuseauHeures = FUSEAU_P
  *
  * Renvoie les résultats triés du plus prioritaire au moins.
  */
+/**
+ * Classe les offres. `ajouts` simule des compétences que le profil n'a pas encore : c'est le seul
+ * levier du « et si j'apprenais X ? », et il ne touche que la couverture des exigences — donc le
+ * critère « cohérence », puis la passe de diversité qui dépend de l'ordre des notes.
+ *
+ * Sans `ajouts`, le résultat est celui du pipeline, à la virgule près.
+ */
 export function classer(
   offres: OffreAScorer[],
   maintenant: number,
   actions: Map<number, number> = new Map(),
+  ajouts: readonly string[] = [],
 ): Resultat[] {
   const premiere: { prio: number; o: OffreAScorer; raisons: string[]; exigs: string[]; manquants: string[]; groupe: string }[] = [];
   for (const o of offres) {
     const exigs = exigences(o);
-    const couvertes = exigs.filter((x) => couverte(x));
-    const manquants = exigs.filter((x) => !couverte(x));
+    const couvertes = exigs.filter((x) => couverte(x, ajouts));
+    const manquants = exigs.filter((x) => !couverte(x, ajouts));
     // Dénominateur plancher de 3 (biais corrigé côté Python le 18/10/2026).
     const base = exigs.length ? couvertes.length / Math.max(3, exigs.length) : 0.35;
     const j = jours(o, maintenant);

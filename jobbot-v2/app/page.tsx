@@ -3,6 +3,12 @@ import { OfferMini } from "@/components/OfferCard";
 import { Bulletin } from "@/components/Bulletin";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import {
+  SEUIL_BONNE_PISTE,
+  competencesSimulables,
+  effetGlobal,
+  volumeSuffisant,
+} from "@/lib/simulation";
+import {
   ageJours,
   lacunesRegroupees,
   meta,
@@ -35,6 +41,16 @@ export default function Home() {
   const lacunes = lacunesRegroupees(offresAvecContrat, 8);
 
   const sources = Object.entries(meta.sources).sort((a, b) => b[1] - a[1]);
+
+  // Le simulant, vu d'ensemble : ce que chaque compétence manquante changerait sur la collecte.
+  // Garde-fou du cahier de route — on n'annonce un comptage que si la base en contient assez,
+  // sinon « 14 offres s'ouvriraient » n'a aucun sens statistique.
+  const leviers = volumeSuffisant()
+    ? competencesSimulables(4)
+        .map((c) => ({ competence: c, effet: effetGlobal(c) }))
+        .filter((l) => l.effet.franchissent > 0 || l.effet.montent > 0)
+        .sort((a, b) => b.effet.franchissent - a.effet.franchissent || b.effet.montent - a.effet.montent)
+    : [];
 
   return (
     <div>
@@ -201,6 +217,53 @@ export default function Home() {
               );
             })}
           </ul>
+        </section>
+      ) : null}
+
+      {/* ------------------------------------------------------------- le simulant */}
+      {leviers.length > 0 ? (
+        <section className="border-t border-line bg-paper-deep/50">
+          <div className="mx-auto max-w-6xl px-5 py-14">
+            <h2 className="font-display text-3xl">Et si tu apprenais une de ces compétences ?</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+              Chaque ligne est la collecte entière reclassée avec cette compétence en plus, par le
+              moteur qui calcule déjà les notes affichées. Aucune estimation, aucun modèle : le même
+              calcul, avec une case cochée en plus.
+            </p>
+            <ul className="mt-7 space-y-3">
+              {leviers.map(({ competence, effet }) => (
+                <li key={competence.label} className="card p-5">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <h3 className="text-[15px] font-medium">{competence.label}</h3>
+                    <span className="num text-xs text-muted">
+                      demandée par {competence.demandee} offre{competence.demandee > 1 ? "s" : ""}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                    {effet.franchissent > 0 ? (
+                      <>
+                        <strong className="num font-semibold text-ink">
+                          {effet.franchissent} offre{effet.franchissent > 1 ? "s" : ""}
+                        </strong>{" "}
+                        passerai{effet.franchissent > 1 ? "ent" : "t"} au-dessus de{" "}
+                        <span className="num">{SEUIL_BONNE_PISTE}</span>.{" "}
+                      </>
+                    ) : (
+                      <>Aucune offre ne franchirait le seuil de {SEUIL_BONNE_PISTE}, mais{" "}</>
+                    )}
+                    <span className="num">{effet.montent}</span> note
+                    {effet.montent > 1 ? "s" : ""} monterai{effet.montent > 1 ? "ent" : "t"}, de{" "}
+                    <span className="num">{effet.gainMoyen}</span> point
+                    {effet.gainMoyen > 1 ? "s" : ""} en moyenne.
+                  </p>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-5 max-w-2xl text-xs leading-relaxed text-muted">
+              Le détail offre par offre est sur chaque fiche : coche la compétence, la note est
+              recalculée et le critère qui bouge est nommé.
+            </p>
+          </div>
         </section>
       ) : null}
 

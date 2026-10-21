@@ -378,6 +378,17 @@ const FAMILLES_LACUNES: { motif: RegExp; nom: string }[] = [
   { motif: /^(bdd|base de donnees|bases de donnees|sql\/nosql)\b/, nom: "Bases de données" },
 ];
 
+/**
+ * La famille d'affichage d'une compétence manquante, ou la compétence elle-même si elle n'entre
+ * dans aucune famille. Exporté pour que le simulant raisonne sur les mêmes regroupements que la
+ * liste « ce qui te manque » : sans ça, « IA », « intelligence artificielle » et « IA générative »
+ * se présenteraient comme trois compétences à apprendre séparément.
+ */
+export function familleLacune(brut: string): string {
+  const norm = sansAccents(brut);
+  return FAMILLES_LACUNES.find((f) => f.motif.test(norm))?.nom ?? brut;
+}
+
 /** Ce qui manque le plus souvent, regroupé par famille. `n` compte des **offres**. */
 export function lacunesRegroupees(
   source: Offer[],

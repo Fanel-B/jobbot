@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Bulletin } from "@/components/Bulletin";
+import { Simulant, SimulantSquelette } from "@/components/Simulant";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import {
   ContractChip,
@@ -49,7 +51,15 @@ function NonPrecise({ quoi }: { quoi: string }) {
   );
 }
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  // Next 16 : `searchParams` est une Promise, et doit être lue dans un composant enveloppé
+  // de <Suspense> — sinon le pré-rendu échoue (« blocking-prerender-dynamic »).
+  searchParams: Promise<{ simule?: string }>;
+}) {
   const { id } = await params;
   const offre = parId(id);
   if (!offre) notFound();
@@ -204,6 +214,11 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
               ) : null}
             </section>
           ) : null}
+
+          {/* Le simulant : « et si j'apprenais X ? » */}
+          <Suspense fallback={<SimulantSquelette />}>
+            <Simulant offreId={offre.id} searchParams={searchParams} />
+          </Suspense>
 
           {/* Description réelle */}
           <section className="mt-9">

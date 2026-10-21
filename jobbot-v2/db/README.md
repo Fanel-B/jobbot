@@ -17,6 +17,10 @@ Deux décisions à ne pas casser (voir `BRIEFING.md`, section 5) :
 
 `data/offers.json` reste en place : c'est le jeu de démonstration hors ligne.
 
+**Toutes les commandes de ce document se lancent depuis `jobbot-v2/`**, la racine du site. C'est ce
+qui rend corrects les chemins `db/schema.sql`, `tools/collecteur_postgres.py` et surtout
+`reference/export_site.py`, dont le collecteur recopie les règles de zone et de contrat.
+
 ---
 
 ## Règle d'or : la chaîne de connexion
