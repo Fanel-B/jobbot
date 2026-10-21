@@ -153,18 +153,18 @@ describe("forme du bulletin", () => {
 /* ------------------------------------------------------------------- bornes */
 
 describe("bornes de la note", () => {
-  it("note plancher : 5, quand chaque critère est au minimum et le groupe déjà plafonné", () => {
+  it("note plancher : 19, quand chaque critère est au minimum mais que la diversité est intacte", () => {
     const resultats = classer([plancher(20), plancher(21), plancher(22), plancher(23)], MAINTENANT);
     const dernier = resultats[3];
     expect(dernier.id).toBe(23);
-    expect(dernier.total).toBe(5);
-    expect(dernier.breakdown.map((l) => l.points)).toEqual([0, 0, 2, 1, 0, 2, 0, 0, 0]);
-    expect(somme(dernier)).toBe(5);
+    expect(dernier.total).toBe(19);
+    expect(dernier.breakdown.map((l) => l.points)).toEqual([0, 0, 2, 1, 0, 2, 0, 0, 14]);
+    expect(somme(dernier)).toBe(19);
   });
 
-  it("les trois premières offres du même groupe gardent leurs 14 points de diversité (5 + 14 = 19)", () => {
+  it("les quatre offres du même groupe gardent leurs 14 points de diversité : plus aucun plafond", () => {
     const resultats = classer([plancher(20), plancher(21), plancher(22), plancher(23)], MAINTENANT);
-    expect(resultats.map((r) => r.total)).toEqual([19, 19, 19, 5]);
+    expect(resultats.map((r) => r.total)).toEqual([19, 19, 19, 19]);
   });
 
   it("note plafond : 100 exactement, jamais au-delà, même avec plus d'exigences et un projet en prime", () => {
@@ -453,8 +453,8 @@ describe("dossier", () => {
 
 /* ---------------------------------------------------------------- diversité */
 
-describe("diversité : plafond de trois offres par groupe", () => {
-  it("Airbus, Airbus Protect et ATR forment un seul groupe : la quatrième offre perd ses 14 points", () => {
+describe("diversité : plus aucun plafond de groupe (décision du 21/10/2026)", () => {
+  it("Airbus, Airbus Protect, ATR et Airbus Defence forment un seul groupe : la quatrième garde ses 14 points", () => {
     const offres = [
       { ...plancher(20), company: "Airbus" },
       { ...plancher(21), company: "Airbus Protect" },
@@ -463,21 +463,21 @@ describe("diversité : plafond de trois offres par groupe", () => {
     ];
     const r = classer(offres, MAINTENANT).find((x) => x.id === 23)!;
     expect(ligne(r, "diversité")).toEqual({
-      critere: "diversité", points: 0, max: 14, detail: "plafond atteint chez Airbus (et Airbus Protect, ATR, Atlantic)",
+      critere: "diversité", points: 14, max: 14, detail: "Airbus (et Airbus Protect, ATR, Atlantic) — 4ᵉ place",
     });
   });
 
-  it("le plafond frappe l'offre la moins bien notée du groupe, pas la dernière arrivée", () => {
+  it("le comptage des places suit toujours la note : la meilleure du groupe est première", () => {
     const meilleure = { ...IDEALE, id: 99, company: "Airbus" };
     const r = classer([plancher(20), plancher(21), plancher(22), meilleure], MAINTENANT);
     expect(ligne(r.find((x) => x.id === 99)!, "diversité").detail).toBe("Airbus (et Airbus Protect, ATR, Atlantic) — 1ᵉ place");
-    expect(ligne(r.find((x) => x.id === 22)!, "diversité").points).toBe(0);
+    expect(ligne(r.find((x) => x.id === 22)!, "diversité").points).toBe(14);
   });
 
-  it("entreprise absente : les offres sans entreprise partagent le groupe « ? » (comme le Python)", () => {
+  it("entreprise absente : les offres sans entreprise partagent le groupe « ? », sans plafond non plus", () => {
     const resultats = classer([offre(30), offre(31), offre(32), offre(33)], MAINTENANT);
-    expect(resultats.map((r) => r.total)).toEqual([38, 38, 38, 24]);
-    expect(ligne(resultats[3], "diversité").detail).toBe("plafond atteint chez ?");
+    expect(resultats.map((r) => r.total)).toEqual([38, 38, 38, 38]);
+    expect(ligne(resultats[3], "diversité").detail).toBe("? — 4ᵉ place");
   });
 });
 
@@ -486,7 +486,7 @@ describe("diversité : plafond de trois offres par groupe", () => {
 describe("contrat inconnu", () => {
   type AvecContrat = OffreAScorer & { contract_known: boolean };
 
-  it("à égalité de note, l'offre sans contrat passe après les stages : c'est elle qui est plafonnée", () => {
+  it("à égalité de note, le départage se fait par identifiant — et plus personne n'est plafonné", () => {
     const offres: AvecContrat[] = [
       { ...plancher(1), contract_known: false },
       { ...plancher(2), contract_known: true },
@@ -495,8 +495,14 @@ describe("contrat inconnu", () => {
     ];
     const ordonnees = ordreDuPipeline(offres);
     expect(ordonnees.map((o) => o.id)).toEqual([2, 3, 4, 1]);
-    const sansContrat = classer(ordonnees, MAINTENANT).find((r) => r.id === 1)!;
-    expect(ligne(sansContrat, "diversité").points).toBe(0);
+    const resultats = classer(ordonnees, MAINTENANT);
+    // Le sans-contrat arrive en dernier à l'entrée, mais à égalité de note c'est son identifiant qui
+    // décide : il passe premier du groupe, sans perdre ses 14 points.
+    const sansContrat = resultats.find((r) => r.id === 1)!;
+    expect(ligne(sansContrat, "diversité")).toMatchObject({
+      points: 14, detail: "Airbus (et Airbus Protect, ATR, Atlantic) — 1ᵉ place",
+    });
+    expect(resultats.map((r) => r.id)).toEqual([1, 2, 3, 4]);
   });
 
   it("les offres sans contrat sont rangées de la plus récente à la plus ancienne", () => {
