@@ -13,7 +13,7 @@
  * dessine exagère les grands écarts. Sur « IA 93 contre AWS 5 », elle mentirait à l'œil.
  */
 
-const PISTE = "relative h-2.5 flex-1 rounded-full bg-paper-deep";
+const PISTE = "relative h-3 flex-1 rounded-full bg-paper-deep";
 
 /* ------------------------------------------------------------------ barres */
 
@@ -42,7 +42,7 @@ export function Barres({
         return (
           <li
             key={d.label}
-            className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 sm:grid-cols-[13rem_1fr_3.5rem]"
+            className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 sm:grid-cols-[13rem_1fr_5.5rem]"
             title={`${d.label} — ${d.valeur} ${unite} sur ${total} (${part} %)`}
           >
             <span className="truncate text-sm text-ink-soft">{d.label}</span>
@@ -52,7 +52,10 @@ export function Barres({
                 style={{ width: `${Math.max((d.valeur / max) * 100, 2)}%` }}
               />
             </span>
-            <span className="num text-right text-sm tabular-nums text-ink">{d.valeur}</span>
+            <span className="text-right text-sm text-ink">
+              <span className="num font-medium">{d.valeur}</span>
+              <span className="num ml-1.5 text-xs text-muted">{part}%</span>
+            </span>
           </li>
         );
       })}
@@ -115,8 +118,14 @@ export function Dumbbell({
               <span className="truncate text-sm text-ink-soft">{d.label}</span>
 
               <span className="relative order-last col-span-2 h-5 sm:order-none sm:col-span-1">
-                {/* la piste */}
-                <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-line" />
+                {/* la piste, et la part déjà acquise : laisser les deux tiers de gauche
+                    vides donnait un graphique tassé à droite, alors que ce vide dit
+                    justement « ce que tu as déjà ». */}
+                <span className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-paper-deep" />
+                <span
+                  className="absolute top-1/2 h-1 -translate-y-1/2 rounded-l-full bg-trace-pale"
+                  style={{ width: `${pos(d.avant)}%` }}
+                />
                 {/* le segment gagné */}
                 <span
                   className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-trace"

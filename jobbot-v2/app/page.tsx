@@ -64,42 +64,74 @@ export default function Home() {
   return (
     <div>
       {/* ------------------------------------------------------------ ouverture */}
-      <section className="border-b border-line">
-        <div className="apparait mx-auto max-w-6xl px-5 pb-16 pt-20 sm:pt-24">
-          <p className="label">
-            Alternance · Stage · Toulouse et Île-de-France
-          </p>
-          <h1 className="titre-geant mt-5 max-w-4xl">
-            Les offres qui te correspondent <span className="surligne">vraiment</span>.
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-ink-soft">
-            JobBot lit les annonces publiées par les entreprises et les sources officielles, puis
-            explique chaque correspondance <strong className="font-medium">critère par critère</strong>
-            {" "}— ce qui colle, ce qui manque, et ce que ça veut dire avant de postuler.
-          </p>
+      {/* Un grand bloc arrondi posé sur le gris, avec l'aurore dessous : c'est la
+          silhouette du site, et ce qui remplace le mur plat d'avant. */}
+      <section className="px-3 pt-3 sm:px-5 sm:pt-5">
+        <div className="aurore bloc mx-auto max-w-[78rem] overflow-hidden border border-line">
+          <div className="cascade grid gap-12 px-6 py-16 sm:px-12 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16 lg:py-20">
+            <div>
+              <p className="label">Alternance · Stage · Toulouse et Île-de-France</p>
+              <h1 className="titre-geant mt-5 max-w-[11ch]">
+                Les offres qui te correspondent <span className="surligne">vraiment</span>.
+              </h1>
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-ink-soft">
+                JobBot lit les annonces publiées par les entreprises et les sources officielles,
+                puis explique chaque correspondance{" "}
+                <strong className="font-medium text-ink">critère par critère</strong> — ce qui
+                colle, ce qui manque, et ce que ça veut dire avant de postuler.
+              </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link
-              href="/offres?zone=toulouse&tri=score"
-              className="rounded-lg bg-ink px-5 py-3 text-sm font-medium text-paper transition hover:bg-ink-soft"
-            >
-              Voir les {meta.zones.toulouse} offres à Toulouse
-            </Link>
-            <Link
-              href="/offres?zone=idf&tri=score"
-              className="rounded-lg border border-line-strong bg-surface px-5 py-3 text-sm font-medium text-ink transition hover:border-ink/30"
-            >
-              Île-de-France ({meta.zones.idf})
-            </Link>
-            <Link
-              href="/methode"
-              className="px-2 py-3 text-sm font-medium text-accent underline decoration-accent/30"
-            >
-              Comment la note est calculée
-            </Link>
+              <div className="mt-9 flex flex-wrap items-center gap-3">
+                <Link
+                  href="/offres?zone=toulouse&tri=score"
+                  className="bouton-plein px-5 py-3 text-sm font-medium"
+                >
+                  Voir les {meta.zones.toulouse} offres à Toulouse
+                </Link>
+                <Link href="/offres?zone=idf&tri=score" className="bouton-vide px-5 py-3 text-sm font-medium">
+                  Île-de-France ({meta.zones.idf})
+                </Link>
+                <Link href="/methode" className="lien-anime py-3 text-sm font-medium text-accent">
+                  Comment ça marche
+                </Link>
+              </div>
+            </div>
+
+            {/* La meilleure offre du jour, en vrai. L'espace à droite montre le produit
+                au lieu de rester vide. */}
+            {reference ? (
+              <div className="relative">
+                <div className="card carte-vive p-6">
+                  <p className="label">Offre la mieux notée aujourd&apos;hui</p>
+                  <h2 className="mt-3 text-lg leading-snug font-medium">
+                    {reference.title ?? "Offre"}
+                  </h2>
+                  <p className="mt-1.5 text-sm text-muted">
+                    {reference.company ?? "—"} · {reference.location ?? "lieu non précisé"}
+                  </p>
+                  <div className="mt-5 flex items-center gap-5 border-t border-line pt-5">
+                    <ScoreBadge score={reference.score} taille="lg" />
+                    <div className="min-w-0 flex-1">
+                      <p className="num text-sm text-ink-soft">
+                        {reference.score_breakdown?.length ?? 0} critères détaillés
+                      </p>
+                      <p className="mt-1 text-xs text-muted">
+                        Chaque point est justifié sur la fiche.
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    href={`/offres/${reference.id}`}
+                    className="lien-anime mt-5 inline-block text-sm font-medium text-accent"
+                  >
+                    Voir son bulletin complet
+                  </Link>
+                </div>
+              </div>
+            ) : null}
           </div>
 
-          <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-6 border-t border-line pt-8 sm:grid-cols-4">
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-8 border-t border-line/80 bg-surface/50 px-6 py-10 backdrop-blur-sm sm:px-12 lg:grid-cols-4">
             {[
               { k: "Offres en base", v: meta.count },
               { k: "Toulouse et alentours", v: meta.zones.toulouse },
@@ -112,7 +144,7 @@ export default function Home() {
               </div>
             ))}
           </dl>
-          <p className="mt-4 text-xs text-muted">
+          <p className="border-t border-line/80 bg-surface/50 px-6 pb-7 text-xs text-muted sm:px-12">
             Chiffres réels, relevés à la dernière collecte du{" "}
             {new Date(meta.generated_at).toLocaleString("fr-FR")}. Aucune donnée de démonstration.
           </p>
@@ -145,7 +177,7 @@ export default function Home() {
         <section className="border-y border-line bg-paper-deep/50">
           <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 lg:grid-cols-[1.1fr_1fr]">
             <div>
-              <h2 className="titre-section">Une note, neuf raisons</h2>
+              <h2 className="titre-section lg:sticky lg:top-24">Une note, neuf raisons</h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-soft">
                 La note n&apos;est pas une impression : elle additionne neuf critères calculés par du
                 code, tous reproductibles. Chaque offre porte son bulletin, y compris quand un
@@ -200,14 +232,14 @@ export default function Home() {
 
       {/* ------------------------------------------------------------ les lacunes */}
       {lacunes.length > 0 ? (
-        <section className="mx-auto max-w-6xl px-5 py-14">
+        <section className="mx-auto max-w-6xl px-5 py-16">
           <h2 className="titre-section">Ce qui revient dans les offres, et pas ton CV</h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
             Compté sur les {offers.length} offres de la collecte, en reprenant les compétences
             explicitement demandées par les annonces. Ces chiffres disent quoi travailler en premier —
             pas une note sur toi.
           </p>
-          <div className="mt-8">
+          <div className="card mt-8 p-6 sm:p-8">
             <Barres
               donnees={lacunes.map((l) => ({ label: l.label, valeur: l.n }))}
               total={offers.length}
@@ -218,8 +250,8 @@ export default function Home() {
 
       {/* ------------------------------------------------------------- le simulant */}
       {leviers.length > 0 ? (
-        <section className="border-t border-line bg-paper-deep/50">
-          <div className="mx-auto max-w-6xl px-5 py-14">
+        <section className="px-3 sm:px-5">
+          <div className="aurore bloc mx-auto max-w-[78rem] border border-line px-6 py-16 sm:px-12">
             <h2 className="titre-section">Et si tu apprenais une de ces compétences ?</h2>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
               Chaque ligne est la collecte entière reclassée avec cette compétence en plus, par le
