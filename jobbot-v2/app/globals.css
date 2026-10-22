@@ -21,18 +21,22 @@
    un contraste d'environ 4,8:1 sur blanc.
    --------------------------------------------------------------------------- */
 @theme {
-  /* Surfaces — gris neutres, aucune chaleur */
-  --color-paper: oklch(96.5% 0 0);
-  --color-paper-deep: oklch(93.2% 0 0);
-  --color-surface: #ffffff;
+  /* Surfaces — un blanc cassé chaud, jamais le blanc pur.
+     Le blanc d'écran à 100 % de luminance brûle les yeux le soir ; la page
+     descend à 91 % et les cartes à 96 %, avec une pointe de chaleur. Ça évite
+     d'avoir à proposer un thème sombre : il n'y a plus de quoi éblouir. */
+  --color-paper: oklch(91.5% 0.007 82);
+  --color-paper-deep: oklch(87.5% 0.009 82);
+  --color-surface: oklch(96% 0.005 82);
 
-  /* Encre — une seule couleur, trois niveaux de présence */
-  --color-ink: oklch(16% 0 0);
-  --color-ink-soft: oklch(38% 0 0);
-  --color-muted: oklch(52% 0 0);
+  /* Encre — un noir adouci, légèrement chaud. Le noir pur sur blanc pur,
+     c'est 17:1 : bien au-delà de ce qu'il faut, et fatigant. Ici 10:1. */
+  --color-ink: oklch(23% 0.009 60);
+  --color-ink-soft: oklch(38% 0.008 60);
+  --color-muted: oklch(45% 0.006 60);
 
-  --color-line: oklch(88.5% 0 0);
-  --color-line-strong: oklch(80% 0 0);
+  --color-line: oklch(83% 0.008 82);
+  --color-line-strong: oklch(74% 0.01 82);
 
   /* Trois couleurs, trois rôles. Le fond reste noir et blanc : elles ne servent
      qu'à dire quelque chose, jamais à décorer.
@@ -46,7 +50,7 @@
   --color-accent-soft: oklch(96.5% 0.028 258);
 
   /* Bleu — les tracés. Deux nuances d'une seule teinte : la règle du avant/après. */
-  --color-trace: oklch(62% 0.15 258);
+  --color-trace: oklch(57% 0.165 258);
   --color-trace-fort: oklch(44% 0.17 258);
   --color-trace-pale: oklch(84% 0.085 258);
 
@@ -157,24 +161,40 @@
     border-radius: var(--radius-bloc);
   }
 
-  /* L'aurore : quatre halos des trois couleurs, très dilués. Le fond reste blanc,
-     la couleur ne fait que respirer dessous. C'est ce qui remplace le mur gris. */
-  .aurore {
+  /* Papier réglé.
+     Le halo flou en dégradé est la signature des pages d'accueil faites à la
+     chaîne : tout le monde a le même. JobBot note des offres et affiche des
+     bulletins — sa trame, c'est celle d'un cahier de notes. La grille est fine,
+     elle s'efface vers le bas, et un seul lavis chaud l'empêche d'être clinique. */
+  .regle {
     position: relative;
     isolation: isolate;
     background-color: var(--color-surface);
   }
-  .aurore::before {
+  .regle::before {
     content: "";
     position: absolute;
     inset: 0;
     z-index: -1;
     border-radius: inherit;
     background-image:
-      radial-gradient(at 12% 18%, oklch(48% 0.17 258 / 0.16) 0px, transparent 55%),
-      radial-gradient(at 86% 8%, oklch(88% 0.17 95 / 0.42) 0px, transparent 48%),
-      radial-gradient(at 74% 72%, oklch(50% 0.14 150 / 0.12) 0px, transparent 52%),
-      radial-gradient(at 32% 92%, oklch(62% 0.15 258 / 0.14) 0px, transparent 50%);
+      linear-gradient(to right, oklch(23% 0.009 60 / 0.11) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(23% 0.009 60 / 0.11) 1px, transparent 1px);
+    background-size: 34px 34px;
+    background-position: center;
+    mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 92%);
+  }
+  .regle::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background-image: radial-gradient(
+      at 97% 0%,
+      oklch(88% 0.17 95 / 0.42) 0px,
+      transparent 30%
+    );
   }
 
   /* Bouton principal : l'anneau de la référence, qui s'ouvre au survol. */
@@ -271,6 +291,50 @@
       var(--color-jaune) 93%,
       transparent 93%
     );
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    animation: trace-marqueur 620ms var(--ease-sortie) 420ms forwards;
+  }
+
+  @keyframes trace-marqueur {
+    to {
+      background-size: 100% 100%;
+    }
+  }
+
+  /* Une barre qui pousse depuis sa base, comme on remplit un bulletin. */
+  .pousse {
+    transform-origin: left;
+    animation: pousse 900ms var(--ease-sortie) both;
+  }
+
+  @keyframes pousse {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* Le numéro de section, en chiffres mono, suivi d'un filet. Repris des
+     rapports imprimés : ça donne au site une voix de document, pas de vitrine. */
+  .compteur {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+  .compteur::after {
+    content: "";
+    height: 1px;
+    flex: 1;
+    max-width: 4.5rem;
+    background: currentColor;
+    opacity: 0.45;
   }
 
   /* Apparition au chargement, en cascade : chaque enfant part un cran après le
@@ -303,8 +367,13 @@
 
   @media (prefers-reduced-motion: reduce) {
     .apparait,
-    .cascade > * {
+    .cascade > *,
+    .pousse {
       animation: none;
+    }
+    .surligne {
+      animation: none;
+      background-size: 100% 100%;
     }
     .carte-vive:hover {
       transform: none;

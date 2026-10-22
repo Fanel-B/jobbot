@@ -48,7 +48,7 @@ export function Barres({
             <span className="truncate text-sm text-ink-soft">{d.label}</span>
             <span className={`${PISTE} order-last col-span-2 sm:order-none sm:col-span-1`}>
               <span
-                className="absolute inset-y-0 left-0 rounded-r-[4px] bg-trace"
+                className="pousse absolute inset-y-0 left-0 rounded-r-[4px] bg-trace"
                 style={{ width: `${Math.max((d.valeur / max) * 100, 2)}%` }}
               />
             </span>
