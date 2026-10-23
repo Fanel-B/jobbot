@@ -14,8 +14,11 @@
 /coverage
 
 # next.js
-/.next/
-/out/
+# Volontairement sans ancrage : « /.next/ » ne couvre que la racine du dossier, et un
+# build lancé depuis le mauvais répertoire avait créé un jobbot-v2/.next imbriqué qui
+# est parti dans un commit. Sans le slash initial, le motif s'applique à toute profondeur.
+.next/
+out/
 
 # production
 /build
