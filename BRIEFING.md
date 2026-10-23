@@ -19,7 +19,7 @@ Deux choses distinctes, à ne pas confondre :
 | | Où | Rôle |
 |---|---|---|
 | **Le pipeline** | `~/.hermes/skills/job-search/` (Python, hors de ce dépôt) | collecte les offres, calcule la note, écrit `data/offers.json` |
-| **Ce dépôt** | ici (`~/jobbot-v2`) | le site : il **lit** `data/offers.json` et n'appelle jamais une source |
+| **Ce dépôt** | ici, à la racine | le site : il **lit** `data/offers.json` et n'appelle jamais une source |
 
 **Conséquence à garder en tête :** le site ne collecte rien, ne calcule aucune note et ne lit aucune
 boîte mail. Toute nouvelle donnée affichable doit passer par le pipeline. Si une donnée manque,
@@ -119,10 +119,10 @@ la base contient assez d'offres, sinon le chiffre ne veut rien dire.
 
 ## 6. Points ouverts (à trancher)
 
-- **Dépôt GitHub** : le travail est poussé où ? Un dépôt neuf (`jobbot-v2`) ou une branche sur
-  l'ancien dépôt `Fanel-B/jobbot` (qui contient l'ancienne application, `index.html`, `api/`,
-  `src/`) ? Recommandation : **branche** `site-v2` sur l'ancien dépôt, pour garder l'historique au
-  même endroit ; on fusionnera quand la v2 remplacera la v1.
+- **Dépôt GitHub** : tranché le 24/10/2026. Le site vit à la **racine** de `Fanel-B/jobbot`, et
+  l'ancienne application est archivée dans **`v1/`**. C'est ce qui permet à Vercel de détecter
+  Next sans aucun réglage : il ne sait pas construire une application Next rangée dans un
+  sous-dossier, il cherche le build à la racine du projet.
 - **`data/offers.json` est committé** (530 ko) pour que le site tourne sans le pipeline. C'est
   volontaire et temporaire : dès que Neon est branché, ce fichier sort du dépôt et devient un jeu de
   démonstration.

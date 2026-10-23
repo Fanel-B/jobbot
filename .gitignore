@@ -1,32 +1,54 @@
-# Dépendances
-node_modules/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Build
-dist/
-dist-ssr/
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# Variables d'environnement - NE JAMAIS COMMIT
-.env
-.env.local
-.env.*.local
+# testing
+/coverage
 
-# Logs
-*.log
-npm-debug.log*
+# next.js
+# Volontairement sans ancrage : « /.next/ » ne couvre que la racine du dossier, et un
+# build lancé depuis le mauvais répertoire avait créé un jobbot-v2/.next imbriqué qui
+# est parti dans un commit. Sans le slash initial, le motif s'applique à toute profondeur.
+.next/
+out/
 
-# Editeurs
+# production
+/build
+
+# L'ancienne application Vite, archivée dans v1/ : son dossier de build et ses
+# dépendances n'ont pas plus à être suivis que ceux du site.
+v1/dist/
+v1/node_modules/
+
+# misc
+.DS_Store
+*.pem
+
+# Réglages d'éditeur : personnels, pas du projet. (Règle reprise de l'ancien
+# .gitignore de la racine, perdue en remontant celui du site.)
 .vscode/settings.json
 .idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
 
-# OS
-.DS_Store
-Thumbs.db
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Fichiers compilés Python (collecteur, et toute lecture de reference/)
-__pycache__/
-*.pyc
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

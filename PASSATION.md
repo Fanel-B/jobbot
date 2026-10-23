@@ -141,19 +141,21 @@ pipeline qu'on étend**, jamais le site qu'on fait deviner.
 
 ## 9. Arrivée dans le dépôt
 
+Cette section décrivait l'arrivée par un *bundle*, du temps où le site vivait dans un dépôt à part.
+Elle est caduque depuis le **24 octobre 2026** : le site est à la **racine** de
+`github.com/Fanel-B/jobbot`, et l'ancienne application Vite est archivée dans **`v1/`**.
+
 ```
-git clone jobbot-v2.bundle jobbot-v2
-cd jobbot-v2
-git remote add origin git@github.com:Fanel-B/jobbot.git
-git push -u origin master:site-v2
+git clone https://github.com/Fanel-B/jobbot.git
+cd jobbot
+npm install
+npm run dev
 ```
 
-Puis, dans VSCode : `git fetch && git checkout site-v2`.
+Le site tourne immédiatement : les offres sont committées dans `data/offers.json` et il ne lit
+aucune variable d'environnement.
 
-Le dépôt part de **3 commits**, tous sur `master` :
-
-1. identité visuelle et site alimenté par de vraies offres ;
-2. regroupement des lacunes par famille + README ;
-3. Île-de-France ouverte sur le site + `BRIEFING.md`.
-
-`npm install` puis `npm run dev` : le site tourne immédiatement, les données sont dans le dépôt.
+Pourquoi la racine plutôt qu'un sous-dossier : Vercel ne sait pas construire une application Next
+rangée ailleurs qu'à la racine du projet — il y cherche le build, et `outputDirectory` est ignoré
+pour ce framework. Le site a donc été remonté, plutôt que de dépendre d'un réglage à refaire à
+chaque nouveau déploiement.

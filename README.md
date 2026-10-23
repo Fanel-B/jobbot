@@ -1,79 +1,99 @@
-# 🎯 JobBot Alternance
+# JobBot V2
 
-> **⚠️ Projet en amélioration.** Prototype v1 : les offres affichées sont générées par une IA, pas collectées depuis de vraies sources. Une v2 avec de vraies offres (APIs La Bonne Alternance et France Travail) est envisagée.
+Trouver les offres d'alternance et de stage qui correspondent vraiment à un profil : les agréger,
+expliquer **pourquoi** elles correspondent, et dire **quoi travailler** pour celles qui ne
+correspondent pas encore.
 
-Bot de recherche d'alternance propulsé par IA — développé par Fanel (MIASHS L2, Toulouse).
+Ce dépôt contient le site. Le moteur de collecte et de notation tourne à part (pipeline Python) et
+produit `data/offers.json`, que le site lit.
 
-## Fonctionnalités
+---
 
-- 🔍 **Génération d'offres** — L'IA génère des offres d'alternance réalistes (Dev & Data) à Toulouse et Paris
-- 📊 **Scoring automatique** — Chaque offre est notée sur 100 selon l'adéquation avec ton profil
-- 📝 **CV adapté** — CV personnalisé généré pour chaque offre en un clic
-- 📥 **Export PDF** — Téléchargement du CV en HTML convertible en PDF
-- 📋 **Suivi des candidatures** — Tableau de bord avec statuts + export CSV
+## État actuel
 
-## Installation
+**Fait — l'esthétique et la chaîne de données de bout en bout.**
 
-### 1. Cloner le repo
+- identité visuelle complète : fond papier, encre, un seul accent, couleurs sémantiques réservées à
+  la note, typographie (serif pour les titres, Inter pour l'interface), chiffres tabulaires ;
+- **vraies offres** : `data/offers.json` est produit par le pipeline, aucune donnée de démonstration ;
+- quatre écrans : accueil, liste filtrable, fiche d'offre, méthode ;
+- la note est **expliquée** : neuf critères, chacun avec ses points et son maximum, et le total
+  affiché correspond exactement à la note du pipeline ;
+- les offres dont la source ne donne pas le type de contrat sont affichées dans un **bloc séparé**,
+  avec un badge distinct — jamais déguisées en stages ;
+- filtres par lieu, type de contrat, source, note minimale et tri, en liens simples : les URL sont
+  partageables et la page fonctionne sans JavaScript ;
+- **en ligne** sur un serveur personnel : <http://148.113.247.10/> (voir « Déploiement » plus bas) ;
+- les offres sont réexportées et le site reconstruit **automatiquement chaque jour**.
 
-```bash
-git clone https://github.com/ton-pseudo/jobbot-alternance.git
-cd jobbot-alternance
-```
+**Reste à faire** (cahier de route, tranches 2 et 3) : comptes et profils, score recalculé selon
+l'utilisateur, dépôt de CV et CV adapté, fit dynamique (« et si tu ajoutais TypeScript ? »).
 
-### 2. Installer les dépendances
+---
+
+## Lancer le site
 
 ```bash
 npm install
+npm run dev            # http://localhost:3000
+npm run build && npm start
 ```
 
-### 3. Configurer la clé API
+Pour régénérer les données affichées, depuis le dossier du pipeline :
 
 ```bash
-cp .env.example .env
+python3 export_site.py
 ```
 
-Édite `.env` et remplace la valeur par ta clé API Anthropic :
+Le script relit la base, recalcule la note et son détail pour chaque offre, puis écrit le JSON dans
+le site. Il ne fabrique rien : un champ absent dans la source sort à `null` et s'affiche
+« non précisé ».
+
+---
+
+## Structure
+
 ```
-VITE_ANTHROPIC_API_KEY=sk-ant-ta-vraie-cle
+app/
+  page.tsx                 accueil : chiffres réels, top du classement, méthode, lacunes du profil
+  offres/page.tsx          liste filtrable (filtres par URL, en suspense)
+  offres/[id]/page.tsx     fiche : note expliquée, compétences, annonce, lien d'origine
+  methode/page.tsx         sources, règles de collecte, fabrication de la note, refus assumés
+components/
+  Chips.tsx                badges (source, zone, contrat, fraîcheur, signal formation)
+  ScoreBadge.tsx           note + barre d'un critère
+  Bulletin.tsx             décomposition de la note
+  OfferCard.tsx            ligne de liste et carte compacte
+lib/offers.ts              types, libellés, fraîcheur, bandes de note
+data/offers.json           offres réelles exportées par le pipeline
 ```
 
-> Obtiens ta clé sur [console.anthropic.com](https://console.anthropic.com)
+## Règles tenues par le code
 
-### 4. Lancer en local
+1. **Aucune donnée inventée.** Champ absent → `null` → affiché « non précisé ». Aucune exception.
+2. **La note n'est pas un chiffre opaque.** Chaque fiche montre son bulletin, et le total est la
+   somme exacte des critères.
+3. **Un type de contrat inconnu reste inconnu.** Badge « non renseigné », bloc séparé, hors du
+   classement principal.
+4. **Le lien vers l'annonce d'origine est toujours présent.** Le site renvoie vers l'employeur, il ne
+   recopie pas l'annonce.
+5. **Le signal « formation imposée » montre son extrait.** Jamais d'accusation sans citation.
+6. **La fraîcheur est datée par rapport à la collecte**, pas à l'heure d'affichage — la page reste
+   donc statique et vraie.
 
-```bash
-npm run dev
-```
+## Déploiement
 
-→ Ouvre http://localhost:5173
+**En ligne : <http://148.113.247.10/>** — sur un serveur personnel (VPS), pas sur Vercel.
 
-### 5. Accès depuis ton téléphone (même Wi-Fi)
+- **Service** : unité systemd `jobbot-site.service`, qui lance `next start` sur le port 80 en tant
+  qu'utilisateur non privilégié (capacité `CAP_NET_BIND_SERVICE`, redémarrage automatique). L'unité
+  ne contient **aucun secret**.
+- **Fraîcheur** : le script `jobbot-site-refresh.sh` réexporte les offres depuis le pipeline,
+  reconstruit le site et redémarre le service. Il tourne chaque jour après la collecte et **reste
+  silencieux quand tout va bien** : il ne parle qu'en cas de problème.
+- **Pourquoi pas Vercel** : le site est statique et alimenté par des données produites ailleurs ; un
+  service systemd sur le serveur qui fait tourner la collecte évite un aller-retour réseau et garde
+  la chaîne observable d'un seul endroit.
 
-```bash
-npm run dev:host
-```
-
-→ L'URL locale s'affiche dans le terminal (ex: `http://192.168.1.xx:5173`)
-
-## Déploiement sur Vercel (accès partout)
-
-1. Push ton code sur GitHub
-2. Va sur [vercel.com](https://vercel.com) → "Add New Project" → importe ton repo
-3. Dans **Environment Variables**, ajoute `VITE_ANTHROPIC_API_KEY` avec ta clé
-4. Clique **Deploy** — c'est en ligne 🚀
-
-## Stack technique
-
-- **React 18** + **Vite**
-- **Lucide React** (icônes)
-- **Claude claude-sonnet-4-20250514** (Anthropic API)
-
-## Sécurité
-
-⚠️ La clé API est exposée côté client. Pour un usage personnel c'est acceptable.
-Pour une mise en production publique, il faudrait un backend proxy (Express/FastAPI).
-
-## Auteur
-
-Fanel — Étudiant MIASHS L2, Université de Toulouse
+**Étape suivante** : PostgreSQL (Neon) et comptes — voir `db/README.md`. Le site ne déclenche jamais
+de collecte lui-même : les sources publiques ont des quotas, c'est le pipeline qui décide.

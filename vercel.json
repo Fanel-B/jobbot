@@ -1,7 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs",
-  "installCommand": "cd jobbot-v2 && npm install",
-  "buildCommand": "cd jobbot-v2 && npm run build",
-  "outputDirectory": "jobbot-v2/.next"
-}
