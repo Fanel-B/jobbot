@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { critereLabel } from "@/lib/offers";
-import { effetSurOffre, lireSimulation, manquantsDe } from "@/lib/simulation";
+import { lireSimulation } from "@/lib/simulation";
+import { effetPour, lireProfil, manquantsPour } from "@/lib/profil";
 
 type Params = { simule?: string };
 
@@ -23,7 +24,10 @@ export async function Simulant({
   searchParams: Promise<Params>;
 }) {
   const p = await searchParams;
-  const manquants = manquantsDe(offreId);
+  // Les compétences proposées sont celles qui manquent **à ce profil**, et l'écart est mesuré
+  // depuis sa note — pas depuis celle du profil d'usine.
+  const profil = await lireProfil();
+  const manquants = manquantsPour(profil, offreId);
 
   if (manquants.length === 0) {
     return (
@@ -44,7 +48,7 @@ export async function Simulant({
     .map((a) => demandees.get(a.toLowerCase()))
     .filter((a): a is string => a !== undefined);
 
-  const effet = actives.length ? effetSurOffre(offreId, actives) : null;
+  const effet = actives.length ? effetPour(profil, offreId, actives) : null;
   const coherence = effet?.lignesQuiBougent.find((l) => l.critere === "cohérence");
   const autres = effet?.lignesQuiBougent.filter((l) => l.critere !== "cohérence") ?? [];
 

@@ -191,6 +191,32 @@ function skillsCommeEnBase(skills: string[] | null): string {
 /* ------------------------------------------------------------- les critères */
 
 /**
+ * Le profil par défaut, tel qu'il tourne côté pipeline. La page `/profil` part de lui : sans ce
+ * point de départ, cocher soixante cases depuis une page vierge serait rédhibitoire.
+ */
+export const ATOUTS_PAR_DEFAUT: readonly (readonly [string, string])[] = MES_ATOUTS;
+
+/**
+ * Le catalogue proposé à la saisie : chaque compétence a un nom affiché et les clés qui la font
+ * reconnaître dans une annonce. Les atouts du profil apportent leurs alias (« node » → Node.js) ;
+ * le reste du vocabulaire technique vient avec sa seule forme.
+ */
+export const CATALOGUE: { nom: string; cles: string[] }[] = (() => {
+  const parNom = new Map<string, string[]>();
+  for (const [cle, nom] of MES_ATOUTS) {
+    parNom.set(nom, [...(parNom.get(nom) ?? []), cle]);
+  }
+  const connus = new Set([...parNom.keys()].map((n) => n.toLowerCase()));
+  for (const mot of VOCABULAIRE) {
+    if (!connus.has(mot.toLowerCase())) {
+      parNom.set(mot, [mot.toLowerCase()]);
+      connus.add(mot.toLowerCase());
+    }
+  }
+  return [...parNom.entries()].map(([nom, cles]) => ({ nom, cles }));
+})();
+
+/**
  * `_exigences` : technos citées par l'offre, en **mot entier**.
  *
  * Python lit aussi `skills_optional`, qui n'est **pas exporté** dans `data/offers.json` : une
@@ -216,20 +242,25 @@ export function exigences(o: OffreAScorer): string[] {
  * exactement ce que rend le pipeline, et `npm run verifier-scoring` le vérifie sur chaque offre.
  * Les ajouts sont examinés en premier, avec la même règle de correspondance que les atouts réels.
  */
-function couverte(exigence: string, ajouts: readonly string[] = []): string | null {
+function couverte(
+  exigence: string,
+  ajouts: readonly string[] = [],
+  atouts: readonly (readonly [string, string])[] = MES_ATOUTS,
+): string | null {
   const e = exigence.toLowerCase();
   for (const brut of ajouts) {
     const cle = brut.toLowerCase().trim();
     if (cle && (e.includes(cle) || cle.includes(e))) return brut;
   }
-  for (const [cle, nom] of MES_ATOUTS) {
+  for (const [cle, nom] of atouts) {
     if (e.includes(cle) || cle.includes(e)) return nom;
   }
+  // Une famille ne joue que si son représentant est **dans le profil** : qui ne connaît pas SQL
+  // ne couvre pas « bases de données » parce que le pipeline, lui, les rattache.
   for (const [cle, proches] of FAMILLES) {
-    if ([cle, ...proches].some((p) => e.includes(p))) {
-      const nom = MES_ATOUTS.find(([k]) => k === cle)?.[1];
-      if (nom) return `${nom} (famille)`;
-    }
+    const nom = atouts.find(([k]) => k === cle)?.[1];
+    if (!nom) continue;
+    if ([cle, ...proches].some((p) => e.includes(p))) return `${nom} (famille)`;
   }
   return null;
 }
@@ -404,12 +435,13 @@ export function classer(
   maintenant: number,
   actions: Map<number, number> = new Map(),
   ajouts: readonly string[] = [],
+  atouts: readonly (readonly [string, string])[] = MES_ATOUTS,
 ): Resultat[] {
   const premiere: { prio: number; o: OffreAScorer; raisons: string[]; exigs: string[]; manquants: string[]; groupe: string }[] = [];
   for (const o of offres) {
     const exigs = exigences(o);
-    const couvertes = exigs.filter((x) => couverte(x, ajouts));
-    const manquants = exigs.filter((x) => !couverte(x, ajouts));
+    const couvertes = exigs.filter((x) => couverte(x, ajouts, atouts));
+    const manquants = exigs.filter((x) => !couverte(x, ajouts, atouts));
     // Dénominateur plancher de 3 (biais corrigé côté Python le 18/10/2026).
     const base = exigs.length ? couvertes.length / Math.max(3, exigs.length) : 0.35;
     const j = jours(o, maintenant);

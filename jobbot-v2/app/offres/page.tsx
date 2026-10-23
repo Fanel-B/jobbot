@@ -4,13 +4,12 @@ import { OfferRow } from "@/components/OfferCard";
 import {
   compterFamilles,
   filtrerParContrat,
-  offresAvecContrat,
-  offresSansContrat,
   sourceLabel,
   ZONE_LABEL,
   type Offer,
   type Zone,
 } from "@/lib/offers";
+import { estParDefaut, lireProfil, offresPour } from "@/lib/profil";
 
 type Params = {
   zone?: string;
@@ -83,6 +82,13 @@ function Filtre({ actif, href, children }: { actif: boolean; href: string; child
 
 async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
   const p = await searchParams;
+
+  // Le classement est celui du profil en cours, recalculé à la lecture — jamais stocké.
+  // C'est la règle du cahier de route : deux personnes voient la même offre, pas la même note.
+  const profil = await lireProfil();
+  const notees = offresPour(profil);
+  const offresAvecContrat = notees.filter((o) => o.contract_known);
+  const offresSansContrat = notees.filter((o) => !o.contract_known);
   const toutes = [...offresAvecContrat, ...offresSansContrat];
   const liste = filtrer(toutes, p);
   const vues = liste.slice(0, 120);
@@ -126,8 +132,12 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
           </>
         ) : (
           <>
-            Le classement par défaut est la note calculée pour ton profil : chaque offre montre
-            son bulletin, critère par critère.
+            Classement calculé pour {estParDefaut(profil) ? "le profil de départ" : "ton profil"} —{" "}
+            <span className="num">{profil.competences.length}</span> compétences confirmées.{" "}
+            <Link href="/profil" className="lien-anime text-accent">
+              {estParDefaut(profil) ? "Règle ton profil" : "Le modifier"}
+            </Link>
+            . Chaque offre montre son bulletin, critère par critère.
           </>
         )}
       </p>

@@ -50,6 +50,12 @@ export default function RootLayout({
                 Offres
               </Link>
               <Link
+                href="/profil"
+                className="rounded-md px-3 py-1.5 transition hover:bg-paper-deep hover:text-ink"
+              >
+                Profil
+              </Link>
+              <Link
                 href="/methode"
                 className="rounded-md px-3 py-1.5 transition hover:bg-paper-deep hover:text-ink"
               >

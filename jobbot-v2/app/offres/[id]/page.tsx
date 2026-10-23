@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Bulletin } from "@/components/Bulletin";
 import { Simulant, SimulantSquelette } from "@/components/Simulant";
+import { NoteDuProfil, NoteSquelette } from "@/components/NoteDuProfil";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import {
   ContractChip,
@@ -247,19 +248,12 @@ export default async function Page({
         {/* ------------------------------------------------------------- latéral */}
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="card p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="label">Note pour ton profil</p>
-                <p className="mt-1 text-sm text-ink-soft">
-                  L3 MIAGE · alternance et stage · Toulouse
-                </p>
-              </div>
-              <ScoreBadge score={offre.score} taille="lg" />
-            </div>
-
-            <div className="mt-6">
-              <Bulletin breakdown={offre.score_breakdown} />
-            </div>
+            {/* La note vient du profil en cours, comme dans la liste. Les deux ne doivent
+                jamais diverger : afficher ici un chiffre calculé autrement serait le genre de
+                contradiction qu'un ami repère en trente secondes. */}
+            <Suspense fallback={<NoteSquelette />}>
+              <NoteDuProfil offreId={offre.id} />
+            </Suspense>
 
             <div className="mt-6 border-t border-line pt-5">
               <p className="label">Version de CV conseillée</p>
