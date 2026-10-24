@@ -44,26 +44,30 @@ describe("toutes les offres de data/offers.json", () => {
     expect(resultats.size).toBe(offers.length);
   });
 
-  it("invariant : la somme des neuf critères égale la note totale, pour chaque offre", () => {
+  it("invariant : la somme de toutes les lignes égale la note totale, pour chaque offre", () => {
     for (const r of resultats.values()) {
-      expect(r.breakdown, `#${r.id}`).toHaveLength(9);
+      // Neuf critères notés + les cinq ajustements du 22/10/2026, plus le plafond s'il mord.
+      expect(r.breakdown.length, `#${r.id}`).toBeGreaterThanOrEqual(14);
+      expect(r.breakdown.length, `#${r.id}`).toBeLessThanOrEqual(15);
       expect(r.breakdown.reduce((s, l) => s + l.points, 0), `#${r.id}`).toBe(r.total);
     }
   });
 
-  it("aucun critère ne sort de [0, max], et les maxima totalisent 100", () => {
+  it("les critères notés restent dans [0, max] ; les ajustements (max 0) portent un signe, et les maxima totalisent 100", () => {
     for (const r of resultats.values()) {
       for (const l of r.breakdown) {
-        expect(l.points, `#${r.id} · ${l.critere}`).toBeGreaterThanOrEqual(0);
-        expect(l.points, `#${r.id} · ${l.critere}`).toBeLessThanOrEqual(l.max);
+        if (l.max > 0) {
+          expect(l.points, `#${r.id} · ${l.critere}`).toBeGreaterThanOrEqual(0);
+          expect(l.points, `#${r.id} · ${l.critere}`).toBeLessThanOrEqual(l.max);
+        }
       }
       expect(r.breakdown.reduce((s, l) => s + l.max, 0)).toBe(100);
     }
   });
 
-  it("chaque note reste entre le plancher (5) et le plafond (100)", () => {
+  it("chaque note reste entre le plancher (0) et le plafond (100)", () => {
     for (const r of resultats.values()) {
-      expect(r.total, `#${r.id}`).toBeGreaterThanOrEqual(5);
+      expect(r.total, `#${r.id}`).toBeGreaterThanOrEqual(0);
       expect(r.total, `#${r.id}`).toBeLessThanOrEqual(100);
     }
   });
@@ -133,5 +137,69 @@ describe("informations manquantes dans les offres réelles", () => {
     expect(o.description).toBeNull();
     expect(resultat(716).raisons).toEqual(o.score_reasons);
     expect(resultat(716).total).toBe(o.score);
+  });
+});
+
+const lot = [836, 788, 832, 817, 828, 829, 837, 855, 867, 783, 897];
+const points = (id: number, critere: string) =>
+  resultat(id).breakdown.find((l) => l.critere === critere)?.points ?? 0;
+const ligneDe = (id: number, critere: string) =>
+  resultat(id).breakdown.find((l) => l.critere === critere)?.detail ?? "";
+
+/**
+ * Cas de référence figés sur les vraies annonces (22/10/2026). L'oracle ne prouve que la
+ * concordance avec le Python, pas la justesse : ces attendus viennent de la lecture des annonces.
+ */
+describe("référence : les 11 offres relues à la main", () => {
+  it("le lot est complet dans data/offers.json", () => {
+    expect(lot.filter((id) => !resultats.has(id))).toEqual([]);
+  });
+
+  it("#897 finit premier des 11 offres", () => {
+    const classement = [...resultats.values()]
+      .filter((r) => lot.includes(r.id))
+      .sort((a, b) => b.total - a.total || a.id - b.id);
+    expect(classement[0].id).toBe(897);
+  });
+
+  it("#828 porte un bloqueur d'habilitation, mais sa note reste sous le plafond : 47", () => {
+    // Le bloqueur existe (habilitation de sécurité) : la note serait plafonnée à 55 si elle
+    // dépassait — elle vaut 47, donc aucune ligne de plafond, et le total reste la somme des
+    // lignes. C'est le malus de fin qui la fait passer sous le plafond (fin 01/10/2027 : -8).
+    expect(resultat(828).total).toBe(47);
+    expect(ligneDe(828, "fin")).toContain("raccourcir");
+    expect(ligneDe(828, "plafond")).toBe("");       // absente, pas zéro : le plafond ne mord pas
+  });
+
+  it("#832 est plafonnée à 55 par la clause de nationalité", () => {
+    expect(resultat(832).total).toBe(55);
+    expect(ligneDe(832, "plafond")).toContain("nationalite");
+  });
+
+  it("#829 perd sur sa date de début (février 2027)", () => {
+    expect(points(829, "dates")).toBe(-10);
+    expect(ligneDe(829, "dates")).toContain("2027-02-01");
+  });
+
+  it("#867 perd sur sa date lue dans l'annonce (janvier 2027)", () => {
+    expect(points(867, "dates")).toBe(-10);
+    expect(ligneDe(867, "dates")).toContain("lu dans l'annonce");
+  });
+
+  it("#783 et #788 perdent sur le niveau Bac+4/5", () => {
+    expect(points(783, "diplôme")).toBe(-8);
+    expect(points(788, "diplôme")).toBe(-8);
+  });
+
+  it("#837 et #867 portent « compétence exigée hors profil »", () => {
+    expect(ligneDe(837, "compétences")).toContain("compétence exigée hors profil");
+    expect(ligneDe(867, "compétences")).toContain("compétence exigée hors profil");
+  });
+
+  it("les 11 notes restent la somme exacte de leur bulletin", () => {
+    for (const id of lot) {
+      expect(resultat(id).breakdown.reduce((s, l) => s + l.points, 0), `#${id}`)
+        .toBe(resultat(id).total);
+    }
   });
 });
