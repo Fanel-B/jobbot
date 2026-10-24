@@ -21,8 +21,9 @@ import {
   ordreDuPipeline,
   type Resultat,
 } from "./scoring";
-import { meta, offers, type Zone } from "./offers";
-import type { EffetOffre, LigneQuiBouge } from "./simulation";
+import { familleLacune, meta, offers, type Zone } from "./offers";
+import { SEUIL_BONNE_PISTE } from "./simulation";
+import type { Competence, EffetGlobal, EffetOffre, LigneQuiBouge } from "./simulation";
 
 export const COOKIE_PROFIL = "jobbot_profil";
 
@@ -193,6 +194,66 @@ export function effetPour(
     bulletinApres: apres.breakdown,
     lignesQuiBougent,
     manquantsApres: apres.manquants,
+  };
+}
+
+/* ------------------------------------------------- le simulant, pour ce profil */
+
+/**
+ * Les compétences manquantes les plus demandées, vues depuis ce profil.
+ *
+ * Même regroupement par famille que `competencesSimulables`, mais la base de calcul est le
+ * profil de la personne : quelqu'un qui maîtrise déjà Docker ne doit pas se le voir proposer.
+ */
+export function competencesSimulablesPour(p: Profil, max = 6): Competence[] {
+  const parFamille = new Map<string, { offres: Set<number>; formes: Set<string> }>();
+  for (const r of classementPour(p).values()) {
+    for (const m of r.manquants) {
+      const nom = familleLacune(m);
+      const e = parFamille.get(nom) ?? { offres: new Set<number>(), formes: new Set<string>() };
+      e.offres.add(r.id);
+      e.formes.add(m);
+      parFamille.set(nom, e);
+    }
+  }
+  return [...parFamille.entries()]
+    .map(([label, f]) => ({ label, formes: [...f.formes], demandee: f.offres.size }))
+    .sort((x, y) => y.demandee - x.demandee || x.label.localeCompare(y.label))
+    .slice(0, max);
+}
+
+/** Combien d'offres ce profil place déjà au-dessus du seuil. */
+export function offresAuDessusPour(p: Profil, seuil: number = SEUIL_BONNE_PISTE): number {
+  let n = 0;
+  for (const r of classementPour(p).values()) if (r.total >= seuil) n += 1;
+  return n;
+}
+
+/** Ce qu'une compétence changerait sur toute la collecte, pour ce profil. */
+export function effetGlobalPour(
+  p: Profil,
+  competence: Competence,
+  seuil: number = SEUIL_BONNE_PISTE,
+): EffetGlobal {
+  const avant = classementPour(p);
+  const apres = classementPour(p, competence.formes);
+  let franchissent = 0;
+  let montent = 0;
+  let gain = 0;
+  for (const [id, a] of avant) {
+    const b = apres.get(id);
+    if (!b) continue;
+    if (b.total > a.total) {
+      montent += 1;
+      gain += b.total - a.total;
+    }
+    if (a.total < seuil && b.total >= seuil) franchissent += 1;
+  }
+  return {
+    competence: competence.label,
+    franchissent,
+    montent,
+    gainMoyen: montent ? Math.round(gain / montent) : 0,
   };
 }
 
