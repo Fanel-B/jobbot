@@ -1,79 +1,54 @@
-# 🎯 JobBot Alternance
+# 🎯 JobBot Alternance — ma première version (archivée)
 
-> **⚠️ Projet en amélioration.** Prototype v1 : les offres affichées sont générées par une IA, pas collectées depuis de vraies sources. Une v2 avec de vraies offres (APIs La Bonne Alternance et France Travail) est envisagée.
+> **⚠️ Prototype v1, conservé hors service.** Dans cette version, les offres affichées étaient
+> **générées par un modèle de langage**, pas collectées depuis de vraies sources. C'est précisément
+> pour cela que j'ai écrit la v2 : des offres réelles, datées, avec un lien vérifiable vers l'annonce.
 
-Bot de recherche d'alternance propulsé par IA — développé par Fanel (MIASHS L2, Toulouse).
+J'ai écrit cette version quand j'étais en L2. Elle marchait — trop bien, même : elle me rendait des
+offres parfaitement crédibles qui n'existaient pas. Un jour j'ai voulu cliquer sur l'une d'elles, et
+il n'y avait rien au bout. C'est là que j'ai compris qu'un outil de recherche d'emploi qui invente ses
+offres n'est pas un outil de recherche d'emploi : c'est un générateur de découragement. Je l'ai donc
+arrêtée, et j'ai recommencé sur des données réelles — c'est la v2, à la racine de ce dépôt.
 
-## Fonctionnalités
+Je garde le code parce qu'il documente mon point de départ, et parce que l'erreur est instructive :
+**le problème n'était pas de générer du texte, c'était d'appeler ce texte une offre.**
 
-- 🔍 **Génération d'offres** — L'IA génère des offres d'alternance réalistes (Dev & Data) à Toulouse et Paris
-- 📊 **Scoring automatique** — Chaque offre est notée sur 100 selon l'adéquation avec ton profil
-- 📝 **CV adapté** — CV personnalisé généré pour chaque offre en un clic
-- 📥 **Export PDF** — Téléchargement du CV en HTML convertible en PDF
-- 📋 **Suivi des candidatures** — Tableau de bord avec statuts + export CSV
+## Ce que faisait la v1
 
-## Installation
+- **Génération d'offres** — un modèle produisait des annonces « réalistes » (Dev & Data, Toulouse et
+  Paris). Aucune n'était vérifiable.
+- **Notation sur 100** — chaque offre était notée selon mon profil. La note portait donc sur une
+  annonce fictive : un score juste appliqué au mauvais objet.
+- **CV adapté en un clic** — un CV par offre, exporté en HTML convertible en PDF.
+- **Suivi des candidatures** — tableau de bord avec statuts et export CSV.
 
-### 1. Cloner le repo
+## Stack
 
-```bash
-git clone https://github.com/ton-pseudo/jobbot-alternance.git
-cd jobbot-alternance
-```
+React 18 + Vite, icônes Lucide, API Anthropic (modèle `claude-sonnet-4-20250514`).
 
-### 2. Installer les dépendances
+## La faille que je ne referais pas
 
-```bash
-npm install
-```
+La clé API était appelée **directement depuis le navigateur** : elle partait donc dans le paquet
+JavaScript public. J'ai laissé le code tel quel en l'archivant, pour ne pas réécrire l'histoire, mais
+je ne remets pas ce montage en ligne. La v2 ne fait aucun appel de modèle depuis le client, et aucune
+clé n'est versionnée.
 
-### 3. Configurer la clé API
+## Ce qui a survécu dans la v2
 
-```bash
-cp .env.example .env
-```
+L'idée de départ — une note qui dit *pourquoi* une offre vaut le détour — est restée. Ce qui a changé :
+la matière première est réelle (API publiques, `robots.txt` respectés), la note est calculée par du
+code déterministe, et chaque offre porte un lien vers son annonce. Le récit complet est dans le
+[README principal](../README.md).
 
-Édite `.env` et remplace la valeur par ta clé API Anthropic :
-```
-VITE_ANTHROPIC_API_KEY=sk-ant-ta-vraie-cle
-```
-
-> Obtiens ta clé sur [console.anthropic.com](https://console.anthropic.com)
-
-### 4. Lancer en local
-
-```bash
-npm run dev
-```
-
-→ Ouvre http://localhost:5173
-
-### 5. Accès depuis ton téléphone (même Wi-Fi)
+## Lancer l'archive (facultatif)
 
 ```bash
-npm run dev:host
+cd v1 && npm install && npm run dev
 ```
 
-→ L'URL locale s'affiche dans le terminal (ex: `http://192.168.1.xx:5173`)
+Un fichier d'environnement est nécessaire pour que la génération fonctionne, mais l'intérêt de cette
+version n'est pas de la relancer : c'est de la lire à côté de la v2.
 
-## Déploiement sur Vercel (accès partout)
+---
 
-1. Push ton code sur GitHub
-2. Va sur [vercel.com](https://vercel.com) → "Add New Project" → importe ton repo
-3. Dans **Environment Variables**, ajoute `VITE_ANTHROPIC_API_KEY` avec ta clé
-4. Clique **Deploy** — c'est en ligne 🚀
-
-## Stack technique
-
-- **React 18** + **Vite**
-- **Lucide React** (icônes)
-- **Claude claude-sonnet-4-20250514** (Anthropic API)
-
-## Sécurité
-
-⚠️ La clé API est exposée côté client. Pour un usage personnel c'est acceptable.
-Pour une mise en production publique, il faudrait un backend proxy (Express/FastAPI).
-
-## Auteur
-
-Fanel — Étudiant MIASHS L2, Université de Toulouse
+**Fanel Balemo** — étudiant en L3 MIAGE, Université de Toulouse
