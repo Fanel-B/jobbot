@@ -15,6 +15,9 @@ import {
   exigences,
   maintenantDeLExport,
   ordreDuPipeline,
+  scoreOffre,
+  bloqueursAdmin,
+  type OffreAEvaluer,
 } from "./scoring";
 
 /* ------------------------------------------------------------------ outils */
@@ -49,8 +52,12 @@ function somme(r: Resultat): number {
   return r.breakdown.reduce((s, l) => s + l.points, 0);
 }
 
-const CRITERES = ["cohérence", "métier", "source", "fiche", "calendrier", "dépôt", "dossier", "fraîcheur", "diversité"];
-const MAXIMA = [30, 12, 8, 6, 8, 6, 4, 12, 14];
+const CRITERES = ["cohérence", "métier", "source", "fiche", "calendrier", "dépôt", "dossier",
+  "fraîcheur", "diversité", "diplôme", "prérequis", "compétences", "dates", "fin"];
+// Les cinq derniers sont les ajustements du 22/10/2026 — les quatre critères d'accessibilité puis
+// la date de fin : maximum 0, leurs points sont signés et entrent dans la note. Le « plafond », s'il
+// mord, est une ligne supplémentaire ajoutée après.
+const MAXIMA = [30, 12, 8, 6, 8, 6, 4, 12, 14, 0, 0, 0, 0, 0];
 
 // Plus de 500 caractères, quatre technos reconnues (Python, React, SQL, Git), toutes couvertes.
 const DESCRIPTION_LONGUE = ("Au sein de l'équipe produit, vous concevez et maintenez une application web interne : "
@@ -99,11 +106,26 @@ describe("offre idéale : chaque critère à son plafond", () => {
       "fraîcheur 12/12 (il y a 0 j)",
       "fenêtre : 7 j restants",
       "diversité 14/14 (acme — 1ᵉ place)",
+      "diplôme 0/0 (niveau de diplôme : non précisé (0))",
+      "prérequis 0/0 (prérequis métier : aucun hors profil (0))",
+      "compétences 0/0 (compétences exigées : toutes dans le référentiel (0))",
+      "dates 3/0 (début 2027-04-01 : compatible avec une disponibilité fin mars 2027 (+3))",
+      // La durée n'est pas renseignée : la fin n'est pas calculable, et rien n'est pénalisé.
+      "fin 0/0 (fin de stage : non calculable (début ou durée absents) (0))",
+      "plafond -3/0 (note plafonnée à 100)",
     ]);
   });
 
-  it("chaque ligne est à son maximum", () => {
-    for (const l of r.breakdown) expect(l.points, l.critere).toBe(l.max);
+  it("chaque ligne notée est à son maximum ; les ajustements portent leur signe", () => {
+    for (const l of r.breakdown) {
+      if (l.max > 0) expect(l.points, l.critere).toBe(l.max);
+    }
+    // Le bonus « dates » (+3) pousse la somme à 103 : la ligne de plafond la ramène à 100.
+    expect(ligne(r, "dates").points).toBe(3);
+    expect(ligne(r, "plafond")).toEqual({
+      critere: "plafond", points: -3, max: 0, detail: "note plafonnée à 100",
+    });
+    expect(somme(r)).toBe(100);
   });
 
   it("reconnaît les quatre technos, toutes couvertes", () => {
@@ -115,7 +137,7 @@ describe("offre idéale : chaque critère à son plafond", () => {
 /* ------------------------------------------- forme du bulletin et invariants */
 
 describe("forme du bulletin", () => {
-  it("compte neuf critères, dans l'ordre, avec les maxima 30·12·8·6·8·6·4·12·14", () => {
+  it("compte neuf critères notés puis les cinq ajustements, maxima 30·12·8·6·8·6·4·12·14·0·0·0·0·0", () => {
     const r = noter(IDEALE);
     expect(r.breakdown.map((l) => l.critere)).toEqual(CRITERES);
     expect(r.breakdown.map((l) => l.max)).toEqual(MAXIMA);
@@ -125,11 +147,11 @@ describe("forme du bulletin", () => {
   it("l'urgence est affichée mais jamais notée : elle n'entre pas dans le bulletin découpé", () => {
     const r = noter(offre(1, { published_at: ilYA(6.5) }));
     expect(r.raisons).toContain("⏳ dernier appel : expire dans 0 j");
-    expect(r.raisons).toHaveLength(10);
-    expect(r.breakdown).toHaveLength(9);
+    expect(r.raisons).toHaveLength(15);
+    expect(r.breakdown).toHaveLength(14);
   });
 
-  it("invariant : la somme des neuf critères égale la note totale, pour toutes les offres fabriquées", () => {
+  it("invariant : la somme de toutes les lignes égale la note totale, pour toutes les offres fabriquées", () => {
     const offres = [
       IDEALE, plancher(20), plancher(21), plancher(22), plancher(23), offre(1),
       offre(3, { title: "Stage Python SQL Git Docker" }),
@@ -153,18 +175,20 @@ describe("forme du bulletin", () => {
 /* ------------------------------------------------------------------- bornes */
 
 describe("bornes de la note", () => {
-  it("note plancher : 19, quand chaque critère est au minimum mais que la diversité est intacte", () => {
+  it("note plancher : 9, quand chaque critère est au minimum et que le début est incompatible", () => {
     const resultats = classer([plancher(20), plancher(21), plancher(22), plancher(23)], MAINTENANT);
     const dernier = resultats[3];
     expect(dernier.id).toBe(23);
-    expect(dernier.total).toBe(19);
-    expect(dernier.breakdown.map((l) => l.points)).toEqual([0, 0, 2, 1, 0, 2, 0, 0, 14]);
-    expect(somme(dernier)).toBe(19);
+    expect(dernier.total).toBe(9);
+    // Neuf critères (19) puis les ajustements : diplôme 0, prérequis 0, compétences 0, dates -10,
+    // fin 0 (aucune date annoncée : on ne pénalise pas un champ vide).
+    expect(dernier.breakdown.map((l) => l.points)).toEqual([0, 0, 2, 1, 0, 2, 0, 0, 14, 0, 0, 0, -10, 0]);
+    expect(somme(dernier)).toBe(9);
   });
 
   it("les quatre offres du même groupe gardent leurs 14 points de diversité : plus aucun plafond", () => {
     const resultats = classer([plancher(20), plancher(21), plancher(22), plancher(23)], MAINTENANT);
-    expect(resultats.map((r) => r.total)).toEqual([19, 19, 19, 19]);
+    expect(resultats.map((r) => r.total)).toEqual([9, 9, 9, 9]);
   });
 
   it("note plafond : 100 exactement, jamais au-delà, même avec plus d'exigences et un projet en prime", () => {
@@ -274,6 +298,11 @@ describe("offre sans aucune information : calculable, sans donnée inventée", (
       "fraîcheur 0/12 (il y a 99 j)",
       "⏳ dernier appel : expire dans 0 j",
       "diversité 14/14 (? — 1ᵉ place)",
+      "diplôme 0/0 (niveau de diplôme : non précisé (0))",
+      "prérequis 0/0 (prérequis métier : aucun hors profil (0))",
+      "compétences 0/0 (compétences exigées : toutes dans le référentiel (0))",
+      "dates 0/0 (dates : début inconnu (0))",
+      "fin 0/0 (date de fin : offre non concernée (contrat non-stage) (0))",
     ]);
     expect(r.total).toBe(38);
     expect(somme(r)).toBe(38);
@@ -546,5 +575,272 @@ describe("heure du calcul", () => {
   it("repart de `generated_at`, décalé du fuseau du pipeline (UTC par défaut)", () => {
     expect(maintenantDeLExport("2026-10-20T02:33:48+00:00")).toBe(Date.UTC(2026, 9, 20, 2, 33, 48));
     expect(maintenantDeLExport("2026-10-20T02:33:48+00:00", 2)).toBe(Date.UTC(2026, 9, 20, 4, 33, 48));
+  });
+});
+
+/* ==========================================================================
+ * `scoreOffre` — les quatre critères ajoutés le 22/10/2026
+ *
+ * Ces valeurs sont recopiées de `scoring.py` (source de vérité) : +7 Bac+3, -8 Bac+5, -4 par
+ * prérequis métier, plafond 55 sur bloqueur administratif, -10 / +3 / 0 sur les dates.
+ * ========================================================================== */
+
+function offreScore(champs: Partial<OffreAEvaluer> = {}): OffreAEvaluer {
+  return {
+    id: 1, source: "thales", canonical_url: "https://example.test/offres/critere",
+    title: "Stage développeur web", company: "Acme", location: "Toulouse",
+    contract_type: "Stage", education_required: null, description: "",
+    skills_required: ["Python", "SQL"], skills_optional: [],
+    miage_mentioned: false, start_date: null, published_at: null, first_seen_at: null,
+    ...champs,
+  };
+}
+
+describe("scoreOffre — niveau de diplôme exigé", () => {
+  it("Bac+3 demandé → bonus +7", () => {
+    const r = scoreOffre(offreScore({ education_required: "Bac+3 validé (licence)" }));
+    expect(r.niveau_diplome).toBe(7);
+    expect(r.reasons).toContain("niveau de diplôme : Bac+3 demandé (+7)");
+  });
+
+  it("Master 2 exigé → malus -8", () => {
+    const r = scoreOffre(offreScore({ education_required: "Master 2 exigé" }));
+    expect(r.niveau_diplome).toBe(-8);
+    expect(r.reasons.join(" ")).toContain("Bac+5 exigé");
+  });
+
+  it("diplôme d'ingénieur exigé → malus -8", () => {
+    expect(scoreOffre(offreScore({ education_required: "Diplôme d'ingénieur exigé" })).niveau_diplome)
+      .toBe(-8);
+  });
+
+  it("BUT en capitales (Bac+2) et le mot « but » restent neutres", () => {
+    expect(scoreOffre(offreScore({ education_required: "BUT Informatique" })).niveau_diplome).toBe(0);
+    expect(scoreOffre(offreScore({ education_required: "Le but est de progresser" })).niveau_diplome).toBe(0);
+  });
+
+  it("« Ingénieur » dans le titre n'est pas un niveau de diplôme", () => {
+    expect(scoreOffre(offreScore({ title: "Ingénieur Développement Logiciel" })).niveau_diplome).toBe(0);
+  });
+
+  it("Bac+5 en cours → -8 : une annonce décrit une exigence, pas le candidat", () => {
+    expect(scoreOffre(offreScore({ education_required: "Bac+5 en cours (M1)" })).niveau_diplome).toBe(-8);
+  });
+
+  it("Bac+4/5 → -8 (le minimum est 4, au-dessus de la L3)", () => {
+    expect(scoreOffre(offreScore({ education_required: "Niveau BAC+4/5 requis" })).niveau_diplome).toBe(-8);
+    expect(scoreOffre(offreScore({ education_required: "Bac+4 et 5" })).niveau_diplome).toBe(-8);
+  });
+
+  it("Bac+3 à Bac+5 → +7 (le niveau le plus accessible est Bac+3)", () => {
+    expect(scoreOffre(offreScore({ education_required: "Bac+3 à Bac+5" })).niveau_diplome).toBe(7);
+  });
+
+  it("« dernière année de cycle ingénieur » → -8", () => {
+    expect(scoreOffre(offreScore({
+      education_required: "Étudiant(e) en Master 2 (ou dernière année de cycle ingénieur)",
+    })).niveau_diplome).toBe(-8);
+  });
+
+  it("« Master's degree » / « MSc » en anglais → -8 (toute l'annonce est lue)", () => {
+    expect(scoreOffre(offreScore({
+      description: "Requirements: Master's degree in Computer Science.",
+    })).niveau_diplome).toBe(-8);
+    expect(scoreOffre(offreScore({ description: "MSc in Data Science required." })).niveau_diplome)
+      .toBe(-8);
+  });
+});
+
+describe("scoreOffre — compétence exigée hors profil", () => {
+  it("C++ déclaré → -3 et ligne explicite", () => {
+    const r = scoreOffre(offreScore({ skills_required: ["C++"] }));
+    expect(r.competences_hors_profil).toBe(-3);
+    expect(r.reasons).toContain("compétence exigée hors profil : C++ (-3)");
+  });
+
+  it("deux technos absentes → -6 ; plafond à -9 au-delà de trois", () => {
+    expect(scoreOffre(offreScore({ skills_required: ["C++", "Vue.js"] })).competences_hors_profil)
+      .toBe(-6);
+    expect(scoreOffre(offreScore({ skills_required: ["C++", "Vue.js", "Spark", "GitLab"] }))
+      .competences_hors_profil).toBe(-9);
+  });
+
+  it("les technos du référentiel ne coûtent rien, celles qui en sont sorties coûtent -3", () => {
+    // Docker a été retiré du référentiel le 22/10/2026 (il n'est prouvé par aucun projet des CV
+    // maîtres) : une annonce qui l'exige est pénalisée, comme le fait `scoring.py`.
+    expect(scoreOffre(offreScore({ skills_required: ["Python", "TypeScript", "Java"] }))
+      .competences_hors_profil).toBe(0);
+    expect(scoreOffre(offreScore({ skills_required: ["Docker"] }))
+      .competences_hors_profil).toBe(-3);
+  });
+});
+
+describe("scoreOffre — dates", () => {
+  it("début février 2027 → -10 ; début avril 2027 → +3 ; inconnu → 0", () => {
+    expect(scoreOffre(offreScore({ start_date: "2027-02-01" })).dates).toBe(-10);
+    expect(scoreOffre(offreScore({ start_date: "2027-04-01" })).dates).toBe(3);
+    expect(scoreOffre(offreScore({ start_date: null, description: "Aucune date." })).dates).toBe(0);
+  });
+
+  it("date lue dans l'annonce quand la colonne est vide → -10, avec la source dans la ligne", () => {
+    const r = scoreOffre(offreScore({
+      start_date: null,
+      description: "Le stage pourrait débuter en Janvier 2027, au sein de l'équipe.",
+    }));
+    expect(r.dates).toBe(-10);
+    expect(r.reasons.join(" ")).toContain("(lu dans l'annonce)");
+  });
+});
+
+describe("scoreOffre — prérequis métier hors profil", () => {
+  it("deux concepts requis → -8, une ligne par concept groupé", () => {
+    const r = scoreOffre(offreScore({
+      description: "Vous maîtrisez la mécanique spatiale et le traitement du signal.",
+    }));
+    expect(r.prerequis_metier).toBe(-8);
+    expect(r.reasons.join("\n"))
+      .toContain("prérequis métier hors profil : mécanique spatiale, traitement du signal");
+  });
+
+  it("le couplet institutionnel « Aéronautique & Spatial » ne compte pas", () => {
+    const r = scoreOffre(offreScore({
+      description: "Thales, leader de l'Aéronautique & Spatial et de la Cyber.",
+    }));
+    expect(r.prerequis_metier).toBe(0);
+  });
+
+  it("un prérequis cité sans marqueur d'exigence ne compte pas", () => {
+    expect(scoreOffre(offreScore({ description: "Nos équipes travaillent sur le spatial." }))
+      .prerequis_metier).toBe(0);
+  });
+});
+
+describe("scoreOffre — bloqueurs administratifs", () => {
+  it("habilitation de sécurité → score plafonné à 55, ligne visible", () => {
+    const r = scoreOffre(offreScore({
+      title: "Développeur Full-Stack React / Node.js",
+      skills_required: ["React", "Node.js", "PostgreSQL", "Git", "Docker"],
+      education_required: "Bac+3", miage_mentioned: true,
+      description: "Ce poste nécessite une habilitation de sécurité.",
+    }));
+    expect(r.plafond).toBe(55);
+    expect(r.score).toBeLessThanOrEqual(55);
+    expect(r.bloqueur_admin).toBe(true);
+    expect(r.reasons).toContain("⛔ bloqueur administratif : habilitation de securite — score plafonné à 55");
+    expect(r.breakdown.find((l) => l.critere === "plafond administratif")?.points).toBe(55);
+  });
+
+  it("nationalité française → bloqueur aussi", () => {
+    expect(bloqueursAdmin(offreScore({ description: "Le candidat doit posséder la nationalité française." })))
+      .toEqual(["nationalite francaise"]);
+  });
+
+  it("sans bloqueur, pas de plafond", () => {
+    expect(scoreOffre(offreScore()).plafond).toBeNull();
+  });
+});
+
+describe("scoreOffre — compatibilité des dates", () => {
+  it("début février 2027 → -10 et ligne explicite", () => {
+    const r = scoreOffre(offreScore({ start_date: "2027-02-01" }));
+    expect(r.dates).toBe(-10);
+    expect(r.reasons).toContain(
+      "début 2027-02-01 : incompatible avec une disponibilité fin mars 2027 (-10)");
+  });
+
+  it("début avril 2027 → +3", () => {
+    expect(scoreOffre(offreScore({ start_date: "2027-04-01" })).dates).toBe(3);
+  });
+
+  it("date inconnue → neutre", () => {
+    expect(scoreOffre(offreScore({ start_date: null })).dates).toBe(0);
+  });
+});
+
+describe("scoreOffre — contrat du moteur", () => {
+  it("chaque nouveau critère a sa ligne dans la décomposition", () => {
+    const r = scoreOffre(offreScore({
+      education_required: "Bac+3", start_date: "2027-02-01",
+      description: "Ce poste nécessite une habilitation de sécurité.",
+    }));
+    expect(r.breakdown.map((l) => l.critere)).toEqual(expect.arrayContaining([
+      "niveau de diplôme", "prérequis métier", "dates", "plafond administratif",
+    ]));
+  });
+
+  it("déterministe : deux appels donnent le même objet", () => {
+    const o = offreScore({ education_required: "Bac+3", start_date: "2027-02-01" });
+    expect(scoreOffre(o)).toEqual(scoreOffre(o));
+  });
+});
+
+/* --------------------------------- les quatre critères dans le bulletin (classer) */
+
+/**
+ * Le bulletin (`classer`) porte les mêmes quatre critères que `scoreOffre` : les lignes sont dans
+ * `score_breakdown`, leur somme est la note affichée, et le plafond administratif borne à 55.
+ * L'offre de base reprend l'offre idéale, pour que seuls les critères testés fassent bouger la note.
+ */
+describe("classer — les quatre critères du 22/10/2026 dans le bulletin", () => {
+  function offreBilan(id: number, champs: Partial<OffreAEvaluer> = {}): OffreAEvaluer {
+    return { ...IDEALE, id, ...champs };
+  }
+
+  it("Bac+3 demandé → ligne diplôme +7", () => {
+    const r = noter(offreBilan(101, { education_required: "Bac+3 validé (licence)" }));
+    expect(ligne(r, "diplôme")).toEqual({
+      critere: "diplôme", points: 7, max: 0,
+      detail: "niveau de diplôme : Bac+3 demandé (+7)",
+    });
+    expect(somme(r)).toBe(r.total);
+  });
+
+  it("Master exigé → ligne diplôme -8", () => {
+    const r = noter(offreBilan(102, { education_required: "Master 2 exigé" }));
+    expect(ligne(r, "diplôme").points).toBe(-8);
+    expect(ligne(r, "diplôme").detail).toBe("niveau de diplôme : Bac+5 exigé (-8)");
+    expect(somme(r)).toBe(r.total);
+  });
+
+  it("prérequis métier hors profil → -4 par concept requis", () => {
+    const r = noter(offreBilan(103, {
+      description: DESCRIPTION_LONGUE + " Vous maîtrisez la mécanique spatiale et le traitement du signal.",
+    }));
+    expect(ligne(r, "prérequis")).toMatchObject({
+      points: -8, max: 0,
+      detail: "prérequis métier hors profil : mécanique spatiale, traitement du signal (-8)",
+    });
+    expect(somme(r)).toBe(r.total);
+  });
+
+  it("habilitation de sécurité → note plafonnée à 55, ligne de plafond explicite", () => {
+    const r = noter(offreBilan(104, {
+      description: DESCRIPTION_LONGUE + " Ce poste nécessite une habilitation de sécurité.",
+    }));
+    expect(r.total).toBe(55);
+    expect(ligne(r, "plafond").detail).toBe(
+      "⛔ bloqueur administratif : habilitation de securite — note plafonnée à 55");
+    // La ligne de plafond ne retire pas de points forfaitaires : elle ramène la somme à 55.
+    expect(somme(r)).toBe(55);
+  });
+
+  it("début février 2027 → ligne dates -10", () => {
+    const r = noter(offreBilan(105, { start_date: "2027-02-01" }));
+    expect(ligne(r, "dates")).toEqual({
+      critere: "dates", points: -10, max: 0,
+      detail: "début 2027-02-01 : incompatible avec une disponibilité fin mars 2027 (-10)",
+    });
+  });
+
+  it("début avril 2027 → ligne dates +3", () => {
+    const r = noter(offreBilan(106, { start_date: "2027-04-01" }));
+    expect(ligne(r, "dates").points).toBe(3);
+    expect(ligne(r, "dates").detail).toBe(
+      "début 2027-04-01 : compatible avec une disponibilité fin mars 2027 (+3)");
+  });
+
+  it("à égalité de note, le classement départage par identifiant", () => {
+    const offres = [offreBilan(303), offreBilan(301), offreBilan(302)];
+    expect(classer(offres, MAINTENANT).map((r) => r.id)).toEqual([301, 302, 303]);
   });
 });
