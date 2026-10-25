@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
-    "verifier-scoring": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/verifier-scoring.mjs"
+    "verifier-scoring": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/verifier-scoring.mjs",
+    "verifier-eligibility": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/verifier-eligibility.mjs"
   },
   "dependencies": {
     "next": "16.4.2",
