@@ -10,6 +10,11 @@ export default defineConfig({
   },
   test: {
     environment: "node",
+    // Plusieurs tests rejouent des classements complets sur toute la collecte — le simulant en
+    // enchaîne une trentaine. À 287 offres et neuf critères, les 5 secondes par défaut ne
+    // suffisent plus. C'est le volume de données qui a grandi, pas le calcul qui a ralenti :
+    // on allonge le délai plutôt que d'échantillonner et d'affaiblir la couverture.
+    testTimeout: 30_000,
     include: ["lib/**/*.test.ts"],
   },
 });
