@@ -79,7 +79,10 @@ def contrats(offre: dict) -> list[str]:
 # Attention aux accents : « dépôt » et « fraîcheur » contiennent ô et î. Une classe de caractères
 # trop restrictive les faisait disparaître du bulletin, et le total affiché ne correspondait plus
 # à la note calculée par le pipeline.
-LIGNE_CRITERE = re.compile(r"^([^\d\s]+)\s+(\d+)\s*/\s*(\d+)\s*(?:\((.*)\))?\s*$")
+# Le signe est accepté : les ajustements (diplôme, prérequis, dates) et la ligne de plafond peuvent
+# être négatifs. Sans ça, ils disparaîtraient du découpage et le total cesserait d'être la somme
+# exacte des lignes — exactement le bug du 19/10/2026.
+LIGNE_CRITERE = re.compile(r"^([^\d\s]+)\s+(-?\d+)\s*/\s*(\d+)\s*(?:\((.*)\))?\s*$")
 
 
 def _decouper(raisons: list[str]) -> list[dict]:
@@ -134,6 +137,10 @@ def ligne(offre: dict, score: dict | None) -> dict:
         "education_required": offre.get("education_required") or None,
         "description": (offre.get("description") or "")[:DESCRIPTION_MAX] or None,
         "skills_required": json.loads(offre.get("skills_required") or "[]"),
+        # `skills_optional` est lu par `priorites._exigences` : ne pas l'exporter faisait diverger le
+        # calcul des exigences entre le pipeline (ligne de base complète) et le site (constaté le
+        # 21/10/2026). Le champ est donc exporté, même vide.
+        "skills_optional": json.loads(offre.get("skills_optional") or "[]"),
         "training_flag": bool(motif),
         "training_excerpt": extrait_formation(offre, motif) if motif else None,
         "published_at": offre.get("published_at"),

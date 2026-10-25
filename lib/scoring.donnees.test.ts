@@ -130,13 +130,20 @@ describe("informations manquantes dans les offres réelles", () => {
     expect(apres.total).toBe(avant.total);
   });
 
-  it("offre #716 (ni contrat, ni lieu, ni description) : bulletin du Python, ligne à ligne", () => {
-    const o = parId(716);
+  it("offre #973 (type de contrat non renseigné) : bulletin du Python, ligne à ligne", () => {
+    const o = parId(973);
     expect(o.contract_known).toBe(false);
-    expect(o.location).toBeNull();
-    expect(o.description).toBeNull();
-    expect(resultat(716).raisons).toEqual(o.score_reasons);
-    expect(resultat(716).total).toBe(o.score);
+    expect(resultat(973).raisons).toEqual(o.score_reasons);
+    expect(resultat(973).total).toBe(o.score);
+  });
+
+  it("effacer le lieu et la description d'une offre sans contrat ne change pas son bulletin (ils ne sont pas notés)", () => {
+    // Le cas d'origine (#716 : ni contrat, ni lieu, ni description) a quitté l'export le 25/10/2026 :
+    // sans lieu, aucune zone n'est calculable, donc l'offre n'est pas publiée. On vérifie la même
+    // propriété — lieu et description ne sont pas notés — en les effaçant en mémoire.
+    const o = parId(973);
+    const ampute = { ...o, location: null, location_zone: null, description: null };
+    expect(classer([ampute], MAINTENANT)[0].raisons).toEqual(classer([o], MAINTENANT)[0].raisons);
   });
 });
 

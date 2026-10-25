@@ -14,6 +14,9 @@ Trois systèmes de classement, tous **déterministes** (aucun score inventé) :
                                                      dans 1 j »), affichée mais jamais notée : elle
                                                      ordonne le message « dernier appel », pas le flux
                                                      du jour.
+   À ces neuf critères s'ajoutent les **cinq ajustements** du 22/10/2026 (diplôme, prérequis
+   métier, compétences hors référentiel, dates, **date de fin**) : ils sont additifs, leur ligne
+   est affichée, et le total du bulletin reste la somme exacte de toutes les lignes.
 
 Filtres appliqués dans tous les cas : stages uniquement (l'alternance est en pause), non rejetées,
 publiées ou repérées depuis `--jours` jours (défaut 7). Trois étiquettes dans la sortie : à attaquer
@@ -35,19 +38,20 @@ import unicodedata
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-REGISTRE = Path.home() / ".hermes/data/job-search/candidatures_envoyees.json"
+# La lecture du registre des candidatures appartient à `candidatures.py` : le bulletin, le rapport
+# quotidien et les alertes s'en servent, et une même règle écrite trois fois finit par diverger.
+from candidatures import REGISTRE, charger as charger_registre, deja_postule as _partage  # noqa: E402
 
-
-def charger_registre() -> list:
-    """Candidatures déjà envoyées (registre local, semé à la main et tenu par `suivi.py --manual`)."""
-    if not REGISTRE.exists():
-        return []
-    try:
-        return json.loads(REGISTRE.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return []
+# (`_cle_texte`, utilisé plus bas pour le dédoublonnage, reste défini dans ce module : il sert à
+# comparer deux intitulés entre eux, pas à lire le registre.)
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+# Les quatre critères d'accessibilité (niveau de diplôme, prérequis métier, bloqueur administratif,
+# dates) sont écrits **une seule fois**, dans le moteur de la base (`scoring.py`). Le bulletin les
+# importe au lieu de les recopier : deux implémentations d'une même règle finissent toujours par
+# diverger, et le site raconterait alors une autre histoire que la note de la base.
+import scoring  # noqa: E402
 
 DB = Path.home() / ".hermes" / "data" / "job-search" / "database.sqlite"
 
@@ -60,6 +64,10 @@ MES_ATOUTS = {
     "power query": "Power Query", "dax": "DAX", "pandas": "Pandas", "matplotlib": "Matplotlib",
     "excel": "Excel", "html": "HTML", "css": "CSS", "api rest": "API REST", "rest": "API REST",
     "javascript/typescript": "JavaScript", "json": "JSON", "scrum": "Scrum", "agile": "Agile",
+    # Ajoutés le 20/10/2026 après la mise en ligne de JobBot V2 : c'est elle qui les prouve.
+    # TypeScript n'était plus « en cours » depuis PortfolioV2 ; JobBot V2 (site rendu en
+    # TypeScript, moteur de scoring porté de Python, 88 tests) en fait une vraie preuve.
+    "typescript": "TypeScript", "tests unitaires": "tests unitaires", "vitest": "Vitest",
 }
 # Familles : une exigence proche compte comme couverte (SQL ↔ MySQL/PostgreSQL/SQLite…).
 FAMILLES = {
@@ -104,10 +112,12 @@ DEPOTS = (
     (5, ("smartrecruiters", "greenhouse", "lever.co", "recruitee", "teamtailor"), "formulaire court"),
     (3, ("linkedin.com", "indeed"), "alerte — il faut retrouver l'offre d'origine"),
 )
-# Plafond par groupe : au-delà, une même entreprise occuperait tous les créneaux prioritaires et
-# Fanel se retrouverait avec 5 candidatures chez Airbus dont 4 dans la même équipe (sa remarque du
-# 18/10/2026 : « la quantité dans un même groupe n'est pas très bien »).
-PLAFOND_GROUPE = 3
+# Plafond par groupe. **Retiré le 21/10/2026 sur demande de Fanel** (« on s'en fout du plafond, enlève-moi
+# les plafonds »). Historique : il limitait à 3 le nombre d'offres d'un même groupe dans le haut de liste,
+# après sa remarque du 18/10 (« la quantité dans un même groupe n'est pas très bien »). Le critère
+# « diversité » reste affiché et vaut donc 14/14 pour tout le monde : le bulletin garde ses neuf critères,
+# mais plus aucune offre n'est abaissée à cause de son groupe. Pour le rétablir : remettre 3.
+PLAFOND_GROUPE = None
 GROUPES = {
     "airbus": "Airbus (et Airbus Protect, ATR, Atlantic)",
     "atr": "Airbus (et Airbus Protect, ATR, Atlantic)",
@@ -139,6 +149,11 @@ PROJETS = (
     ("Biblio-Tech — application web full stack (Next.js, Node, API, JWT, IoT simulé)",
      ("web", "front", "react", "next", "javascript", "application", "interface", "api", "full stack",
       "fullstack", "développement logiciel", "site")),
+    # Ajouté le 20/10/2026 : JobBot V2 est en ligne. Ce qui le rend crédible sur une offre, ce n'est
+    # pas « un site », c'est le TypeScript, le portage d'un moteur Python et les tests qui le tiennent.
+    ("JobBot V2 — site Next.js/TypeScript, moteur de scoring porté de Python, 88 tests, PostgreSQL",
+     ("typescript", "tests", "test unitaire", "postgresql", "déploiement", "mise en production",
+      "modèle de données", "algorithme", "veille", "collecte", "automatisé", "qualité de code")),
     ("Analyse Insertion Pro MIAGE — analyse de données emploi, tableaux de bord",
      ("données", "data", "tableaux de bord", "dashboard", "power bi", "analyse", "statistique",
       "reporting", "kpi", "indicateurs", "visualisation")),
@@ -170,10 +185,27 @@ def _exigences(offre) -> list:
 
 
 def _couverte(exigence: str) -> str | None:
-    """Renvoie le nom de l'atout qui couvre cette exigence, sinon None."""
-    e = exigence.lower()
+    """Renvoie le nom de l'atout qui couvre cette exigence, sinon None.
+
+    Les clés courtes (« ml », « ia », « sql ») se comparent **en mot entier**. Sans cela « ml » est
+    « couvert » par HTML — le « ml » de HT**ML** — et une annonce qui demande du machine learning
+    s'affiche comme une compétence maîtrisée : faux positif mesuré le 25/10/2026 sur #795, #817 et
+    #921, qui affichaient ✅ face à « ML » sur une page publique.
+    """
+    e = exigence.lower().strip()
+
+    def couvre(cle: str) -> bool:
+        if cle == e:
+            return True
+        if " " in cle:                      # « power bi », « api rest » : la clé est une locution
+            return cle in e or e in cle
+        # Mot entier, dans les deux sens : « ml » ne doit pas être absorbé par HT«ml», ni « java »
+        # par JavaScript. C'est la règle sûre, et elle n'enlève aucune couverture réelle.
+        return (re.search(rf"(?<![a-z0-9]){re.escape(cle)}(?![a-z0-9])", e) is not None
+                or re.search(rf"(?<![a-z0-9]){re.escape(e)}(?![a-z0-9])", cle) is not None)
+
     for cle, nom in MES_ATOUTS.items():
-        if cle in e or e in cle:
+        if couvre(cle):
             return nom
     for cle, proches in FAMILLES.items():
         if any(p in e for p in (cle, *proches)):
@@ -192,7 +224,14 @@ def _projet(titre: str, description: str) -> str | None:
 
 
 def _jours(offre, now) -> float:
-    """Ancienneté en jours. En base, `published_at` est tantôt complet, tantôt une simple date."""
+    """Ancienneté en jours. En base, `published_at` est tantôt complet, tantôt une simple date.
+
+    `now` peut porter un fuseau ou non : `classer()` échouait avec un `TypeError` quand un appelant
+    passait un datetime conscient (constaté le 24/10/2026), parce que les dates lues en base sont
+    naïves. On ramène l'instant à un UTC naïf, ce que fait déjà `main()`.
+    """
+    if now.tzinfo is not None:
+        now = now.astimezone(timezone.utc).replace(tzinfo=None)
     d = (offre["published_at"] or offre["first_seen_at"] or "")[:19]
     for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d"):
         try:
@@ -339,6 +378,77 @@ def _dossier_pret(o, actions: dict) -> tuple:
     return 0, "rien de fait"
 
 
+# Plafond administratif : même valeur que `scoring.PLAFOND_ADMIN`. Une offre bloquée (habilitation,
+# secret défense, nationalité…) ne peut dépasser 55/100, **dans aucun des quatre systèmes** : une
+# offre impossible ne doit arriver en tête d'aucune liste. Le plafond ne retire pas de points
+# forfaitaires, il borne la note.
+PLAFOND_ADMIN = scoring.PLAFOND_ADMIN
+PLAFOND_BULLETIN = 100
+
+
+def _ajustements(o) -> dict:
+    """Les cinq critères du 22/10/2026, calculés par `scoring.py` (règles et pièges uniques).
+
+    Renvoie des points **entiers** et les textes tels que le moteur de la base les écrit, pour que
+    le bulletin affiché par le site dise exactement la même chose que la note de la base.
+    """
+    pts_niveau, txt_niveau = scoring.niveau_diplome(o)
+    pts_metier, termes = scoring.prerequis_metier(o)
+    bloqueurs = scoring.bloqueurs_admin(o)
+    pts_dates, txt_dates = scoring.dates_score(o)
+    pts_comp, comps = scoring.competences_hors_profil(o)
+    # 5e critère : la date de fin, qui commande tout (rentrée de Master en septembre 2027).
+    # Au-delà du 31/07/2027 la fin se négocie ou se raccourcit, et le dépassement se voit ici.
+    pts_fin, txt_fin = scoring.fin_score(o)
+    niveau, metier, dates = int(round(pts_niveau)), int(round(pts_metier)), int(round(pts_dates))
+    competences, fin = int(round(pts_comp)), int(round(pts_fin))
+    txt_prerequis = (f"prérequis métier hors profil : {', '.join(termes)} ({metier:+d})"
+                     if termes else "prérequis métier : aucun hors profil (0)")
+    if len(comps) == 1:
+        txt_competences = f"compétence exigée hors profil : {comps[0]} ({competences:+d})"
+    elif comps:
+        txt_competences = (f"compétences exigées hors profil : {', '.join(comps)} "
+                           f"({competences:+d})")
+    else:
+        txt_competences = "compétences exigées : toutes dans le référentiel (0)"
+    return {
+        "niveau": niveau, "metier": metier, "dates": dates, "competences": competences,
+        "fin": fin,
+        "txt_niveau": txt_niveau, "txt_prerequis": txt_prerequis, "txt_dates": txt_dates,
+        "txt_competences": txt_competences, "txt_fin": txt_fin,
+        "bloqueurs": bloqueurs,
+        "total": niveau + metier + dates + competences + fin,
+    }
+
+
+def _lignes_ajustements(a: dict) -> list:
+    """Les cinq lignes **additives** du bulletin. Leur maximum est 0 : ce sont des ajustements
+    (bonus/malus), pas des critères notés sur un budget — mais leurs points entrent dans la note,
+    et le total affiché reste la somme exacte de toutes les lignes. La ligne « fin » porte le
+    dépassement de la date de fin (« nécessite de raccourcir de N semaines »), pour qu'une offre
+    à négocier ne se présente jamais au niveau d'une offre qui tient dans la fenêtre."""
+    return [
+        f"diplôme {a['niveau']}/0 ({a['txt_niveau']})",
+        f"prérequis {a['metier']}/0 ({a['txt_prerequis']})",
+        f"compétences {a['competences']}/0 ({a['txt_competences']})",
+        f"dates {a['dates']}/0 ({a['txt_dates']})",
+        f"fin {a['fin']}/0 ({a['txt_fin']})",
+    ]
+
+
+def _ligne_plafond(a: dict, brut: int, note: int, plafond: int) -> str:
+    """La ligne qui porte le plafond, quand il mord.
+
+    Ce n'est **pas** un malus : elle ne fait que constater l'écart entre la somme des critères et la
+    note bornée. Sans elle, le total affiché par le site cesserait d'être la somme de son bulletin.
+    """
+    ecart = note - brut
+    if a["bloqueurs"]:
+        return (f"plafond {ecart}/0 (⛔ bloqueur administratif : {a['bloqueurs'][0]} — "
+                f"note plafonnée à {plafond})")
+    return f"plafond {ecart}/0 (note plafonnée à {plafond})"
+
+
 def _cle_texte(s) -> str:
     """Normalisation **stricte** pour comparer deux intitulés : minuscules, sans accents, toute
     ponctuation réduite à une espace (sinon `STAGE/Ingénieur Web (F/H)` et `STAGE– Ingénieur Web -
@@ -375,15 +485,12 @@ def _dedoublonner(offres) -> tuple:
 
 
 def _deja_postule(o, registre) -> dict | None:
-    """L'offre correspond-elle à une candidature déjà envoyée (registre local alimenté par
-    `suivi.py --manual`) ? Le but est de ne jamais reproposer un poste déjà traité."""
-    entreprises = _cle_texte(o["company"])
-    titre = _cle_texte(o["title"])
-    for c in registre:
-        cle = _cle_texte(c.get("company"))[:12]
-        if cle and cle in entreprises and (not c.get("titre_cle") or c["titre_cle"] in titre):
-            return c
-    return None
+    """L'offre correspond-elle à une candidature déjà envoyée ?
+
+    L'appariement est **celui de `candidatures.py`**, partagé avec `reports.py` et
+    `freshness.select_alerts` : ne jamais reproposer un poste déjà traité, dans aucun canal.
+    """
+    return _partage(o, registre)
 
 
 def _appliquer_diversite(resultats) -> list:
@@ -392,20 +499,33 @@ def _appliquer_diversite(resultats) -> list:
 
     Le plafond ne supprime rien : l'offre reste dans la liste, simplement plus bas.
     """
-    ordonnes = sorted(resultats, key=lambda r: -r[0])
+    # Départage par identifiant : sans lui, l'ordre des offres à égalité de note dépendrait de l'ordre
+    # d'entrée (base d'un côté, JSON de l'autre) et les « nᵉ place » du critère diversité divergeraient
+    # entre le pipeline et le site — constaté le 21/10/2026 après le retrait du plafond.
+    ordonnes = sorted(resultats, key=lambda r: (-r[0], r[1]["id"]))
     vus = {}
+    finaux = []
     for prio, o, raisons, _manquants, bulletin in ordonnes:
         groupe = bulletin["groupe"]
-        if vus.get(groupe, 0) < PLAFOND_GROUPE:
+        if PLAFOND_GROUPE is None or vus.get(groupe, 0) < PLAFOND_GROUPE:
             vus[groupe] = vus.get(groupe, 0) + 1
             points, pourquoi = 14, f"{groupe} — {vus[groupe]}ᵉ place"
         else:
             points, pourquoi = 0, f"plafond atteint chez {groupe}"
         bulletin["diversite"] = points
         raisons.append(f"diversité {points}/14 ({pourquoi})")
+        # Les quatre lignes du 22/10/2026, puis le plafond s'il mord. `prio` contient déjà les
+        # ajustements : la note finale est la somme des lignes, bornée à 55 en cas de bloqueur.
+        ajust = bulletin.get("ajust") or {}
+        raisons.extend(_lignes_ajustements(ajust))
+        brut = prio + points
+        plafond = PLAFOND_ADMIN if ajust.get("bloqueurs") else PLAFOND_BULLETIN
+        note = min(brut, plafond)
+        if note != brut:
+            raisons.append(_ligne_plafond(ajust, brut, note, plafond))
+        finaux.append((note, o, raisons, _manquants, bulletin))
     # Re-tri : la passe de diversité a changé les totaux, la liste doit repartir du meilleur.
-    return sorted(((p + b["diversite"], o, r, m, b) for p, o, r, m, b in ordonnes),
-                  key=lambda r: -r[0])
+    return sorted(finaux, key=lambda r: (-r[0], r[1]["id"]))
 
 
 def classer(offres, systeme: int, now, actions: dict | None = None) -> list:
@@ -421,12 +541,16 @@ def classer(offres, systeme: int, now, actions: dict | None = None) -> list:
         base = len(couvertes) / max(3, len(exigs)) if exigs else 0.35
         jours = _jours(o, now)
         lien = _projet(o["title"] or "", o["description"] or "")
+        # Les quatre critères d'accessibilité s'appliquent à **tous** les systèmes : une offre hors
+        # calibre (Bac+5, prérequis spatial, démarrage trop tôt, habilitation) ne doit arriver en
+        # tête d'aucune liste, et pas seulement du bulletin.
+        ajust = _ajustements(o)
         if systeme == 1:
             prio = (o["score"] or 0) + {True: 10, False: 0}[jours <= 2] \
-                + (6 if 3 <= jours <= 7 else 0)
+                + (6 if 3 <= jours <= 7 else 0) + ajust["total"]
             raisons = [f"score {o['score']}/100", f"publiée il y a {jours:.0f} j"]
         elif systeme == 2:
-            prio = round(60 * base + _fraicheur(jours) + 0.15 * (o["score"] or 0))
+            prio = round(60 * base + _fraicheur(jours) + 0.15 * (o["score"] or 0)) + ajust["total"]
             raisons = [(f"{len(couvertes)}/{len(exigs)} exigences couvertes" if exigs
                         else "annonce sans technos exploitables"),
                        f"publiée il y a {jours:.0f} j"] + ([lien] if lien else [])
@@ -438,8 +562,9 @@ def classer(offres, systeme: int, now, actions: dict | None = None) -> list:
                        + (f" + {lien.split(' — ')[0]}" if lien else "") + ")",
                        f"fraîcheur {_fraicheur(jours)}/25 (il y a {jours:.0f} j)"] + raisons_acc
             if systeme == 4:
-                # Système 4 « bulletin » : neuf critères notés, tous affichés, plus l'urgence
-                # (affichée mais jamais notée). Aucune offre n'est éliminée ni réduite à un chiffre.
+                # Système 4 « bulletin » : neuf critères notés, tous affichés, plus les quatre
+                # ajustements du 22/10/2026 et l'urgence (affichée mais jamais notée). Aucune offre
+                # n'est éliminée ni réduite à un chiffre.
                 metier, pts_metier = _metier(o)
                 pts_source, pourquoi_source = _fiabilite_source(o)
                 pts_fiche, pourquoi_fiche = _qualite_fiche(o)
@@ -453,7 +578,8 @@ def classer(offres, systeme: int, now, actions: dict | None = None) -> list:
                 cal8 = round(8 * pts_cal / 10)
                 cout6 = round(6 * pts_cout / 5)
                 frais12 = round(12 * _fraicheur(jours) / 25)
-                prio = coherence + metier12 + source8 + fiche6 + cal8 + cout6 + frais12 + pts_dos
+                prio = (coherence + metier12 + source8 + fiche6 + cal8 + cout6 + frais12 + pts_dos
+                        + ajust["total"])
                 raisons = [f"cohérence {coherence}/30 ({len(couvertes)}/{len(exigs)} exigences"
                            + (f" + {lien.split(' — ')[0]}" if lien else "") + ")",
                            f"métier {metier12}/12 ({metier or 'indéterminé'})",
@@ -464,13 +590,24 @@ def classer(offres, systeme: int, now, actions: dict | None = None) -> list:
                            f"dossier {pts_dos}/4 ({pourquoi_dos})",
                            f"fraîcheur {frais12}/12 (il y a {jours:.0f} j)",
                            _urgence(o, jours)]
-                bulletin = {"groupe": _groupe(o), "diversite": 0}
+                # Les lignes d'ajustement et le plafond sont posés après la diversité (deuxième
+                # passe) : la note du bulletin reste la somme exacte de **toutes** ses lignes.
+                bulletin = {"groupe": _groupe(o), "diversite": 0, "ajust": ajust}
                 resultats.append((prio, dict(o), raisons, manquants, bulletin))
                 continue
+        # Systèmes 1 à 3 : l'accessibilité est affichée et le plafond administratif s'applique aussi.
+        raisons.append(f"accessibilité {ajust['total']:+d} (diplôme {ajust['niveau']:+d}, "
+                       f"prérequis {ajust['metier']:+d}, dates {ajust['dates']:+d}, "
+                       f"compétences {ajust['competences']:+d})")
+        if ajust["bloqueurs"] and prio > PLAFOND_ADMIN:
+            prio = PLAFOND_ADMIN
+            raisons.append(f"⛔ bloqueur administratif : {ajust['bloqueurs'][0]} — "
+                           f"priorité plafonnée à {PLAFOND_ADMIN}")
         resultats.append((prio, dict(o), raisons, manquants))
     if systeme == 4:
         return [(p, o, r, m) for p, o, r, m, _b in _appliquer_diversite(resultats)]
-    return sorted(resultats, key=lambda r: -r[0])
+    # Départage par identifiant : à égalité, l'ordre ne doit pas dépendre de l'ordre d'entrée.
+    return sorted(resultats, key=lambda r: (-r[0], r[1]["id"]))
 
 
 def main(argv=None) -> int:

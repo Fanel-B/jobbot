@@ -263,13 +263,24 @@ function couverte(
   ajouts: readonly string[] = [],
   atouts: readonly (readonly [string, string])[] = MES_ATOUTS,
 ): string | null {
-  const e = exigence.toLowerCase();
+  const e = exigence.toLowerCase().trim();
+  // Mot entier, dans les deux sens : « ml » ne doit pas être absorbé par HT«ml», ni « java » par
+  // JavaScript. Les clés à plusieurs mots (« power bi », « api rest ») sont des locutions, donc
+  // comparées en sous-chaîne. Même règle que `priorites._couverte` depuis le 25/10/2026.
+  const couvre = (cle: string): boolean => {
+    if (cle === e) return true;
+    if (cle.includes(" ")) return e.includes(cle) || cle.includes(e);
+    const echappe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const motEntier = (mot: string, texte: string) =>
+      new RegExp(`(?<![a-z0-9])${echappe(mot)}(?![a-z0-9])`).test(texte);
+    return motEntier(cle, e) || motEntier(e, cle);
+  };
   for (const brut of ajouts) {
     const cle = brut.toLowerCase().trim();
-    if (cle && (e.includes(cle) || cle.includes(e))) return brut;
+    if (cle && couvre(cle)) return brut;
   }
   for (const [cle, nom] of atouts) {
-    if (e.includes(cle) || cle.includes(e)) return nom;
+    if (couvre(cle)) return nom;
   }
   // Une famille ne joue que si son représentant est **dans le profil** : qui ne connaît pas SQL
   // ne couvre pas « bases de données » parce que le pipeline, lui, les rattache.

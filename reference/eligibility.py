@@ -3,7 +3,13 @@
 PROFILE_STAGE_2027  (ACTIF) :
     stage débutant en 2027, visé au 29/03/2027 (modifiable : un début à plus de
     ~2 mois de cette date reste en "uncertain", il n'est pas rejeté).
-    Durée 4-5 mois attendue ; 6 mois => uncertain sauf mention Bac+3, > 6 mois => ineligible.
+    **La date de fin commande tout** (révision du 22/10/2026) : rentrée de Master en septembre
+    2027, donc fin impérative au 31/07/2027. Durée minimale 14 semaines — seule borne de durée
+    fermée (3 jours de moins => ineligible). Entre 14 semaines et 5 mois => éligible, avec le
+    drapeau « durée courte, acceptable » en dessous de 4 mois. Au-delà de 5 mois, la durée ne
+    tranche plus : `fin_de_stage()` classe la fin calculée en quatre paliers (31/07 = rien à
+    négocier ; août = « dépasse de N semaines, à négocier » ; septembre-octobre = « nécessite de
+    raccourcir », malus de classement ; après le 31/10 = ineligible).
     Stage explicitement non rémunéré => ineligible.
 PROFILE_ALTERNANCE_2026  (⏸️ EN PAUSE) :
     alternance / apprentissage / professionnalisation, 12 à 24 mois.
@@ -12,13 +18,19 @@ PROFILE_ALTERNANCE_2026  (⏸️ EN PAUSE) :
     réécrire les règles, mais `active=False` : il n'est plus appliqué, donc toute offre
     alternance sort en "rejected" avec une note explicative.
 
-Zone géographique : une seule zone de recherche, Toulouse et alentours
-(`ZONE_PATTERNS`). Hors zone => ineligible. Localisation absente => uncertain.
+Zone géographique : une seule zone de recherche, Toulouse et alentours, déclarée dans `faits.ZONE`
+(`ZONE_PATTERNS` est construit à partir d'elle). Hors zone => ineligible. Localisation absente =>
+uncertain.
+
+Type de contrat : le champ `contract_type` fait foi. S'il est **vide**, les termes sont cherchés
+dans le titre puis dans la description (règle du 22/10/2026) ; introuvables partout, l'offre est
+`uncertain` — une information absente n'est pas un critère violé. `check()` n'interrompt plus
+l'évaluation : les autres critères sont toujours examinés, pour que la raison soit complète.
 
 Chaque vérification renvoie un statut :
     "eligible"   : toutes les conditions sont vérifiées
     "ineligible" : au moins une condition est violée
-    "uncertain"  : rien de violé mais une info manque (date, durée, zone) -> à vérifier
+    "uncertain"  : rien de violé mais une info manque (date, durée, zone, contrat) -> à vérifier
     "rejected"   : école / CFA partenaire imposé explicitement (tous profils)
 
 Champs de l'offre lus : contract_type, start_date, end_date, duration, location,
@@ -30,8 +42,15 @@ import unicodedata
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 
+from faits import ZONE  # noqa: F401  (re-exporté : `faits.ZONE` est la source de la zone)
+import faits
+
 
 ELIGIBLE, INELIGIBLE, UNCERTAIN, REJECTED = "eligible", "ineligible", "uncertain", "rejected"
+
+# Libellés lisibles des champs où l'on cherche le type de contrat (raisons affichées à Fanel).
+LIBELLE_CHAMP_CONTRAT = {"contract_type": "le champ contract_type", "title": "le titre",
+                         "description": "la description"}
 
 
 @dataclass(frozen=True)
@@ -47,8 +66,21 @@ class Profile:
     asap_ok: bool = False                # "dès que possible" accepté comme date de début
     reject_unpaid: bool = False          # rejet si non rémunéré explicitement
     active: bool = True                  # False = profil en pause, plus appliqué
+    # Au-delà de la borne dure : « à vérifier » si l'annonce accepte un Bac+3, écartée sinon.
+    # Vrai pour la recherche de stage (règle du 22/10/2026) ; faux pour l'alternance, où un
+    # contrat de 36 mois n'est pas une alternance qu'on vérifie, il est hors sujet.
+    over_max_uncertain_with_bac3: bool = False
     preferred_start: date | None = None  # date de début visée (écart -> uncertain, pas rejeté)
     preferred_tolerance_days: int = 61   # ± tolérance autour de preferred_start
+    # Durée minimale en semaines (14 pour un stage : plusieurs programmes, dont ceux d'Airbus,
+    # sont calibrés à cette durée). Exprimée en semaines pour rester exacte — 14 semaines ne font
+    # pas 3,5 mois pile.
+    min_semaines: float | None = None
+    # Fenêtre de fin : les seuils sont lus dans `faits.STAGE['fin_paliers']`. Le critère qui
+    # commande tout est la date de fin (rentrée de Master en septembre 2027), pas la durée.
+    fin_compatible: date | None = None   # fin jusqu'ici : rien à négocier
+    fin_negociation: date | None = None  # palier suivant : drapeau « à négocier », sans malus
+    fin_raccourcir: date | None = None   # palier suivant : drapeau + malus ; au-delà, écartée
 
 
 PROFILE_ALTERNANCE_2026 = Profile(
@@ -67,11 +99,17 @@ PROFILE_STAGE_2027 = Profile(
     name="PROFILE_STAGE_2027",
     contract_terms=("stage", "stagiaire", "internship", "intern"),
     start_year=2027,
-    min_months=4,
-    max_months=5,
-    conditional_max_months=6,
+    # Durée lue dans `faits.STAGE` : une seule déclaration pour le filtre, le CV, la lettre et le
+    # pitch (règle du 22/10/2026). Cible 4 à 6 mois ; au-delà, « à vérifier » si Bac+3 est accepté.
+    min_months=faits.STAGE["duree_min"],
+    min_semaines=faits.STAGE["duree_min_semaines"],
+    max_months=faits.STAGE["duree_max"],
     reject_unpaid=True,
-    preferred_start=date(2027, 3, 29),   # visé, modifiable
+    over_max_uncertain_with_bac3=True,
+    preferred_start=date.fromisoformat(faits.STAGE["debut_iso"]),
+    fin_compatible=date.fromisoformat(faits.STAGE["fin_paliers"]["compatible"]),
+    fin_negociation=date.fromisoformat(faits.STAGE["fin_paliers"]["negociation"]),
+    fin_raccourcir=date.fromisoformat(faits.STAGE["fin_paliers"]["raccourcir"]),
 )
 
 PROFILES = (PROFILE_ALTERNANCE_2026, PROFILE_STAGE_2027)
@@ -84,6 +122,9 @@ class EligibilityResult:
     profile: str
     status: str
     reasons: list = field(default_factory=list)
+    # Drapeaux non bloquants, affichés à Fanel (« dépasse de N semaines, à négocier »,
+    # « durée courte (14 semaines), acceptable ») : une offre signalée reste candidatable.
+    flags: list = field(default_factory=list)
 
     @property
     def eligible(self) -> bool:
@@ -246,20 +287,42 @@ def partner_school_match(offer: dict) -> str | None:
 
 
 # --- Zone géographique : Toulouse et alentours -----------------------------
+# Une seule déclaration : la liste des communes vit dans `faits.ZONE`, les expressions régulières
+# sont construites ici. `faits.py` et `eligibility.py` ne peuvent donc plus se contredire
+# (règle du 22/10/2026 : la source unique se lit, elle ne se recopie pas).
 
-ZONE_LABEL = "Toulouse et alentours"
-ZONE_PATTERNS = (
-    r"\btoulouse\b", r"\bhaute[-\s]?garonne\b", r"\bcolomiers\b", r"\bblagnac\b",
-    r"\blabege\b", r"\bbalma\b", r"\bsaint[-\s]?orens\b", r"\bramonville\b",
-    r"\bmuret\b", r"\bcastanet[-\s]?tolosan\b", r"\bl'union\b", r"\bfenouillet\b",
-    r"\bcornebarrieu\b", r"\baucamville\b", r"\bbeauzelle\b", r"\bcugnaux\b",
-    r"\btournefeuille\b", r"\bplaisance[-\s]?du[-\s]?touch\b",
-    r"\bportet[-\s]?sur[-\s]?garonne\b", r"\bpoucharramet\b",
+
+def _motif_zone(terme: str) -> str:
+    """Motif d'une commune : « haute-garonne » reconnaît aussi « haute garonne »."""
+    corps = re.escape(_norm(terme)).replace(r"\-", r"[-\s]?")
+    return rf"\b{corps}\b"
+
+
+ZONE_LABEL = faits.ZONE["libelle"]
+ZONE_PATTERNS = tuple([_motif_zone(v) for v in faits.ZONE["villes"]] + [
     # Libellés France Travail « 31 - Commune » et codes postaux 31xxx : Haute-Garonne entière.
     r"\b31\s*-\s*[a-z]", r"\b31\d{3}\b",
-)
+])
 REMOTE_PATTERNS = (r"\bteletravail\b", r"\bremote\b", r"\ba distance\b", r"\bhome ?office\b")
 REASON_OUT_OF_ZONE = f"hors zone {ZONE_LABEL}"
+# Régions qui *contiennent* la zone de recherche. Une annonce localisée « Occitanie » seule n'est ni
+# dans la zone (Montpellier y est aussi) ni hors zone (Toulouse y est) : la rejeter reviendrait à
+# jeter une offre toulousaine possible sur une information manquante. On la garde à vérifier.
+# La règle ne vaut que si **aucune ville** n'est nommée : « Rodez, Occitanie » ou
+# « Montpellier, Occitanie » nomment une ville précise, hors zone, et restent inéligibles.
+# Sans cette règle, l'alerte Safran ne rend rien : ses mails ne donnent que la région (21/10/2026).
+REGIONS_QUI_CONTIENNENT_LA_ZONE = tuple(_motif_zone(r) for r in faits.ZONE["regions_englobantes"])
+MOTS_SANS_VILLE = re.compile(
+    r"\b(?:occitanie|france|franche|region|regions|metropole|hors|remote|fr)\b|[^a-z0-9]+")
+
+
+def _reste_une_ville(loc: str) -> bool:
+    """Vrai s'il reste autre chose que la région et le pays après retrait des mots génériques.
+
+    « Occitanie » -> False (lieu régional seul) · « Occitanie, France » -> False ·
+    « Rodez, Occitanie » -> True (la ville est nommée, donc on sait où c'est).
+    """
+    return bool(re.sub(r"\s+", "", MOTS_SANS_VILLE.sub(" ", loc)).strip())
 
 
 def _in_zone(text: str) -> bool:
@@ -279,6 +342,9 @@ def zone_status(offer: dict) -> tuple[str, str]:
             return ELIGIBLE, f"zone OK ({ZONE_LABEL})"
         if any(re.search(p, loc) for p in REMOTE_PATTERNS):
             return UNCERTAIN, f"télétravail sans zone précisée ({offer.get('location')!r})"
+        if any(re.search(p, loc) for p in REGIONS_QUI_CONTIENNENT_LA_ZONE) and not _reste_une_ville(loc):
+            return UNCERTAIN, (f"lieu au niveau régional seulement ({offer.get('location')!r}) : "
+                               f"{ZONE_LABEL} possible, ville à vérifier sur l'annonce")
         return INELIGIBLE, f"{REASON_OUT_OF_ZONE} : {offer.get('location')!r}"
     title = _norm(offer.get("title"))
     if _in_zone(title):
@@ -306,9 +372,17 @@ def offer_notes(offer: dict) -> list:
 
 # --- Vérification ----------------------------------------------------------
 
+def _terme_contrat(profile: Profile, value) -> str | None:
+    """Terme de contrat du profil présent dans un texte, ou None."""
+    texte = _norm(value)
+    for t in profile.contract_terms:
+        if re.search(rf"\b{re.escape(t)}\b", texte):
+            return t
+    return None
+
+
 def _matches_contract(profile: Profile, contract_type) -> bool:
-    ct = _norm(contract_type)
-    return any(re.search(rf"\b{re.escape(t)}\b", ct) for t in profile.contract_terms)
+    return _terme_contrat(profile, contract_type) is not None
 
 
 def _fmt(n: float) -> str:
@@ -318,14 +392,33 @@ def _fmt(n: float) -> str:
 def check(offer: dict, profile: Profile) -> EligibilityResult:
     res = EligibilityResult(profile.name, ELIGIBLE)
 
+    # École / CFA partenaire imposé : rejet définitif, mais on continue l'évaluation pour que la
+    # raison affichée soit complète (règle du 22/10/2026 : plus aucune sortie anticipée).
     school = partner_school_match(offer)
     if school:
         res._downgrade(REJECTED, f"{REASON_PARTNER_SCHOOL} ({school!r})")
-        return res
 
-    if not _matches_contract(profile, offer.get("contract_type")):
-        res._downgrade(INELIGIBLE, f"type de contrat incompatible : {offer.get('contract_type')!r}")
-        return res
+    # Type de contrat. Le champ déclaré fait foi. Quand il est **vide**, on le cherche dans le titre
+    # puis dans la description : beaucoup d'annonces annoncent « Stage » dans leur titre et laissent
+    # le champ vide. Une information absente n'est pas un critère violé -> `uncertain`, jamais
+    # `ineligible`. Et la fonction ne s'interrompt plus : les autres critères sont toujours évalués.
+    declare = str(offer.get("contract_type") or "").strip()
+    champ = terme = None
+    if not declare:
+        for nom_champ in ("title", "description"):
+            terme = _terme_contrat(profile, offer.get(nom_champ))
+            if terme:
+                champ = nom_champ
+                break
+    if declare and _matches_contract(profile, declare):
+        pass
+    elif champ:
+        res.reasons.append(f"contrat lu dans {LIBELLE_CHAMP_CONTRAT[champ]} ({terme!r})")
+    elif declare:
+        res._downgrade(INELIGIBLE, f"type de contrat incompatible : {declare!r}")
+    else:
+        res._downgrade(UNCERTAIN, "type de contrat inconnu : champ vide, et ni le titre ni la "
+                                  "description ne nomment ce contrat")
 
     # Zone de recherche (une seule zone : Toulouse et alentours)
     z_status, z_reason = zone_status(offer)
@@ -362,19 +455,43 @@ def check(offer: dict, profile: Profile) -> EligibilityResult:
             lo, hi = dur
             wanted = (f"{_fmt(profile.min_months)} mois" if profile.min_months == profile.max_months
                       else f"{_fmt(profile.min_months)}-{_fmt(profile.max_months)} mois")
-            # Arrondi au mois : 11.9 mois déduits des dates comptent pour 12
-            lo_r, hi_r = round(lo), round(hi)
+            lo_w, hi_w = lo * SEMAINES_PAR_MOIS, hi * SEMAINES_PAR_MOIS
+            lo_r, hi_r = round(lo), round(hi)   # arrondi au mois (profil alternance)
             hard_max = profile.conditional_max_months or profile.max_months
-            if hard_max is not None and lo_r > hard_max:
-                res._downgrade(INELIGIBLE, f"{src} > {_fmt(hard_max)} mois")
-            elif profile.min_months is not None and hi_r < profile.min_months:
+            # Seule borne de durée réellement fermée : moins de 14 semaines (décision du
+            # 22/10/2026). Comparaison en semaines : 14 semaines ne font pas 3,5 mois pile.
+            if profile.min_semaines is not None and hi_w < profile.min_semaines:
+                res._downgrade(INELIGIBLE, f"{src} < {profile.min_semaines:.0f} semaines ({wanted})")
+            elif profile.min_semaines is None and profile.min_months is not None and hi_r < profile.min_months:
                 res._downgrade(INELIGIBLE, f"{src} < {wanted}")
-            elif profile.max_months is None or lo_r <= profile.max_months:
+            elif profile.max_months is None or lo <= profile.max_months:
                 res.reasons.append(f"{src} compatible ({wanted})")
+                if profile.min_months is not None and lo < profile.min_months:
+                    res.flags.append(f"durée courte ({lo_w:.0f} semaines), acceptable")
+            elif profile.over_max_uncertain_with_bac3:
+                # Au-delà de la durée maximale (5 mois), ce n'est plus la durée qui tranche :
+                # la date de fin décide (critère dédié ci-dessous). On note l'écart, sans rejeter.
+                res.reasons.append(f"{src} > {wanted} : la date de fin décide")
+            elif hard_max is not None and lo_r > hard_max:
+                res._downgrade(INELIGIBLE, f"{src} > {_fmt(hard_max)} mois")
             elif accepts_bac3(offer):
+                # Bande conditionnelle (13-24 mois d'un profil alternance) : le Bac+3 sauve la mise.
                 res.reasons.append(f"{src} > {wanted} mais Bac+3 / L3 / poursuite Master acceptée")
             else:
                 res._downgrade(UNCERTAIN, f"{src} > {wanted} sans mention Bac+3 : à vérifier")
+
+    # Date de fin : le critère qui commande tout (22/10/2026). Une annonce plus longue que la
+    # fenêtre reste candidatable — l'écart est affiché, et au-delà d'août il est pénalisé au
+    # classement (`scoring.FIN_TARDIVE_MALUS`) pour qu'elle ne dépasse jamais une offre qui tient.
+    if profile.fin_compatible:
+        fin = fin_de_stage(offer, profile)
+        if fin.fin is not None and fin.palier == PALIER_FIN_HORS_PORTEE:
+            res._downgrade(INELIGIBLE, fin.drapeau)
+        elif fin.drapeau:
+            res.reasons.append(fin.drapeau)
+            res.flags.append(fin.drapeau)
+        elif fin.fin is not None:
+            res.reasons.append(f"fin {fin.fin:%d/%m/%Y} : dans la fenêtre")
 
     # Rémunération
     if profile.reject_unpaid and is_unpaid(offer):
@@ -383,6 +500,99 @@ def check(offer: dict, profile: Profile) -> EligibilityResult:
     if res.status == ELIGIBLE and not res.reasons:
         res.reasons.append("contrat et dates compatibles")
     return res
+
+
+SEMAINES_PAR_MOIS = 4.345
+PALIER_FIN_COMPATIBLE = "compatible"
+PALIER_FIN_NEGOCIATION = "negociation"
+PALIER_FIN_RACCOURCIR = "raccourcir"
+PALIER_FIN_HORS_PORTEE = "hors_portee"
+
+
+@dataclass
+class FinStage:
+    """Fin calculée d'un stage et son palier dans la fenêtre de Fanel."""
+    fin: date | None
+    # Pas de palier par défaut : `FinStage(None)` est une **absence** de calcul (début ou durée
+    # inconnus), pas une fin compatible. Un défaut « compatible » ferait lire « rien à négocier »
+    # à qui oublie de tester `fin` — le portage TypeScript, lui, renvoie une chaîne vide ici.
+    palier: str = ""
+    depassement_semaines: int = 0
+    drapeau: str = ""
+
+
+def _ajouter_mois(d: date, mois: float) -> date:
+    """Ajoute des mois (fractionnaires acceptés) à une date, sans dépendance externe."""
+    return d + timedelta(days=int(round(mois * 30.4375)))
+
+
+def fin_de_stage(offer: dict, profile: Profile | None = None) -> FinStage:
+    """Date de fin du stage, et le palier de la fenêtre — le critère qui commande tout.
+
+    La rentrée de Master de Fanel est en septembre 2027 : c'est la **fin** qui compte, pas la
+    durée. Un stage de 4 mois démarrant en juin a une durée parfaitement conforme et finit en
+    octobre — c'est ce cas que le critère de durée seul ne voyait pas.
+
+    On prend la durée la plus **courte** annoncée par l'annonce : c'est la lecture sans écart,
+    donc la plus favorable, et elle ne fabrique pas un dépassement que l'annonce ne demande pas.
+    Quatre paliers : fin au 31/07 ou avant = rien à négocier ; août = drapeau « à négocier » ;
+    septembre-octobre = drapeau « à raccourcir » + malus de classement ; après le 31/10 = hors de
+    portée, l'offre est écartée.
+    """
+    p = profile or PROFILE_STAGE_2027
+    if not (p.fin_compatible and p.fin_negociation and p.fin_raccourcir):
+        return FinStage(None)
+    debut = parse_date(offer.get("start_date"))
+    if not isinstance(debut, date):
+        # Début inconnu (ou « dès que possible ») : on ne fabrique pas une fin. Le critère de
+        # durée parle, et l'incertitude sur le début est déjà signalée par ailleurs.
+        return FinStage(None)
+    dur, _src = offer_duration(offer)
+    if not dur:
+        return FinStage(None)
+    fin = _ajouter_mois(debut, dur[0])
+    if fin <= p.fin_compatible:
+        return FinStage(fin, PALIER_FIN_COMPATIBLE)
+    semaines = max(1, int(round((fin - p.fin_compatible).days / 7)))
+    if fin <= p.fin_negociation:
+        return FinStage(fin, PALIER_FIN_NEGOCIATION, semaines,
+                        f"fin {fin:%d/%m/%Y} : dépasse de {semaines} semaine(s), à négocier")
+    if fin <= p.fin_raccourcir:
+        return FinStage(fin, PALIER_FIN_RACCOURCIR, semaines,
+                        f"fin {fin:%d/%m/%Y} : nécessite de raccourcir de {semaines} semaine(s)")
+    return FinStage(fin, PALIER_FIN_HORS_PORTEE, semaines,
+                    f"fin {fin:%d/%m/%Y} au-delà du {p.fin_raccourcir:%d/%m/%Y} : hors de portée, "
+                    "rien à négocier")
+
+
+def contrat_inconnu(offer: dict, profile: Profile | None = None) -> bool:
+    """Type de contrat introuvable partout : ni le champ, ni le titre, ni la description.
+
+    Décision du 22/10/2026 : ces offres **restent** dans la base en `uncertain` (« à vérifier »,
+    l'information manque, elle n'est pas contredite) mais **sortent des alertes** : sur les 127
+    offres à champ vide de la base, aucune n'annonce un stage, et 76 d'entre elles auraient
+    gonflé la liste quotidienne avec des CDI parisiens. Une alerte doit rester rare pour rester
+    lue (argument de Fanel sur la notification immédiate).
+    """
+    p = profile or PROFILE_STAGE_2027
+    for champ in ("contract_type", "title", "description"):
+        if _terme_contrat(p, offer.get(champ)):
+            return False
+    return not str(offer.get("contract_type") or "").strip()
+
+
+def est_stage(offer: dict, profile: Profile | None = None) -> bool:
+    """Le contrat de stage est-il annoncé ? Champ déclaré, sinon titre, sinon description.
+
+    Sert au critère de date de fin du scoring : la fenêtre du 31/07 concerne les stages, pas
+    les alternances (profil en pause) ni les CDI. Offre sans aucune mention de stage : False —
+    c'est alors `check()` qui décide, avec le statut « incertain » et non un malus.
+    """
+    p = profile or PROFILE_STAGE_2027
+    for champ in ("contract_type", "title", "description"):
+        if _terme_contrat(p, offer.get(champ)):
+            return True
+    return False
 
 
 def paused_profile_for(offer: dict) -> Profile | None:
