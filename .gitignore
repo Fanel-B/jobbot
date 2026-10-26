@@ -45,6 +45,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# …sauf le gabarit, qui ne contient aucune valeur : il documente les noms de variables
+# attendus, et sans lui personne ne sait quoi poser dans .env.local.
+!.env.local.example
 
 # vercel
 .vercel
