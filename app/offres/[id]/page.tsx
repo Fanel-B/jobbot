@@ -188,15 +188,16 @@ export default async function Page({
                 {exigences.map((e) => {
                   const manque = manquants.has(e.toLowerCase());
                   return (
-                    <li key={e} className="flex items-start gap-3 text-sm">
+                    /* Un filet vertical plutôt qu'une pastille cochée : la petite coche verte
+                       dans un carré est le motif de liste le plus vu, et la couleur n'y porte
+                       jamais seule l'information — le texte dit déjà lequel manque. */
+                    <li key={e} className="flex items-start gap-3.5 text-sm">
                       <span
-                        className={`mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-md text-[11px] ${
-                          manque ? "bg-bad-soft text-bad" : "bg-good-soft text-good"
+                        className={`mt-1 h-4 w-0.5 shrink-0 rounded-sm ${
+                          manque ? "bg-bad" : "bg-good"
                         }`}
                         aria-hidden
-                      >
-                        {manque ? "✕" : "✓"}
-                      </span>
+                      />
                       <span className={manque ? "text-ink-soft" : "text-ink"}>
                         {e}
                         {manque ? (

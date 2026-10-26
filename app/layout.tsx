@@ -99,6 +99,14 @@ export default function RootLayout({
                     Sources et méthode
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    href="/confidentialite"
+                    className="underline decoration-line-strong hover:text-ink"
+                  >
+                    Données et mentions légales
+                  </Link>
+                </li>
                 <li className="num">
                   Dernière collecte : {collecte.toLocaleString("fr-FR")}
                 </li>

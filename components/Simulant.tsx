@@ -75,7 +75,7 @@ export async function Simulant({
             <Link
               key={m}
               href={lien(suivant)}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${
+              className={`inline-flex items-center gap-1.5 rounded-[6px] border px-3 py-1 text-xs transition ${
                 active
                   ? "border-accent/30 bg-accent-soft text-accent-ink"
                   : "border-line bg-surface text-ink-soft hover:border-line-strong"

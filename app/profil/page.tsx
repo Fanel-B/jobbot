@@ -38,7 +38,7 @@ function Case({
   children: React.ReactNode;
 }) {
   return (
-    <label className="group inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-xs text-ink-soft transition hover:border-ink/40 hover:text-ink has-checked:border-ink has-checked:bg-ink has-checked:font-medium has-checked:text-paper">
+    <label className="group inline-flex cursor-pointer items-center gap-2 rounded-[6px] border border-line bg-surface px-3 py-1.5 text-xs text-ink-soft transition hover:border-ink/40 hover:text-ink has-checked:border-ink has-checked:bg-ink has-checked:font-medium has-checked:text-paper">
       <input
         type="checkbox"
         name={name}
@@ -152,7 +152,7 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
             {NIVEAUX.map((n) => (
               <label
                 key={n}
-                className="group inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-xs text-ink-soft transition hover:border-ink/40 hover:text-ink has-checked:border-ink has-checked:bg-ink has-checked:font-medium has-checked:text-paper"
+                className="group inline-flex cursor-pointer items-center gap-2 rounded-[6px] border border-line bg-surface px-3 py-1.5 text-xs text-ink-soft transition hover:border-ink/40 hover:text-ink has-checked:border-ink has-checked:bg-ink has-checked:font-medium has-checked:text-paper"
               >
                 <input
                   type="radio"

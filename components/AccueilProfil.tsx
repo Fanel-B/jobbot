@@ -3,7 +3,7 @@ import { Bulletin } from "@/components/Bulletin";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { OfferMini } from "@/components/OfferCard";
 import { Barres, Dumbbell } from "@/components/Graphes";
-import { critereLabel, lacunesRegroupees, meta } from "@/lib/offers";
+import { critereLabel, enLettres, lacunesRegroupees, meta, structureBulletin } from "@/lib/offers";
 import { SEUIL_BONNE_PISTE, volumeSuffisant } from "@/lib/simulation";
 import {
   competencesSimulablesPour,
@@ -132,9 +132,12 @@ export async function SectionsProfil() {
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 lg:grid-cols-[1.1fr_1fr]">
         <div>
           <p className="compteur">02</p>
-          <h2 className="titre-section mt-3 lg:sticky lg:top-24">Une note, neuf raisons</h2>
+          <h2 className="titre-section mt-3 lg:sticky lg:top-24">
+                Une note, {enLettres(structureBulletin.notes.length)} raisons
+              </h2>
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-ink-soft">
-            La note n&apos;est pas une impression : elle additionne neuf critères calculés par du
+            La note n&apos;est pas une impression : elle additionne{" "}
+            {enLettres(structureBulletin.notes.length)} critères calculés par du
             code, tous reproductibles. Chaque offre porte son bulletin, y compris quand un
             critère tombe à zéro — c&apos;est justement l&apos;information utile.
           </p>

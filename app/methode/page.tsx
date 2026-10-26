@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { meta, nbSignalFormation, offers, sourceLabel } from "@/lib/offers";
+import { critereLabel, enLettres, meta, nbSignalFormation, offers, sourceLabel, structureBulletin } from "@/lib/offers";
 
 const SOURCES_DETAIL: Record<string, string> = {
   "sopra-steria": "Site carrière de l'entreprise (interface publique de recrutement).",
@@ -18,6 +18,9 @@ const SOURCES_DETAIL: Record<string, string> = {
 export default function Page() {
   const sources = Object.entries(meta.sources).sort((a, b) => b[1] - a[1]);
   const nbFormation = nbSignalFormation(offers);
+  // Décrit à partir de l'export, pas écrit en dur : le pipeline ajoute des critères, et une
+  // phrase figée devient fausse sans que personne ne le voie.
+  const bulletin = structureBulletin;
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-12">
@@ -106,14 +109,22 @@ export default function Page() {
         <h2 className="titre-section">Comment la note est fabriquée</h2>
         <p className="mt-3 text-sm leading-relaxed text-ink-soft">
           La note est calculée par du <strong className="font-medium">code déterministe</strong>, pas
-          par un modèle de langage. Neuf critères, chacun avec un maximum de points, additionnés sur
-          100. Deux personnes avec le même profil obtiennent donc exactement la même note, et
-          n&apos;importe qui peut refaire le calcul à la main.
+          par un modèle de langage : {enLettres(bulletin.notes.length)} critères notés, chacun avec
+          son maximum, additionnés sur <span className="num">{bulletin.total}</span>. Deux personnes
+          avec le même profil obtiennent exactement la même note, et n&apos;importe qui peut refaire
+          le calcul à la main.
         </p>
         <p className="mt-3 text-sm leading-relaxed text-muted">
-          Les critères : cohérence avec le profil, métier visé, qualité de la source, complétude de la
-          fiche, compatibilité du calendrier, coût du dépôt (longueur du formulaire), pièces déjà
-          prêtes, diversité des candidatures, fraîcheur de l&apos;annonce.
+          Les critères notés : {bulletin.notes.map((c) => critereLabel(c).toLowerCase()).join(", ")}.
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          S&apos;y ajoutent {enLettres(bulletin.ajustements.length)} lignes d&apos;
+          <strong className="font-medium text-ink-soft">ajustement</strong>, sans maximum propre :
+          elles ajoutent ou retirent des points après coup —{" "}
+          {bulletin.ajustements.map((c) => critereLabel(c).toLowerCase()).join(", ")}. Un niveau de
+          diplôme hors de portée retire des points ; un bloqueur administratif, comme une
+          habilitation de sécurité, plafonne la note. Elles figurent au bulletin comme les autres,
+          pour que le total reste la somme de ce qui est affiché.
         </p>
         {/* Le plafond par groupe a été retiré le 21/10/2026. Le critère reste dans le bulletin —
             l'en retirer casserait la promesse que le total est la somme de ses lignes — et son

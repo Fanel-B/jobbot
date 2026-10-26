@@ -69,7 +69,7 @@ function Filtre({ actif, href, children }: { actif: boolean; href: string; child
   return (
     <Link
       href={href}
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ${
+      className={`inline-flex items-center gap-1.5 rounded-[6px] border px-3 py-1.5 text-xs transition ${
         actif
           ? "border-ink bg-ink font-medium text-paper"
           : "border-line bg-surface text-ink-soft hover:border-ink/40 hover:text-ink"

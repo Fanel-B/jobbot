@@ -125,10 +125,63 @@ export const CRITERE_LABEL: Record<string, string> = {
   diversite: "Diversité des candidatures",
   fraîcheur: "Fraîcheur de l'offre",
   fraicheur: "Fraîcheur de l'offre",
+  // Lignes d'ajustement ajoutées par le pipeline : sans libellé, le bulletin affichait
+  // « Fin » ou « Plafond » tout court, ce qui ne veut rien dire pour qui lit sa note.
+  diplôme: "Niveau de diplôme exigé",
+  diplome: "Niveau de diplôme exigé",
+  prérequis: "Prérequis métier",
+  prerequis: "Prérequis métier",
+  compétences: "Compétences exigées",
+  competences: "Compétences exigées",
+  dates: "Dates de disponibilité",
+  fin: "Fin du stage",
+  plafond: "Bloqueur administratif",
 };
 
 export function critereLabel(c: string): string {
   return CRITERE_LABEL[c] ?? c.charAt(0).toUpperCase() + c.slice(1);
+}
+
+/* -------------------------------------------------- structure du bulletin */
+
+export type StructureBulletin = {
+  /** Critères notés : ils ont un maximum, et leur somme fait le total sur 100. */
+  notes: string[];
+  /** Lignes d'ajustement : maximum nul, elles ajoutent ou retirent des points. */
+  ajustements: string[];
+  /** Somme des maximums — 100, sauf si le pipeline change de barème. */
+  total: number;
+};
+
+/**
+ * La forme réelle du bulletin, **lue dans les données** plutôt qu'écrite en dur.
+ *
+ * Le site a longtemps annoncé « neuf critères ». Le pipeline en a ajouté depuis — diplôme exigé,
+ * prérequis métier, dates, bloqueurs administratifs — et la phrase est devenue fausse sans que
+ * personne ne s'en aperçoive. La décrire à partir de l'export empêche que ça recommence.
+ */
+export const structureBulletin: StructureBulletin = (() => {
+  const vus = new Map<string, number>();
+  for (const o of data.offers) {
+    for (const b of o.score_breakdown ?? []) {
+      if (!vus.has(b.critere)) vus.set(b.critere, b.max);
+    }
+  }
+  const notes = [...vus.entries()].filter(([, max]) => max > 0);
+  return {
+    notes: notes.map(([nom]) => nom),
+    ajustements: [...vus.entries()].filter(([, max]) => max === 0).map(([nom]) => nom),
+    total: notes.reduce((s, [, max]) => s + max, 0),
+  };
+})();
+
+/** « neuf », « quatorze »… pour écrire un nombre en toutes lettres dans une phrase. */
+export function enLettres(n: number): string {
+  const mots = [
+    "zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf",
+    "dix", "onze", "douze", "treize", "quatorze", "quinze", "seize",
+  ];
+  return mots[n] ?? String(n);
 }
 
 /* ------------------------------------------------------------------- score */

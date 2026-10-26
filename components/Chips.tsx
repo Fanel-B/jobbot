@@ -1,7 +1,7 @@
 import { contratLabel, estNonRenseigne, fraicheur, sourceLabel } from "@/lib/offers";
 import type { Offer, Zone } from "@/lib/offers";
 
-const BASE = "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs";
+const BASE = "inline-flex items-center gap-1.5 rounded-[6px] border px-2 py-0.5 text-xs";
 
 export function SourceChip({ source }: { source: string }) {
   return (

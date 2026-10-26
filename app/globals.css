@@ -74,8 +74,10 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
 
-  --radius-card: 16px;
-  --radius-bloc: 40px;
+  /* Assez pour adoucir, pas assez pour faire bulle. */
+  --radius-card: 10px;
+  --radius-bloc: 22px;
+  --radius-puce: 6px;
 
   /* Une vraie ombre, pas un filet : c'est elle qui donne du relief aux cartes. */
   --ombre-carte: 0 1px 2px rgb(0 0 0 / 0.04), 0 12px 28px -14px rgb(0 0 0 / 0.18);
@@ -137,23 +139,26 @@
 
   /* La carte : blanc sur gris, posée — pas dessinée. L'ombre fait le relief que le
      filet seul ne faisait pas, et la carte se soulève quand on la survole. */
+  /* La carte est plate : blanc sur papier, un filet net. C'est le contraste de surface qui la
+     détache. Une ombre sur chaque carte ne hiérarchise plus rien — elle devient du bruit. */
   .card {
     background: var(--color-surface);
     border: 1px solid var(--color-line);
     border-radius: var(--radius-card);
+  }
+
+  /* L'exception : une carte qui flotte vraiment au-dessus du reste. Une seule par écran. */
+  .card-posee {
     box-shadow: var(--ombre-carte);
   }
 
+  /* Au survol, le filet se renforce. Pas de lévitation : quand toutes les cartes se soulèvent,
+     le geste ne désigne plus rien. */
   .carte-vive {
-    transition:
-      transform var(--duree-moyenne) var(--ease-sortie),
-      box-shadow var(--duree-moyenne) var(--ease-sortie),
-      border-color var(--duree-moyenne) var(--ease-sortie);
+    transition: border-color var(--duree-courte) var(--ease-sortie);
   }
   .carte-vive:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--ombre-levee);
-    border-color: var(--color-line-strong);
+    border-color: var(--color-ink);
   }
 
   /* Le grand bloc arrondi de la référence : c'est lui qui donne sa silhouette au site. */
@@ -184,18 +189,9 @@
     background-position: center;
     mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 92%);
   }
-  .regle::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    background-image: radial-gradient(
-      at 97% 0%,
-      oklch(88% 0.17 95 / 0.42) 0px,
-      transparent 30%
-    );
-  }
+  /* Pas de halo lumineux : le dégradé radial flou dans un angle est l'ornement le plus
+     reconnaissable des pages faites à la chaîne. La trame suffit à porter l'identité, et le
+     jaune garde plus de force là où il dit quelque chose — le surlignage du titre. */
 
   /* Bouton principal : l'anneau de la référence, qui s'ouvre au survol. */
   .bouton-plein {

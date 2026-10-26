@@ -45,7 +45,7 @@ export function OfferRow({ offre, rang }: { offre: Offer; rang?: number }) {
             <SourceChip source={offre.source} />
             <ZoneChip zone={offre.location_zone} />
             {offre.duration ? (
-              <span className="inline-flex items-center rounded-full border border-line bg-surface px-2.5 py-0.5 text-xs text-muted num">
+              <span className="inline-flex items-center rounded-[6px] border border-line bg-surface px-2 py-0.5 text-xs text-muted num">
                 {offre.duration}
               </span>
             ) : null}

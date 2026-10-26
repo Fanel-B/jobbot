@@ -108,27 +108,33 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-5 py-14">
           <p className="compteur">05</p>
           <h2 className="titre-section mt-3">Ce que les outils américains ne peuvent pas faire</h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          {/* Trois lignes, pas trois cartes identiques. La rangée de cartes jumelles est la
+              mise en page la plus reconnaissable des pages faites à la chaîne ; ici chaque point
+              se lit comme l'entrée d'un document, avec son titre à gauche et son texte à droite. */}
+          <dl className="mt-10 divide-y divide-line border-y border-line">
             {[
               {
                 t: "Le signal « formation imposée »",
-                d: `Un stage publié par un organisme de formation qui impose son école, c'est du sourcing, pas un poste. JobBot le repère et le dit, toujours en citant l'extrait qui a déclenché le signal. ${texteFormation}`,
+                d: `Un stage publié par un organisme de formation qui impose son école relève du sourcing. JobBot le repère et le dit, toujours en citant l'extrait qui a déclenché le signal. ${texteFormation}`,
               },
               {
                 t: "Les règles françaises d'éligibilité",
-                d: "Durée minimale, date de début, niveau requis : ce sont les conventions françaises qui décident, pas un score générique importé d'un autre marché.",
+                d: "Durée minimale, date de début, niveau requis : ce sont les conventions françaises qui décident, et non un score générique importé d'un autre marché.",
               },
               {
                 t: "Les sources officielles",
-                d: "La Bonne Alternance et France Travail ont des interfaces publiques et gratuites. Là où Teal ou Jobscan s'arrêtent aux annonces anglo-saxonnes.",
+                d: "La Bonne Alternance et France Travail ont des interfaces publiques et gratuites. Teal et Jobscan, eux, s'arrêtent aux annonces anglo-saxonnes.",
               },
             ].map((b) => (
-              <div key={b.t} className="card p-5">
-                <h3 className="text-[15px] font-medium">{b.t}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{b.d}</p>
+              <div
+                key={b.t}
+                className="grid gap-x-10 gap-y-2 py-6 sm:grid-cols-[16rem_1fr] sm:py-7"
+              >
+                <dt className="text-[15px] font-medium leading-snug">{b.t}</dt>
+                <dd className="max-w-2xl text-sm leading-relaxed text-muted">{b.d}</dd>
               </div>
             ))}
-          </div>
+          </dl>
         </div>
       </section>
 
