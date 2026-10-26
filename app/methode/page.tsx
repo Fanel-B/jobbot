@@ -115,6 +115,17 @@ export default function Page() {
           fiche, compatibilité du calendrier, coût du dépôt (longueur du formulaire), pièces déjà
           prêtes, diversité des candidatures, fraîcheur de l&apos;annonce.
         </p>
+        {/* Le plafond par groupe a été retiré le 21/10/2026. Le critère reste dans le bulletin —
+            l'en retirer casserait la promesse que le total est la somme de ses lignes — et son
+            détail reste informatif (le rang chez l'employeur), mais il ne retire plus de points.
+            Le dire ici évite qu'on se demande pourquoi cette ligne est pleine partout. */}
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          Un mot sur la <strong className="font-medium text-ink-soft">diversité des candidatures</strong> :
+          elle comptait le rang d&apos;une offre parmi celles d&apos;un même employeur, et retirait des
+          points au-delà de la troisième. Ce plafond a été retiré le 21 octobre 2026. La ligne reste
+          au bulletin, et son détail dit toujours le rang — mais elle ne retire plus rien, et affiche
+          donc son maximum sur toutes les offres.
+        </p>
         <p className="mt-3 text-sm leading-relaxed text-muted">
           Ce que la note ne prend pas en compte, faute de pouvoir le mesurer honnêtement : la
           rémunération, le temps de trajet, la concurrence sur le poste et le « potentiel

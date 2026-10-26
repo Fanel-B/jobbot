@@ -91,19 +91,38 @@ Aujourd'hui le site lit un fichier. C'est parfait pour la démo, insuffisant dè
 comptes : chaque personne doit avoir son classement, donc la note doit être calculée **à la
 lecture**, pas stockée.
 
-- [ ] Créer un projet Neon (offre gratuite) — **à faire par Fanel**, la chaîne de connexion ne doit
-      jamais passer par un chat : elle va dans `~/.hermes/.env` ou dans le coffre.
-- [ ] Schéma : `offers`, `users`, `profiles`, `resumes`, `saved_offers`, `ai_usage`.
-      `offers` porte `canonical_url` **unique** (base du dédoublonnage) et **pas** de colonne
-      `score` : la note dépend de qui regarde.
+- [x] Schéma écrit : `db/schema.sql` crée les six tables. `offers.canonical_url` est **unique**
+      (base du dédoublonnage) et il n'y a **pas** de colonne `score` — la note dépend de qui regarde.
+      Le fichier est rejouable : `IF NOT EXISTS` partout, aucune suppression.
+- [x] Connexion posée : `lib/db.ts` (pilote `node-postgres` + `attachDatabasePool`, comme le
+      prescrit la skill `neon-postgres` pour Vercel) et `npm run verifier-db`, qui dit en une
+      commande si la base répond et si les six tables existent.
+- [x] Outillage Neon installé : skills dans `.claude/skills/`, serveur MCP dans `.mcp.json`
+      (URL seule, aucune clé).
+- [ ] **Créer le projet Neon et poser la chaîne** — *à faire par Fanel*. Elle ne passe jamais par
+      un chat : `.env.local` pour le site (chaîne **pooled**), `~/.hermes/.env` sur le VPS pour le
+      collecteur (chaîne **directe**). Modèle : `.env.local.example`.
 - [ ] Le collecteur Python écrit dans Neon au lieu du JSON (garder le JSON pour la démo hors ligne).
-- [ ] Le site lit Neon, la note est calculée en TypeScript au rendu.
+- [ ] Le site lit Neon. **Pas avant que la base soit peuplée** : basculer sur une base vide
+      casserait un site qui marche.
 
 ### B. Comptes et score personnalisé
 
-Auth.js (Google ou lien e-mail), `/profil`, portage de `scoring.py` et `eligibility.py` en
-TypeScript, tri par score quand la personne est connectée. **C'est la tranche qui transforme la
-vitrine en produit.**
+**Trois points sur quatre sont livrés** (état au 26/10/2026) :
+
+- [x] `/profil` : les compétences confirmées, la zone, le niveau, le type recherché. Un formulaire
+      sur action serveur, donc utilisable sans JavaScript. Le profil vit dans un cookie lisible,
+      pas dans l'URL — il doit survivre à la navigation.
+- [x] Portage de `scoring.py` : `npm run verifier-scoring`, zéro désaccord sur l'export courant.
+- [x] Portage de `eligibility.py` : `npm run verifier-eligibility`, zéro désaccord. Attention,
+      ce zéro couvre moins qu'il n'y paraît — les données n'exercent ni le découpage sur « / », ni
+      la priorité entre zones, ni le signal d'école. `lib/eligibilite.test.ts` épingle ces règles,
+      et le vérificateur affiche lui-même sa couverture.
+- [x] Tri par score : la liste et les fiches sont classées par la note du profil, recalculée à la
+      lecture et jamais stockée. Deux personnes voient la même offre, pas la même note.
+- [ ] **Auth.js** (Google ou lien e-mail) — le seul morceau qui reste. Il dépend de Neon (pour
+      stocker comptes et sessions) et d'identifiants OAuth à créer côté Google. Tant qu'il n'est
+      pas là, le profil est par navigateur : ça marche pour une personne, pas pour plusieurs.
 
 ### C. CV adapté
 
