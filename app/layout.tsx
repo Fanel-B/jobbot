@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
+import { Suspense } from "react";
 import Link from "next/link";
+import { Compte, CompteSquelette } from "@/components/Compte";
 import "./globals.css";
 import { meta } from "@/lib/offers";
 
@@ -63,7 +65,10 @@ export default function RootLayout({
               </Link>
             </nav>
 
-            <div className="ml-auto flex items-center gap-3">
+            <div className="ml-auto flex items-center gap-2 sm:gap-3">
+              <Suspense fallback={<CompteSquelette />}>
+                <Compte />
+              </Suspense>
               <span className="num hidden text-xs text-muted md:inline">
                 {meta.count} offres · collecte du {collecte.toLocaleDateString("fr-FR")}
               </span>

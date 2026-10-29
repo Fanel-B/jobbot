@@ -13,7 +13,8 @@ import {
   type NiveauEtudes,
   type TypeRecherche,
 } from "@/lib/profil";
-import { enregistrerProfil, reinitialiserProfil } from "./actions";
+import { auth } from "@/auth";
+import { enregistrerProfil, reinitialiserProfil, supprimerCompte } from "./actions";
 
 export const metadata: Metadata = {
   title: "Ton profil — JobBot",
@@ -57,6 +58,7 @@ function Case({
 async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre?: string; reinitialise?: string }> }) {
   const p = await searchParams;
   const profil = await lireProfil();
+  const session = await auth();
   const choisies = new Set(profil.competences);
   const parDefaut = estParDefaut(profil);
 
@@ -189,6 +191,27 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
           Effacer mon profil
         </button>
       </form>
+
+      {/* Visible seulement quand il y a un compte à supprimer. Le cahier de route en fait une
+          obligation dès qu'une autre personne dépose ses données : « un bouton qui fonctionne
+          vraiment ». Il supprime la ligne `users` ; la cascade du schéma emporte le reste. */}
+      {session?.user ? (
+        <form action={supprimerCompte} className="mt-10 border-t border-line pt-6">
+          <h2 className="label">Supprimer mon compte</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+            Efface ton compte{session.user.email ? ` (${session.user.email})` : ""}, tes sessions
+            ouvertes et ton profil, définitivement et tout de suite. Il n&apos;y a pas de
+            corbeille, pas de délai, et rien à me demander. Les offres, elles, ne t&apos;ont
+            jamais appartenu : elles restent.
+          </p>
+          <button
+            type="submit"
+            className="mt-4 rounded-[10px] border border-bad/40 bg-bad-soft px-4 py-2.5 text-sm font-medium text-bad transition hover:border-bad"
+          >
+            Supprimer mon compte et mes données
+          </button>
+        </form>
+      ) : null}
 
       <p className="mt-10 text-xs leading-relaxed text-muted">
         Le profil de départ reprend celui du pipeline ({PROFIL_DEFAUT.competences.length}{" "}

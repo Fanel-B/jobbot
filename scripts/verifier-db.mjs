@@ -51,11 +51,11 @@ for (const t of TABLES_ATTENDUES) {
 console.log("");
 if (etat.manquantes.length) {
   console.log(`${etat.manquantes.length} table(s) manquante(s) : le schéma n'a pas été appliqué.`);
-  console.log("  Ouvre db/schema.sql, copie tout, et exécute-le dans l'éditeur SQL de Neon.");
+  console.log("  Lance `npm run db:schema` : il applique db/schema.sql par la connexion directe.");
   process.exit(1);
 }
 
-console.log(`Les six tables sont là. Offres en base : ${etat.offres}.`);
+console.log(`Les ${TABLES_ATTENDUES.length} tables sont là. Offres en base : ${etat.offres}.`);
 if (etat.offres === 0) {
   console.log("  Vide pour l'instant — c'est le collecteur Python qui la remplit (db/README.md).");
 }

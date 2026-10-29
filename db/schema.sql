@@ -60,17 +60,87 @@ CREATE INDEX IF NOT EXISTS offers_last_seen_at_idx  ON offers (last_seen_at DESC
 
 -- Une personne qui se connecte (Auth.js : Google ou lien e-mail). Les tables propres à Auth.js
 -- (comptes OAuth, sessions, jetons de vérification) seront ajoutées avec l'adaptateur choisi.
+-- Les noms de colonnes entre guillemets sont imposés par l'adaptateur Postgres d'Auth.js, qui
+-- écrit littéralement `"emailVerified"` et `"userId"`. PostgreSQL replie les identifiants nus en
+-- minuscules : sans les guillemets ici, les requêtes de l'adaptateur ne trouveraient pas leurs
+-- colonnes. Vérifié dans le SQL de `node_modules/@auth/pg-adapter`, pas supposé.
 CREATE TABLE IF NOT EXISTS users (
     id              bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     email           text        NOT NULL,
     name            text,
-    email_verified  timestamptz,
+    "emailVerified" timestamptz,
+    image           text,                                  -- avatar renvoyé par le fournisseur
     created_at      timestamptz NOT NULL DEFAULT now(),
     updated_at      timestamptz NOT NULL DEFAULT now()
 );
 
 -- Unicité insensible à la casse : « Fanel@… » et « fanel@… » sont la même personne.
 CREATE UNIQUE INDEX IF NOT EXISTS users_email_lower_key ON users (lower(email));
+
+-- ------------------------------------------------- évolutions de `users`
+
+-- `CREATE TABLE IF NOT EXISTS` ne touche pas une table déjà créée : une base montée avant
+-- l'arrivée d'Auth.js garde `email_verified` en minuscules et n'a pas de colonne `image`. Ces
+-- deux blocs rattrapent l'écart sans rien perdre — un renommage conserve les données, et les
+-- deux sont sans effet si la colonne est déjà au bon nom.
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns
+                WHERE table_schema = 'public' AND table_name = 'users'
+                  AND column_name = 'email_verified')
+       AND NOT EXISTS (SELECT 1 FROM information_schema.columns
+                        WHERE table_schema = 'public' AND table_name = 'users'
+                          AND column_name = 'emailVerified') THEN
+        ALTER TABLE users RENAME COLUMN email_verified TO "emailVerified";
+    END IF;
+END $$;
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS image text;
+
+-- ------------------------------------------------- comptes et sessions (Auth.js)
+
+-- Les identités externes rattachées à une personne : un compte Google aujourd'hui, un autre
+-- fournisseur demain. `ON DELETE CASCADE` est ce qui fait que « supprimer mon compte » supprime
+-- vraiment tout — c'est une obligation du cahier de route, pas une commodité.
+CREATE TABLE IF NOT EXISTS accounts (
+    id                  bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "userId"            bigint  NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    type                text    NOT NULL,
+    provider            text    NOT NULL,
+    "providerAccountId" text    NOT NULL,
+    refresh_token       text,
+    access_token        text,
+    expires_at          bigint,
+    token_type          text,
+    scope               text,
+    id_token            text,
+    session_state       text,
+
+    CONSTRAINT accounts_provider_key UNIQUE (provider, "providerAccountId")
+);
+
+CREATE INDEX IF NOT EXISTS accounts_user_id_idx ON accounts ("userId");
+
+-- Une ligne par session ouverte. Les sessions sont en base plutôt qu'en JWT : la déconnexion
+-- doit prendre effet immédiatement, et un jeton déjà émis ne se révoque pas.
+CREATE TABLE IF NOT EXISTS sessions (
+    id             bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "sessionToken" text        NOT NULL UNIQUE,
+    "userId"       bigint      NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    expires        timestamptz NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS sessions_user_id_idx ON sessions ("userId");
+
+-- Jetons à usage unique (lien par e-mail). Inutilisée tant qu'on n'a que Google, mais
+-- l'adaptateur la requiert au démarrage.
+CREATE TABLE IF NOT EXISTS verification_token (
+    identifier text        NOT NULL,
+    token      text        NOT NULL,
+    expires    timestamptz NOT NULL,
+
+    PRIMARY KEY (identifier, token)
+);
 
 -- Le profil qui sert à calculer la note à la lecture. Un seul profil par personne.
 CREATE TABLE IF NOT EXISTS profiles (

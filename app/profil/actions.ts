@@ -3,6 +3,8 @@
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { auth, signOut } from "@/auth";
+import { base } from "@/lib/db";
 import { CATALOGUE } from "@/lib/scoring";
 import {
   COOKIE_PROFIL,
@@ -58,6 +60,31 @@ export async function enregistrerProfil(donnees: FormData) {
 
   revalidatePath("/", "layout");
   redirect("/profil?enregistre=1");
+}
+
+/**
+ * Supprime le compte et tout ce qui s'y rattache.
+ *
+ * Une seule instruction suffit : `accounts` et `sessions` référencent `users (id) ON DELETE
+ * CASCADE`, donc la ligne supprimée emporte les identités externes et les sessions ouvertes. La
+ * cascade est dans le schéma plutôt que dans du code — c'est ce qui rend l'oubli impossible.
+ *
+ * Le cookie de profil est effacé dans la foulée : il vit dans le navigateur et ne serait pas
+ * concerné par une suppression en base.
+ */
+export async function supprimerCompte() {
+  const session = await auth();
+  const id = session?.user?.id;
+  if (!id) redirect("/connexion");
+
+  await base().query("delete from users where id = $1", [id]);
+
+  const magasin = await cookies();
+  magasin.delete(COOKIE_PROFIL);
+
+  // Déconnexion après coup : la session n'existe plus en base, mais le cookie de session
+  // traîne encore côté navigateur et doit partir aussi.
+  await signOut({ redirectTo: "/?compte=supprime" });
 }
 
 /** Remet le profil d'usine — celui du pipeline. Le pendant honnête du « supprimer mes données ». */

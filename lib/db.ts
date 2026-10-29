@@ -72,10 +72,14 @@ export function sslExplicite(url: string): string {
   return url.replace(/([?&])sslmode=(require|prefer|verify-ca)(?=&|$)/i, "$1sslmode=verify-full");
 }
 
-/** Les six tables que `db/schema.sql` crée. Sert à vérifier qu'une base est bien initialisée. */
+/** Les tables que `db/schema.sql` crée. Sert à vérifier qu'une base est bien initialisée. */
 export const TABLES_ATTENDUES = [
   "offers",
   "users",
+  // Auth.js : les noms et les colonnes sont imposés par son adaptateur Postgres.
+  "accounts",
+  "sessions",
+  "verification_token",
   "profiles",
   "resumes",
   "saved_offers",
