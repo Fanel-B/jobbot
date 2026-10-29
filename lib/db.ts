@@ -42,7 +42,7 @@ export function base(): Pool {
     );
   }
 
-  pool = new Pool({ connectionString: url });
+  pool = new Pool({ connectionString: sslExplicite(url), ssl: { rejectUnauthorized: true } });
 
   // Sur Vercel, laisse la plateforme vider le pool quand la fonction se suspend. Ailleurs —
   // en local, sur le VPS — le module n'existe pas ou ne sert à rien : on continue sans.
@@ -55,6 +55,21 @@ export function base(): Pool {
   }
 
   return pool;
+}
+
+/**
+ * Écrit `sslmode=verify-full` à la place de `require`.
+ *
+ * `pg` traite aujourd'hui `require` comme `verify-full` — le certificat est vérifié — mais
+ * préviendra bientôt le contraire : en pg 9, `require` prendra la sémantique libpq, plus faible.
+ * Neon présente un certificat valide, donc on demande explicitement le comportement fort plutôt
+ * que d'hériter d'un affaiblissement à la prochaine montée de version.
+ *
+ * La réécriture se fait ici et non dans `.env.local`, parce que ce fichier est régénéré par
+ * `neon env pull` : une correction posée dedans disparaîtrait au prochain tirage.
+ */
+export function sslExplicite(url: string): string {
+  return url.replace(/([?&])sslmode=(require|prefer|verify-ca)(?=&|$)/i, "$1sslmode=verify-full");
 }
 
 /** Les six tables que `db/schema.sql` crée. Sert à vérifier qu'une base est bien initialisée. */
