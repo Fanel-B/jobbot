@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { meta } from "@/lib/offers";
 
 export const metadata: Metadata = {
-  title: "Données et mentions légales — JobBot",
+  title: "Données et mentions légales - JobBot",
   description:
     "Ce que JobBot stocke, où, pourquoi, et comment l'effacer. Éditeur, hébergeur et sources des offres.",
 };
@@ -28,8 +28,8 @@ export default function Page() {
       <h1 className="titre-page mt-3">Ce que ce site sait de toi</h1>
       <p className="mt-4 text-sm leading-relaxed text-ink-soft">
         Réponse courte : <strong className="font-medium text-ink">presque rien</strong>, et rien
-        qui sorte de ton navigateur. Le détail suit, et il décrit ce que le code fait aujourd&apos;hui
-        — pas ce qui est prévu.
+        qui sorte de ton navigateur. Le détail suit, et il décrit ce que le code fait aujourd&apos;hui,
+        pas ce qui est prévu.
       </p>
 
       <section className="mt-12">
@@ -43,7 +43,7 @@ export default function Page() {
               ta zone, ton niveau et le type de contrat recherché. Ils vivent dans un{" "}
               <strong className="font-medium text-ink-soft">cookie sur ton navigateur</strong>,
               en clair et lisible. Ils ne sont envoyés à aucun serveur et ne sont associés à aucun
-              compte — il n&apos;y a pas de compte.
+              compte : il n&apos;y a pas de compte.
             </dd>
           </div>
 
@@ -85,7 +85,7 @@ export default function Page() {
         <p className="mt-4 text-sm leading-relaxed text-ink-soft">
           Les {meta.count} annonces viennent des interfaces publiques des entreprises et des
           sources officielles françaises, relevées le {collecte}. Elles sont publiques et
-          reproduites avec, toujours, un lien vers l&apos;annonce d&apos;origine — le site renvoie
+          reproduites avec, toujours, un lien vers l&apos;annonce d&apos;origine : le site renvoie
           vers l&apos;employeur, il ne se substitue pas à lui.
         </p>
         <p className="mt-3 text-sm leading-relaxed text-muted">
@@ -122,7 +122,7 @@ export default function Page() {
           <dd className="text-ink-soft">Fanel Balemo</dd>
           <dt className="text-muted">Hébergeur</dt>
           <dd className="text-ink-soft">
-            Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis — vercel.com
+            Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis (vercel.com)
           </dd>
           <dt className="text-muted">Code source</dt>
           <dd className="text-ink-soft">
@@ -133,8 +133,8 @@ export default function Page() {
               className="lien-anime text-accent"
             >
               github.com/Fanel-B/jobbot
-            </a>{" "}
-            — ouvert, y compris le calcul de la note.
+            </a>
+            {", ouvert, y compris le calcul de la note."}
           </dd>
         </dl>
       </section>

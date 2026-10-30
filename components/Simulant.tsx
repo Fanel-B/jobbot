@@ -37,7 +37,7 @@ export async function Simulant({
         </h2>
         <p className="mt-4 text-sm leading-relaxed text-muted">
           Rien à simuler sur cette offre : elle ne demande aucune compétence qui manque à ton
-          profil. L&apos;écart se joue ailleurs — sur le calendrier, la source ou la fraîcheur.
+          profil. L&apos;écart se joue ailleurs : sur le calendrier, la source ou la fraîcheur.
         </p>
       </section>
     );
@@ -164,7 +164,7 @@ export async function Simulant({
                     </span>
                     {(() => {
                       const detail = effet.bulletinApres.find((b) => b.critere === l.critere)?.detail;
-                      return detail ? <span className="text-muted"> — {detail}</span> : null;
+                      return detail ? <span className="text-muted"> · {detail}</span> : null;
                     })()}
                   </li>
                 ))}
@@ -173,7 +173,7 @@ export async function Simulant({
                 <p className="mt-2.5 max-w-2xl text-xs leading-relaxed text-muted">
                   La diversité ne mesure pas ton profil : elle évite que tes candidatures se
                   concentrent sur un même employeur. Elle se redistribue dès que ton classement
-                  change — apprendre cette compétence fait monter d&apos;autres offres, et celle-ci
+                  change : apprendre cette compétence fait monter d&apos;autres offres, et celle-ci
                   peut perdre sa place au profit d&apos;une annonce d&apos;une autre entreprise.
                 </p>
               ) : null}

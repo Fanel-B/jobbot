@@ -6,7 +6,7 @@ import { connection } from "next/server";
 import { auth, signIn } from "@/auth";
 
 export const metadata: Metadata = {
-  title: "Se connecter — JobBot",
+  title: "Se connecter - JobBot",
   description: "Connexion par compte Google. Aucun mot de passe à retenir, aucun à stocker.",
 };
 
@@ -33,7 +33,7 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ error?: st
       <h1 className="titre-page mt-3">Garder ton profil</h1>
       <p className="mt-4 text-sm leading-relaxed text-ink-soft">
         Sans compte, le site marche déjà : les offres sont les mêmes pour tout le monde et ton
-        profil vit dans ce navigateur. Un compte sert à le retrouver ailleurs — et plus tard, à
+        profil vit dans ce navigateur. Un compte sert à le retrouver ailleurs, et plus tard, à
         garder tes offres mises de côté.
       </p>
 
@@ -68,7 +68,7 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ error?: st
             reconnaître d&apos;une visite à l&apos;autre.
           </li>
           <li>
-            Ton profil de compétences, s&apos;il y en a un — c&apos;est tout l&apos;intérêt.
+            Ton profil de compétences, s&apos;il y en a un : c&apos;est tout l&apos;intérêt.
           </li>
         </ul>
         <p className="mt-4 text-sm leading-relaxed text-muted">

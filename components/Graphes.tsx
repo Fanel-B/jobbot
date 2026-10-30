@@ -43,7 +43,7 @@ export function Barres({
           <li
             key={d.label}
             className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 sm:grid-cols-[13rem_1fr_5.5rem]"
-            title={`${d.label} — ${d.valeur} ${unite} sur ${total} (${part} %)`}
+            title={`${d.label}, ${d.valeur} ${unite} sur ${total} (${part} %)`}
           >
             <span className="truncate text-sm text-ink-soft">{d.label}</span>
             <span className={`${PISTE} order-last col-span-2 sm:order-none sm:col-span-1`}>

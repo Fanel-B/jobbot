@@ -17,7 +17,7 @@ import { auth } from "@/auth";
 import { enregistrerProfil, reinitialiserProfil, supprimerCompte } from "./actions";
 
 export const metadata: Metadata = {
-  title: "Ton profil — JobBot",
+  title: "Ton profil - JobBot",
   description:
     "Les compétences que tu confirmes, ta zone et ton niveau : c'est à partir d'eux que chaque offre est notée.",
 };
@@ -107,7 +107,7 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
         <section>
           <h2 className="label">Compétences confirmées</h2>
           <p className="mt-2 text-sm text-muted">
-            Coche ce que tu sais utiliser aujourd&apos;hui. Décoche ce qui n&apos;est pas vrai — une
+            Coche ce que tu sais utiliser aujourd&apos;hui. Décoche ce qui n&apos;est pas vrai : une
             liste trop généreuse donne des notes flatteuses et des candidatures perdues.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -216,7 +216,7 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
       <p className="mt-10 text-xs leading-relaxed text-muted">
         Le profil de départ reprend celui du pipeline ({PROFIL_DEFAUT.competences.length}{" "}
         compétences). Tant que tu n&apos;y touches pas, les notes affichées sont exactement celles
-        que le moteur Python calcule — c&apos;est ce qui rend ce réglage sans risque.
+        que le moteur Python calcule, c&apos;est ce qui rend ce réglage sans risque.
       </p>
     </div>
   );

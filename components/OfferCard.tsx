@@ -64,7 +64,7 @@ export function OfferRow({ offre, rang }: { offre: Offer; rang?: number }) {
               <span className="text-ink-soft">Demande : </span>
               {manquants.slice(0, 5).join(", ")}
               {manquants.length > 5 ? ` (+${manquants.length - 5})` : ""}
-              <span className="text-muted"> — absent de ton profil</span>
+              <span className="text-muted"> · absent de ton profil</span>
             </p>
           ) : null}
         </div>

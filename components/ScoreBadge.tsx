@@ -22,7 +22,7 @@ export function ScoreBadge({
       <div
         className={`num font-semibold leading-none ${grand ? "text-3xl" : "text-xl"}`}
       >
-        {score ?? "—"}
+        {score ?? "-"}
       </div>
       {grand ? (
         <div className="mt-1 text-xs font-medium">{BANDE_TEXTE[b]}</div>

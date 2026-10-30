@@ -27,7 +27,7 @@ export async function NoteDuProfil({ offreId }: { offreId: number }) {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="label">
-            {estParDefaut(profil) ? "Note — profil de départ" : "Note pour ton profil"}
+            {estParDefaut(profil) ? "Note du profil de départ" : "Note pour ton profil"}
           </p>
           <p className="mt-1 text-sm text-ink-soft">{resume}</p>
         </div>

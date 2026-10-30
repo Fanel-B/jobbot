@@ -22,7 +22,7 @@ const display = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "JobBot — les offres qui te correspondent vraiment",
+  title: "JobBot, les offres qui te correspondent vraiment",
   description:
     "Alternance et stage en France : les offres publiées par les entreprises et les sources officielles, avec une note expliquée critère par critère.",
 };

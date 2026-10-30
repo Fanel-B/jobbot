@@ -49,6 +49,16 @@ yarn-error.log*
 # attendus, et sans lui personne ne sait quoi poser dans .env.local.
 !.env.local.example
 
+# Journaux de `next dev` redirigés dans un fichier pour être relus après coup. Utiles sur le
+# moment, sans intérêt dans l'historique — et ils contiennent les URL de rappel OAuth, codes
+# d'autorisation compris.
+dev*.log
+
+# Captures prises pour juger le design, et le dossier de travail du pilote de navigateur :
+# des pièces de brouillon, pas des sources.
+jobbot-*.png
+.playwright-mcp/
+
 # vercel
 .vercel
 

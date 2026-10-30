@@ -44,14 +44,14 @@ export default function Home() {
         <div className="regle bloc mx-auto max-w-[78rem] overflow-hidden border border-line">
           <div className="cascade grid gap-12 px-6 py-16 sm:px-12 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16 lg:py-20">
             <div>
-              <p className="label">Alternance · Stage · Toulouse et Île-de-France</p>
+              <p className="label">Stages et alternances · Toulouse et Île-de-France</p>
               <h1 className="titre-geant mt-5 max-w-[11ch]">
                 Les offres qui te correspondent <span className="surligne">vraiment</span>.
               </h1>
               <p className="mt-6 max-w-xl text-base leading-relaxed text-ink-soft">
                 JobBot lit les annonces publiées par les entreprises et les sources officielles,
                 puis explique chaque correspondance{" "}
-                <strong className="font-medium text-ink">critère par critère</strong> — ce qui
+                <strong className="font-medium text-ink">critère par critère</strong> : ce qui
                 colle, ce qui manque, et ce que ça veut dire avant de postuler.
               </p>
 
@@ -106,8 +106,7 @@ export default function Home() {
       {/* -------------------------------------------------------- différenciateurs */}
       <section className="border-t border-line bg-paper-deep/50">
         <div className="mx-auto max-w-6xl px-5 py-14">
-          <p className="compteur">05</p>
-          <h2 className="titre-section mt-3">Ce que les outils américains ne peuvent pas faire</h2>
+          <h2 className="titre-section">Ce que les outils américains ne peuvent pas faire</h2>
           {/* Trois lignes, pas trois cartes identiques. La rangée de cartes jumelles est la
               mise en page la plus reconnaissable des pages faites à la chaîne ; ici chaque point
               se lit comme l'entrée d'un document, avec son titre à gauche et son texte à droite. */}
@@ -152,7 +151,7 @@ export default function Home() {
             <p className="label">Avec un compte</p>
             <p className="mt-2 text-sm leading-relaxed text-ink-soft">
               Les <strong className="font-medium">mêmes offres</strong>, triées par ce qui te
-              correspond — le détail de la note, les compétences qui manquent, et la version de CV à
+              correspond : le détail de la note, les compétences qui manquent, et la version de CV à
               envoyer. Nous ne prétendons pas avoir de meilleures offres que les autres.
             </p>
           </div>

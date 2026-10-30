@@ -33,7 +33,7 @@ export default function Page() {
       <section className="mt-12">
         <h2 className="titre-section">D&apos;où viennent les offres</h2>
         <p className="mt-3 text-sm leading-relaxed text-muted">
-          Collecte du {new Date(meta.generated_at).toLocaleString("fr-FR")} — {meta.count} offres en
+          Collecte du {new Date(meta.generated_at).toLocaleString("fr-FR")}, {meta.count} offres en
           base. Toutes proviennent d&apos;interfaces publiques ou d&apos;alertes que l&apos;utilisateur
           a lui-même créées.
         </p>
@@ -89,7 +89,7 @@ export default function Page() {
             <span>
               <strong className="font-medium">Aucun contournement.</strong> Ni protection anti-robot
               forcée, ni CAPTCHA cassé, ni compte emprunté. Quand un portail bloque, on passe et on le
-              dit — jamais on ne s&apos;acharne.
+              dit, jamais on ne s&apos;acharne.
             </span>
           </li>
           <li className="flex gap-3">
@@ -120,7 +120,7 @@ export default function Page() {
         <p className="mt-3 text-sm leading-relaxed text-muted">
           S&apos;y ajoutent {enLettres(bulletin.ajustements.length)} lignes d&apos;
           <strong className="font-medium text-ink-soft">ajustement</strong>, sans maximum propre :
-          elles ajoutent ou retirent des points après coup —{" "}
+          elles ajoutent ou retirent des points après coup, à savoir{" "}
           {bulletin.ajustements.map((c) => critereLabel(c).toLowerCase()).join(", ")}. Un niveau de
           diplôme hors de portée retire des points ; un bloqueur administratif, comme une
           habilitation de sécurité, plafonne la note. Elles figurent au bulletin comme les autres,
@@ -134,7 +134,7 @@ export default function Page() {
           Un mot sur la <strong className="font-medium text-ink-soft">diversité des candidatures</strong> :
           elle comptait le rang d&apos;une offre parmi celles d&apos;un même employeur, et retirait des
           points au-delà de la troisième. Ce plafond a été retiré le 21 octobre 2026. La ligne reste
-          au bulletin, et son détail dit toujours le rang — mais elle ne retire plus rien, et affiche
+          au bulletin, et son détail dit toujours le rang, mais elle ne retire plus rien, et affiche
           donc son maximum sur toutes les offres.
         </p>
         <p className="mt-3 text-sm leading-relaxed text-muted">

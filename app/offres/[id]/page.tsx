@@ -36,9 +36,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const offre = parId(id);
-  if (!offre) return { title: "Offre introuvable — JobBot" };
+  if (!offre) return { title: "Offre introuvable - JobBot" };
   return {
-    title: `${offre.title ?? "Offre"} — ${offre.company ?? "JobBot"}`,
+    title: `${offre.title ?? "Offre"} - ${offre.company ?? "JobBot"}`,
     description: (offre.description ?? "").slice(0, 155) || undefined,
   };
 }
@@ -122,7 +122,7 @@ export default async function Page({
           {signalFormationCitable(offre) ? (
             <div className="mt-6 rounded-card border border-warn/30 bg-warn-soft p-5">
               <p className="text-sm font-medium text-warn">
-                ⚠ Offre à vérifier — signaux d&apos;un organisme de formation
+                ⚠ Offre à vérifier, signaux d&apos;un organisme de formation
               </p>
               <p className="mt-2 text-sm leading-relaxed text-ink-soft">
                 Cette annonce contient des formulations typiques d&apos;une école ou d&apos;un CFA
@@ -203,10 +203,10 @@ export default async function Page({
                         {manque ? (
                           <span className="text-muted">
                             {" "}
-                            — demandé, absent de ton profil aujourd&apos;hui
+                            · demandé, absent de ton profil aujourd&apos;hui
                           </span>
                         ) : (
-                          <span className="text-muted"> — déjà dans ton profil</span>
+                          <span className="text-muted"> · déjà dans ton profil</span>
                         )}
                       </span>
                     </li>
@@ -239,7 +239,7 @@ export default async function Page({
               </p>
             ) : (
               <p className="mt-4 rounded-card border border-line bg-paper-deep/50 p-4 text-sm text-muted">
-                La source ne fournit pas le texte de cette annonce. JobBot ne le reconstitue pas —
+                La source ne fournit pas le texte de cette annonce. JobBot ne le reconstitue pas,
                 ouvre l&apos;annonce d&apos;origine pour la lire en entier.
               </p>
             )}
@@ -260,7 +260,7 @@ export default async function Page({
               <p className="label">Version de CV conseillée</p>
               <p className="mt-1 text-sm font-medium">{cvRecommande}</p>
               <p className="mt-1 text-xs text-muted">
-                Décidée par le type de contrat de l&apos;offre — pas par une impression.
+                Décidée par le type de contrat de l&apos;offre, pas par une impression.
               </p>
             </div>
 
@@ -287,7 +287,7 @@ export default async function Page({
               <div className="flex justify-between gap-3">
                 <dt>Identifiant source</dt>
                 <dd className="num max-w-[11rem] truncate text-right text-ink-soft">
-                  {offre.source_offer_id ?? "—"}
+                  {offre.source_offer_id ?? "non communiqué"}
                 </dd>
               </div>
               <div className="flex justify-between gap-3">

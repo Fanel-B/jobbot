@@ -132,7 +132,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
           </>
         ) : (
           <>
-            Classement calculé pour {estParDefaut(profil) ? "le profil de départ" : "ton profil"} —{" "}
+            Classement calculé pour {estParDefaut(profil) ? "le profil de départ" : "ton profil"}, avec{" "}
             <span className="num">{profil.competences.length}</span> compétences confirmées.{" "}
             <Link href="/profil" className="lien-anime text-accent">
               {estParDefaut(profil) ? "Règle ton profil" : "Le modifier"}
@@ -301,7 +301,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
 
       {liste.length > vues.length ? (
         <p className="mt-4 text-center text-xs text-muted">
-          Les {vues.length} premières sur {liste.length} — affine les filtres pour voir le reste.
+          Les {vues.length} premières sur {liste.length}, affine les filtres pour voir le reste.
         </p>
       ) : null}
 
