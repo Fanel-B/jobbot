@@ -46,13 +46,13 @@ export default function Home() {
             <div>
               <p className="label">Stages et alternances · Toulouse et Île-de-France</p>
               <h1 className="titre-geant mt-5 max-w-[11ch]">
-                Les offres qui te correspondent <span className="surligne">vraiment</span>.
+                Les offres qui te correspondent <em className="italique-accent">vraiment</em>.
               </h1>
               <p className="mt-6 max-w-xl text-base leading-relaxed text-ink-soft">
-                JobBot lit les annonces publiées par les entreprises et les sources officielles,
-                puis explique chaque correspondance{" "}
+                <span className="num">{meta.count}</span> annonces réelles, relevées chez les
+                entreprises et les sources officielles. Pour chacune, sa note{" "}
                 <strong className="font-medium text-ink">critère par critère</strong> : ce qui
-                colle, ce qui manque, et ce que ça veut dire avant de postuler.
+                colle, et ce qui manque.
               </p>
 
               <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -85,9 +85,11 @@ export default function Home() {
               { k: "Île-de-France", v: meta.zones.idf },
               { k: "Vues ces 7 derniers jours", v: vues7j },
             ].map((s) => (
+              // Le micro-label au-dessus du nombre, pas en dessous : on lit d'abord de quoi
+              // il s'agit, puis combien. Posé après coup, le chiffre arrive sans sujet.
               <div key={s.k}>
-                <dd className="num font-display text-4xl leading-none tracking-tight">{s.v}</dd>
-                <dt className="mt-2 label">{s.k}</dt>
+                <dt className="label">{s.k}</dt>
+                <dd className="chiffre mt-2">{s.v}</dd>
               </div>
             ))}
           </dl>
@@ -105,7 +107,7 @@ export default function Home() {
 
       {/* -------------------------------------------------------- différenciateurs */}
       <section className="border-t border-line bg-paper-deep/50">
-        <div className="mx-auto max-w-6xl px-5 py-14">
+        <div className="mx-auto max-w-6xl px-5 py-24">
           <h2 className="titre-section">Ce que les outils américains ne peuvent pas faire</h2>
           {/* Trois lignes, pas trois cartes identiques. La rangée de cartes jumelles est la
               mise en page la plus reconnaissable des pages faites à la chaîne ; ici chaque point
@@ -138,7 +140,7 @@ export default function Home() {
       </section>
 
       {/* ------------------------------------------------------------ honnêteté */}
-      <section className="mx-auto max-w-6xl px-5 py-14">
+      <section className="mx-auto max-w-6xl px-5 py-24">
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="card p-6">
             <p className="label">Sans compte</p>

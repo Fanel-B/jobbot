@@ -130,7 +130,7 @@ export async function SectionsProfil() {
   return (
     <>
   {/* ------------------------------------------------------- meilleures offres */}
-  <section className="mx-auto max-w-6xl px-5 py-14">
+  <section className="mx-auto max-w-6xl px-5 py-24">
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div>
         <h2 className="titre-section">Le haut du classement aujourd&apos;hui</h2>
@@ -153,7 +153,7 @@ export async function SectionsProfil() {
   {/* ---------------------------------------------------------- le bulletin */}
   {reference ? (
     <section className="border-y border-line bg-paper-deep/50">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 lg:grid-cols-[1.1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-24 lg:grid-cols-[1.1fr_1fr]">
         <div>
           <h2 className="titre-section lg:sticky lg:top-24">
                 Une note, {enLettres(structureBulletin.notes.length)} raisons
@@ -242,7 +242,7 @@ export async function SectionsProfil() {
         <div className="mt-9 card p-6 sm:p-7">
           <p className="text-sm text-ink-soft">
             Aujourd&apos;hui,{" "}
-            <strong className="num font-semibold text-ink">{dejaBonnes} offres</strong> sont
+            <strong className="num font-medium text-ink">{dejaBonnes} offres</strong> sont
             au-dessus de <span className="num">{SEUIL_BONNE_PISTE}</span> sur{" "}
             <span className="num">{offers.length}</span>. Voilà où chaque compétence
             emmènerait ce chiffre.
@@ -277,7 +277,7 @@ export async function SectionsProfil() {
 
 export function SectionsProfilSquelette() {
   return (
-    <div className="mx-auto max-w-6xl px-5 py-14" aria-hidden>
+    <div className="mx-auto max-w-6xl px-5 py-24" aria-hidden>
       <div className="h-3 w-10 rounded bg-paper-deep" />
       <div className="mt-4 h-9 w-96 max-w-full rounded bg-paper-deep" />
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

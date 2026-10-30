@@ -30,11 +30,21 @@ export type Famille = {
   principales: string[];
   /** Les formes que les annonces emploient aussi, repliées derrière un bouton. */
   variantes: string[];
+  /**
+   * La teinte de la famille, nommée par sa variable CSS.
+   *
+   * On stocke le nom de la variable et non une classe Tailwind : une classe construite à
+   * l'exécution (`text-fam-${id}`) n'existerait pas dans la feuille, puisque Tailwind ne voit
+   * que les chaînes écrites en toutes lettres dans le code. `var(--color-fam-web)` en style
+   * en ligne marche toujours, et garde l'identité de la famille à un seul endroit.
+   */
+  teinte: string;
 };
 
 export const FAMILLES: Famille[] = [
   {
     id: "web",
+    teinte: "--color-fam-web",
     titre: "Web",
     question: "Tu construis des sites ou des applications web ?",
     principales: [
@@ -53,6 +63,7 @@ export const FAMILLES: Famille[] = [
   },
   {
     id: "donnees",
+    teinte: "--color-fam-donnees",
     titre: "Données",
     question: "Tu manipules des données, des tableaux, des rapports ?",
     principales: ["SQL", "Excel", "Power BI", "Pandas", "Tableau", "Qlik", "Spark", "ETL"],
@@ -72,6 +83,7 @@ export const FAMILLES: Famille[] = [
   },
   {
     id: "ia",
+    teinte: "--color-fam-ia",
     titre: "Intelligence artificielle",
     question: "Tu touches à l'IA, de près ou de loin ?",
     principales: [
@@ -93,6 +105,7 @@ export const FAMILLES: Famille[] = [
   },
   {
     id: "langages",
+    teinte: "--color-fam-langages",
     titre: "Programmation",
     question: "Tu programmes en dehors du web ?",
     principales: ["Python", "Java", "Kotlin", "C++", "C#", ".NET", "VBA"],
@@ -100,6 +113,7 @@ export const FAMILLES: Famille[] = [
   },
   {
     id: "infra",
+    teinte: "--color-fam-infra",
     titre: "Infrastructure",
     question: "Tu déploies, tu administres, tu automatises ?",
     principales: ["Docker", "Kubernetes", "AWS", "Azure", "GCP", "Linux"],
@@ -107,6 +121,7 @@ export const FAMILLES: Famille[] = [
   },
   {
     id: "methode",
+    teinte: "--color-fam-methode",
     titre: "Méthode et outils",
     question: "Tu travailles en équipe, avec des outils d'entreprise ?",
     principales: ["Git", "GitHub", "Scrum", "Agile", "tests unitaires", "SAP"],

@@ -248,7 +248,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
         {/* Le résultat se lit au pied des réglages, là où on vient de cliquer. */}
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 bg-paper-deep/60 px-5 py-3">
           <p className="text-sm text-ink-soft">
-            <span className="num font-semibold text-ink">{liste.length}</span> offre
+            <span className="num font-medium text-ink">{liste.length}</span> offre
             {liste.length > 1 ? "s" : ""}
             {liste.length > vues.length ? (
               <span className="text-muted">

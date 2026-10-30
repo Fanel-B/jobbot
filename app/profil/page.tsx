@@ -106,9 +106,9 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
           ) : (
             <>
               Avec ce profil : note moyenne{" "}
-              <strong className="num font-semibold text-ink">{moyenne}</strong> sur les{" "}
+              <strong className="num font-medium text-ink">{moyenne}</strong> sur les{" "}
               <span className="num">{offers.length}</span> offres, dont{" "}
-              <strong className="num font-semibold text-ink">{auDessusDe65}</strong> au-dessus de 65.
+              <strong className="num font-medium text-ink">{auDessusDe65}</strong> au-dessus de 65.
             </>
           )}
         </p>
@@ -130,16 +130,20 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
               const cochees = [...f.principales, ...f.variantes].filter((n) => choisies.has(n)).length;
               return (
                 <div key={f.id} id={f.id} className="scroll-mt-24">
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-l-[3px] pl-3"
+                       style={{ borderColor: `var(${f.teinte})` }}>
                     <h3 className="text-[15px] font-medium text-ink">{f.question}</h3>
                     {cochees > 0 ? (
-                      <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-accent">
+                      <span
+                        className="font-mono text-[11px] uppercase tracking-[0.1em]"
+                        style={{ color: `var(${f.teinte})` }}
+                      >
                         <span className="num">{cochees}</span> cochée{cochees > 1 ? "s" : ""}
                       </span>
                     ) : null}
                   </div>
 
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="mt-3 flex flex-wrap gap-2 pl-3">
                     {f.principales.map((nom) => (
                       <Case key={nom} name="competence" value={nom} defaultChecked={choisies.has(nom)}>
                         {nom}

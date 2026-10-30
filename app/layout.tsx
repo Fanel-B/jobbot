@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Newsreader } from "next/font/google";
 import { Suspense } from "react";
 import Link from "next/link";
 import { Compte, CompteSquelette } from "@/components/Compte";
@@ -12,11 +12,26 @@ const inter = Inter({
   display: "swap",
 });
 
-// Outfit : grotesque géométrique à grande hauteur d'x. C'est l'équivalent libre le plus proche
-// du Gotham de la référence, qui est sous licence et ne peut pas être repris.
-const display = Outfit({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
+/**
+ * Newsreader, en graisse 300, pour tous les titres.
+ *
+ * Elle remplace Outfit, un grotesque géométrique. Ce n'était pas un mauvais choix en soi, mais
+ * c'est la police la plus employée par les gabarits engendrés automatiquement : un titre gras en
+ * grotesque géométrique sur fond clair est devenu l'image même du site fait à la chaîne. Changer
+ * la famille est le seul geste typographique qui se voit immédiatement sur toutes les pages.
+ *
+ * Le choix suit le relevé de design/cedaorg.net.md : grand et **maigre**, pas grand et gras. À
+ * 80 px la forme des lettres porte déjà l'emphase, et la graisse en plus ne fait qu'un mur.
+ * Newsreader a un axe optique — à grande taille elle s'affine d'elle-même, ce que ne fait aucune
+ * police à graisses figées.
+ *
+ * Deux serifs ont été volontairement écartées, Fraunces et Instrument Serif : ce sont celles que
+ * les modèles proposent par réflexe, donc exactement ce qu'on cherche à fuir.
+ */
+const display = Newsreader({
+  subsets: ["latin", "latin-ext"],
+  weight: ["300", "400"],
+  style: ["normal", "italic"],
   variable: "--font-display-latin",
   display: "swap",
 });
@@ -34,14 +49,17 @@ export default function RootLayout({
 
   return (
     <html lang="fr" className={`${inter.variable} ${display.variable}`}>
-      <body className="flex min-h-screen flex-col antialiased">
+      {/* min-h-dvh et non min-h-screen : 100vh ignore la barre d'adresse des navigateurs
+          mobiles, qui se rétracte au défilement. Le pied de page se retrouvait alors poussé
+          sous le pli d'une centaine de pixels. dvh suit la hauteur réellement visible. */}
+      <body className="flex min-h-dvh flex-col antialiased">
         <header className="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-5">
             <Link href="/" className="flex items-center gap-2.5">
-              <span className="grid h-7 w-7 place-items-center rounded-md bg-ink text-[13px] font-semibold text-paper">
+              <span className="grid h-7 w-7 place-items-center rounded-md bg-ink text-[13px] font-medium text-paper">
                 J
               </span>
-              <span className="text-[15px] font-semibold tracking-tight">JobBot</span>
+              <span className="text-[15px] font-medium tracking-tight">JobBot</span>
             </Link>
 
             <nav className="hidden items-center gap-1 text-sm text-ink-soft sm:flex">
@@ -72,11 +90,15 @@ export default function RootLayout({
               <span className="num hidden text-xs text-muted md:inline">
                 {meta.count} offres · collecte du {collecte.toLocaleDateString("fr-FR")}
               </span>
+              {/* `whitespace-nowrap` : à 390 px, « Voir les offres » et « Se connecter »
+                  se repliaient chacun sur deux lignes et l'en-tête se télescopait. Le libellé
+                  raccourcit au lieu de passer à la ligne, et la barre garde sa hauteur. */}
               <Link
                 href="/offres"
-                className="rounded-lg bg-ink px-3.5 py-2 text-sm font-medium text-paper transition hover:bg-ink-soft"
+                className="whitespace-nowrap rounded-lg bg-ink px-3.5 py-2 text-sm font-medium text-paper transition hover:bg-ink-soft"
               >
-                Voir les offres
+                <span className="sm:hidden">Offres</span>
+                <span className="hidden sm:inline">Voir les offres</span>
               </Link>
             </div>
           </div>

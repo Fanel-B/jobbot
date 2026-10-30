@@ -6,6 +6,7 @@
  * deviendrait impossible à cocher — donc une offre qui la demande resterait éternellement
  * « manquante » sans moyen d'y remédier. C'est exactement le genre de défaut qui ne se voit pas.
  */
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { CATALOGUE } from "./scoring";
 import {
@@ -49,6 +50,18 @@ describe("forme des familles", () => {
     // pas une question casserait ce ton sans qu'on s'en aperçoive en relisant le code.
     for (const f of FAMILLES) {
       expect(f.question.endsWith("?"), f.id).toBe(true);
+    }
+  });
+
+  it("donne à chacune une teinte distincte, réellement définie dans la feuille", () => {
+    // Deux pièges que seul un test attrape : deux familles qui finissent de la même couleur,
+    // et une variable CSS citée ici mais jamais déclarée — auquel cas le texte s'affiche en
+    // noir sans que rien ne signale l'erreur.
+    const feuille = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+    const teintes = FAMILLES.map((f) => f.teinte);
+    expect(new Set(teintes).size).toBe(teintes.length);
+    for (const t of teintes) {
+      expect(feuille.includes(`${t}:`), `${t} absente de globals.css`).toBe(true);
     }
   });
 

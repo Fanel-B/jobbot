@@ -18,7 +18,7 @@ export async function Compte() {
     return (
       <Link
         href="/connexion"
-        className="rounded-md px-3 py-1.5 text-sm text-ink-soft transition hover:bg-paper-deep hover:text-ink"
+        className="whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm text-ink-soft transition hover:bg-paper-deep hover:text-ink sm:px-3"
       >
         Se connecter
       </Link>

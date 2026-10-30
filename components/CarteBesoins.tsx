@@ -36,10 +36,20 @@ export function CarteBesoins({ compacte = false }: { compacte?: boolean }) {
           <li key={f.id}>
             <Link
               href={`/profil#${f.id}`}
-              className="group block px-6 py-4 transition hover:bg-paper-deep/40"
+              className="group relative block py-4 pl-6 pr-6 transition hover:bg-paper-deep/40"
             >
+              {/* Le filet de famille. Fin au repos, large au survol : la couleur répond au
+                  geste au lieu de rester un aplat décoratif. */}
+              <span
+                aria-hidden
+                className="absolute inset-y-0 left-0 w-[3px] transition-[width] duration-200 group-hover:w-[6px]"
+                style={{ background: `var(${f.teinte})` }}
+              />
               <p className="text-[15px] text-ink">{f.titre}</p>
-              <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.1em] text-accent">
+              <p
+                className="mt-1 font-mono text-[11px] uppercase tracking-[0.1em]"
+                style={{ color: `var(${f.teinte})` }}
+              >
                 {f.principales.slice(0, 4).join(", ")}
                 {f.principales.length > 4 ? ` +${f.principales.length - 4}` : ""}
               </p>

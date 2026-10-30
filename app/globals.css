@@ -42,7 +42,7 @@
      qu'à dire quelque chose, jamais à décorer.
        bleu  — les liens, et tout ce qui est tracé (barres, points) ;
        vert  — ce qui est acquis, ce qui monte ;
-       jaune — ce qui demande une vérification, et le surlignage. */
+       jaune — ce qui demande une vérification. */
 
   /* Bleu — accent et liens */
   --color-accent: oklch(48% 0.17 258);
@@ -64,6 +64,28 @@
   --color-warn-soft: oklch(95% 0.065 95);
   --color-jaune: oklch(88% 0.17 95);
 
+  /* Les six familles de compétences, chacune sa teinte.
+     Ce n'est pas de la décoration : une famille se reconnaît à sa couleur sur la carte
+     d'accueil, dans le formulaire et sur les puces cochées. La couleur porte donc une
+     information, ce qui est la seule raison valable d'en ajouter six.
+     Même clarté et même chroma pour les six : elles se lisent comme une famille et non
+     comme six décisions séparées. 46 % de clarté est le point où la plus faible — le
+     sarcelle — passe encore 4,5:1 sur le papier, mesuré, pas estimé. */
+  --color-fam-web: oklch(46% 0.14 258);
+  --color-fam-donnees: oklch(46% 0.14 150);
+  --color-fam-ia: oklch(46% 0.14 310);
+  --color-fam-langages: oklch(46% 0.14 30);
+  --color-fam-infra: oklch(46% 0.14 195);
+  --color-fam-methode: oklch(46% 0.14 85);
+
+  /* Les mêmes, en fond très clair, pour une puce cochée. */
+  --color-fam-web-doux: oklch(96% 0.028 258);
+  --color-fam-donnees-doux: oklch(96% 0.028 150);
+  --color-fam-ia-doux: oklch(96% 0.028 310);
+  --color-fam-langages-doux: oklch(96% 0.028 30);
+  --color-fam-infra-doux: oklch(96% 0.028 195);
+  --color-fam-methode-doux: oklch(96% 0.028 85);
+
   /* Rouge — ce qui manque */
   --color-bad: oklch(50% 0.17 27);
   --color-bad-soft: oklch(96% 0.03 27);
@@ -79,9 +101,13 @@
   --radius-bloc: 22px;
   --radius-puce: 6px;
 
-  /* Une vraie ombre, pas un filet : c'est elle qui donne du relief aux cartes. */
-  --ombre-carte: 0 1px 2px rgb(0 0 0 / 0.04), 0 12px 28px -14px rgb(0 0 0 / 0.18);
-  --ombre-levee: 0 2px 4px rgb(0 0 0 / 0.05), 0 22px 44px -20px rgb(0 0 0 / 0.28);
+  /* Une seule ombre sur tout le site, et discrète.
+     La référence n'en a qu'une, à 12 % d'opacité. Deux profondeurs obligent à trancher à chaque
+     carte laquelle les mérite, et cette décision se prend toujours mal : au bout de trois pages
+     tout est levé, donc plus rien ne l'est. `--ombre-levee` subsiste pour ne rien casser, et
+     vaut désormais la même chose. */
+  --ombre-carte: 0 1px 2px rgb(0 0 0 / 0.04), 0 10px 24px -16px rgb(0 0 0 / 0.14);
+  --ombre-levee: var(--ombre-carte);
 
   /* Mouvement — courbe et durées de la référence */
   --ease-doux: cubic-bezier(0.4, 0, 0.2, 1);
@@ -191,7 +217,7 @@
   }
   /* Pas de halo lumineux : le dégradé radial flou dans un angle est l'ornement le plus
      reconnaissable des pages faites à la chaîne. La trame suffit à porter l'identité, et le
-     jaune garde plus de force là où il dit quelque chose — le surlignage du titre. */
+     jaune ne sert plus qu'à ce qu'il signifie : une ligne de bulletin à vérifier. */
 
   /* Bouton principal : l'anneau de la référence, qui s'ouvre au survol. */
   .bouton-plein {
@@ -253,49 +279,65 @@
     color: var(--color-muted);
   }
 
-  /* Les deux tailles de titre qui portent la page d'accueil. */
+  /* Trois tailles, une seule graisse, et un interligne qui tend vers 1.
+     C'est la décision centrale du relevé (design/cedaorg.net.md) : à cette taille la lettre
+     porte déjà l'emphase, et la graisse en plus ne ferait qu'un mur opaque. L'interligne à 1
+     soude les lignes d'un titre en un bloc au lieu d'une pile de lignes. Les rapports entre
+     les trois marches restent au-dessus de 1,4 : une échelle plate ne hiérarchise rien. */
   .titre-geant {
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: clamp(2.75rem, 7vw, 5.5rem);
-    line-height: 1.02;
-    letter-spacing: -0.035em;
+    font-weight: 300;
+    font-size: clamp(2.75rem, 6.5vw, 5rem);
+    /* 1.06, pas 1.0. La référence tient le 1.0 parce que son slab a des descendantes
+       courtes ; ici le « q » de « qui » touchait la ligne suivante. Copier la valeur sans
+       regarder la police aurait été reprendre le chiffre en ratant la raison. */
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
 
   .titre-page {
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: clamp(2.25rem, 4.5vw, 3.25rem);
-    line-height: 1.05;
-    letter-spacing: -0.03em;
+    font-weight: 300;
+    font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
 
   .titre-section {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 300;
     font-size: clamp(1.75rem, 3.2vw, 2.5rem);
-    line-height: 1.1;
-    letter-spacing: -0.025em;
+    line-height: 1.05;
+    letter-spacing: -0.018em;
+    text-wrap: balance;
   }
 
-  /* Surlignage au marqueur. Le jaune passe derrière le texte, qui reste encre :
-     13,5:1 de contraste, donc il décore sans jamais gêner la lecture. */
-  .surligne {
-    background-image: linear-gradient(
-      transparent 56%,
-      var(--color-jaune) 56%,
-      var(--color-jaune) 93%,
-      transparent 93%
-    );
-    background-repeat: no-repeat;
-    background-size: 0% 100%;
-    animation: trace-marqueur 620ms var(--ease-sortie) 420ms forwards;
+  /* Le chiffre comme seul ornement.
+     Quatrième principe du relevé : un nombre est à la fois la décoration et l'argument, donc
+     rien ici n'est décoratif pour rien. C'est ce qui remplace les pictogrammes et les images
+     d'illustration qu'un site sans photographies légitimes ne peut pas se permettre. */
+  .chiffre {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+    color: var(--color-accent);
   }
 
-  @keyframes trace-marqueur {
-    to {
-      background-size: 100% 100%;
-    }
+  /* L'emphase du titre, en italique véritable.
+     Elle remplace un surlignage jaune au marqueur. Deux raisons de l'avoir retiré : il formait
+     un second accent, alors que la règle est d'en tenir un seul sur toute la page ; et il était
+     calé en pourcentage de hauteur de ligne pour un grotesque gras, donc il tombait au mauvais
+     endroit dès que la police a changé. Une serif a quelque chose qu'aucun grotesque n'a : un
+     italique dessiné, pas penché. C'est l'emphase à sa place, sans rien peindre. */
+  .italique-accent {
+    font-style: italic;
+    font-weight: 300;
   }
 
   /* Une barre qui pousse depuis sa base, comme on remplit un bulletin. */
@@ -366,10 +408,6 @@
     .cascade > *,
     .pousse {
       animation: none;
-    }
-    .surligne {
-      animation: none;
-      background-size: 100% 100%;
     }
     .carte-vive:hover {
       transform: none;

@@ -112,7 +112,7 @@ export async function Simulant({
                     <span className="mx-2 text-muted" aria-hidden>
                       →
                     </span>
-                    <span className="font-semibold text-good">{coherence.apres}</span>
+                    <span className="font-medium text-good">{coherence.apres}</span>
                     <span className="text-muted">/{coherence.max}</span>
                   </>
                 ) : (
@@ -134,7 +134,7 @@ export async function Simulant({
                   →
                 </span>
                 <span
-                  className={`font-semibold ${
+                  className={`font-medium ${
                     effet.totalApres > effet.totalAvant
                       ? "text-good"
                       : effet.totalApres < effet.totalAvant
