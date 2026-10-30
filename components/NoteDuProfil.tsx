@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Bulletin } from "@/components/Bulletin";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { ZONE_LABEL } from "@/lib/offers";
-import { NIVEAU_LABEL, RECHERCHE_LABEL, classementPour, estParDefaut, lireProfil } from "@/lib/profil";
+import { NIVEAU_LABEL, RECHERCHE_LABEL, classementPour, estVide, lireProfil } from "@/lib/profil";
 
 /**
  * La note de cette offre **pour le profil en cours**, avec son bulletin.
@@ -13,6 +13,32 @@ import { NIVEAU_LABEL, RECHERCHE_LABEL, classementPour, estParDefaut, lireProfil
  */
 export async function NoteDuProfil({ offreId }: { offreId: number }) {
   const profil = await lireProfil();
+
+  // Pas de profil, pas de note. Afficher un bulletin calculé sur zéro compétence donnerait une
+  // page entière de lignes à zéro, exacte et incompréhensible : on dirait que l'offre est
+  // mauvaise alors qu'on ne sait simplement rien de la personne.
+  if (estVide(profil)) {
+    return (
+      <div>
+        <p className="label">Cette offre te correspond-elle ?</p>
+        <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+          Dis ce que tu sais faire et cette offre reçoit sa note, détaillée critère par critère :
+          ce qui colle, ce qui manque, et ce que ça change.
+        </p>
+        <Link
+          href="/profil"
+          className="bouton-plein mt-5 inline-flex px-5 py-3 text-sm font-medium"
+        >
+          Dire ce que je sais faire
+        </Link>
+        <p className="mt-4 text-xs text-muted">
+          Une minute, rien à créer, et la note se recalcule à chaque visite plutôt que d&apos;être
+          stockée.
+        </p>
+      </div>
+    );
+  }
+
   const resultat = classementPour(profil).get(offreId);
 
   const zones = profil.zones.length
@@ -26,9 +52,7 @@ export async function NoteDuProfil({ offreId }: { offreId: number }) {
     <>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="label">
-            {estParDefaut(profil) ? "Note du profil de départ" : "Note pour ton profil"}
-          </p>
+          <p className="label">Note pour ton profil</p>
           <p className="mt-1 text-sm text-ink-soft">{resume}</p>
         </div>
         <ScoreBadge score={resultat?.total ?? null} taille="lg" />

@@ -1,0 +1,98 @@
+{
+  "source": "https://www.cedaorg.net/en",
+  "pages_analysees": [
+    "https://www.cedaorg.net/en",
+    "https://www.cedaorg.net/en/find-services",
+    "https://www.cedaorg.net/en/our-blog"
+  ],
+  "tokens": {
+    "spacing": {
+      "scale": [8, 16, 24, 28, 32, 48, 80, 100],
+      "base_unit": 8,
+      "section_gap": "100px"
+    },
+    "typography": {
+      "families": ["Montagu Slab", "Inter", "DM Sans"],
+      "weights_utilises": ["300", "400"],
+      "scale": [
+        { "role": "hero", "size": "80px", "weight": "300", "line_height": "80px", "letter_spacing": "-1.6px", "family": "Montagu Slab" },
+        { "role": "h2", "size": "64px", "weight": "300", "line_height": "64px", "letter_spacing": "-1.28px", "family": "Montagu Slab" },
+        { "role": "h3", "size": "48px", "weight": "300", "line_height": "48px", "letter_spacing": "normal", "family": "Montagu Slab" },
+        { "role": "chiffre-vedette", "size": "64px", "weight": "300", "family": "Montagu Slab" },
+        { "role": "body", "size": "16px", "weight": "400", "family": "Inter" },
+        { "role": "micro-label", "size": "12px", "weight": "400", "letter_spacing": "0.96px", "text_transform": "uppercase", "family": "Inter" }
+      ]
+    },
+    "colors": [
+      { "role": "background", "value": "#FFFFFF", "surface_pct": 45.3 },
+      { "role": "background-chaud", "value": "#FFF8F0", "surface_pct": 2.9 },
+      { "role": "background-inverse", "value": "#191919", "surface_pct": 27.4 },
+      { "role": "text-primary", "value": "#191919", "usages_texte": 52 },
+      { "role": "text-muted", "value": "#919191", "usages_texte": 11 },
+      { "role": "accent", "value": "#0F8751", "surface_pct": 1.2, "usages_texte": 35, "usages_fond": 10 }
+    ],
+    "radius": ["8px", "12px", "16px", "24px", "9999px"],
+    "radius_dominant": "9999px",
+    "shadows": ["rgba(0, 0, 0, 0.12) 8px 8px"],
+    "motion": {
+      "duree": "0.4s",
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "proprietes": ["color", "background-color", "border-color", "box-shadow", "padding", "opacity"]
+    },
+    "accessibilite": { "focus_visible": true },
+    "image_ratios": [
+      { "usage": "hero", "ratio": "1.54:1" },
+      { "usage": "hero-secondaire", "ratio": "1.50:1" },
+      { "usage": "thumbnail", "ratio": "1.43:1" }
+    ],
+    "grid": { "max_width": "1440px", "columns": 3, "gutter": "80px", "note": "une seule grille declaree sur la page ; le reste est un flux a deux colonnes de hauteurs inegales" }
+  },
+  "taste": [
+    {
+      "name": "Le titre enorme est maigre",
+      "trigger": "Un titre d'accueil pose par-dessus une photographie pleine largeur",
+      "decision": "80px en graisse 300 avec un interligne de 1.0, plutot qu'un 48px gras",
+      "reason": "A 80px la forme des lettres domine deja la page ; ajouter de la graisse par-dessus transformerait la phrase en mur opaque et ecraserait la photographie qui porte l'emotion. La taille fait l'emphase, donc la graisse peut rester legere. L'interligne a exactement 1.0 soude les quatre lignes en un bloc unique au lieu d'une liste de lignes.",
+      "evidence": [
+        "h1 : 80px / line-height 80px / weight 300 / letter-spacing -1.6px",
+        "deux graisses seulement sur toute la page : 300 (79 occurrences) et 400 (58)",
+        "aucun gras : ni 600 ni 700 dans la distribution"
+      ]
+    },
+    {
+      "name": "L'accent couvre un pour cent de la page",
+      "trigger": "Devoir signaler ce qui est cliquable et ce qui est une categorie",
+      "decision": "Un seul vert #0F8751, employe surtout comme encre, plutot qu'en aplats de section",
+      "reason": "Le vert est utilise 35 fois comme couleur de texte contre 10 fois comme fond, et ne peint que 1,2 % de la surface. Inonder des sections entieres de la couleur de marque rendrait indistinguables les quelques elements qui comptent vraiment : la pastille d'action et les sous-categories de service. La rarete est ce qui fait que l'oeil les trouve.",
+      "evidence": [
+        "#0F8751 : 1,2 % de la surface peinte, contre 45,3 % de blanc",
+        "35 usages en couleur de texte contre 10 en fond",
+        "une seule couleur d'accent sur les trois pages analysees"
+      ]
+    },
+    {
+      "name": "La premiere decision est une liste de besoins, pas un menu",
+      "trigger": "Un visiteur arrive sans connaitre le vocabulaire de l'organisation",
+      "decision": "Une carte creme posee sur la photographie, titree « What do you need today ? », listant cinq besoins concrets, plutot qu'une barre de navigation deployee",
+      "reason": "Une navigation dit comment l'organisation est decoupee ; la carte dit ce que la personne ressent. Chaque ligne porte un titre en serif et un micro-label vert de 12px qui enumere les cas reels (« HEATING, ELECTRICITY, WATER, FURNACE ») : on se reconnait sans connaitre le mot juste. La derniere ligne, « Not sure what you need ? », admet que la taxonomie echouera pour certains et leur donne quand meme une porte.",
+      "evidence": [
+        "la barre de navigation est repliee en un seul bouton « Menu » dans l'accueil",
+        "carte sur fond #FFF8F0 posee en chevauchement sur la photographie",
+        "sous-labels a 12px, letter-spacing 0.96px, capitales, en #0F8751",
+        "ligne de secours terminale avec pastille pleine « WE'VE GOT YOU »"
+      ]
+    },
+    {
+      "name": "Les chiffres sont le seul ornement",
+      "trigger": "Devoir etablir une echelle et une credibilite sans illustration",
+      "decision": "Des nombres en serif de 64px et plus, en vert, avec un micro-label au-dessus, plutot que des pictogrammes ou des images d'illustration",
+      "reason": "Un nombre est a la fois la decoration et l'argument, donc rien sur la page n'est purement decoratif. Pose en alternance gauche-droite dans un flux de hauteurs inegales, il echappe au bandeau de statistiques aligne que produit n'importe quel gabarit.",
+      "evidence": [
+        "51000, 172751, 130 composes a 64px et plus en #0F8751",
+        "micro-label de 12px en capitales au-dessus de chaque nombre",
+        "ecarts de section constants a 100px",
+        "une seule ombre sur toute la page, a 12 % d'opacite, decalee de 8px sans flou de halo"
+      ]
+    }
+  ]
+}

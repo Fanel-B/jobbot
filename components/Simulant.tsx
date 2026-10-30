@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { critereLabel } from "@/lib/offers";
 import { lireSimulation } from "@/lib/simulation";
-import { effetPour, lireProfil, manquantsPour } from "@/lib/profil";
+import { effetPour, estVide, lireProfil, manquantsPour } from "@/lib/profil";
 
 type Params = { simule?: string };
 
@@ -27,6 +27,11 @@ export async function Simulant({
   // Les compétences proposées sont celles qui manquent **à ce profil**, et l'écart est mesuré
   // depuis sa note — pas depuis celle du profil d'usine.
   const profil = await lireProfil();
+
+  // Sans profil, tout manque. Le simulant proposerait alors les quinze technos de l'annonce
+  // comme autant de lacunes, ce qui est vrai au sens strict et décourageant pour rien.
+  if (estVide(profil)) return null;
+
   const manquants = manquantsPour(profil, offreId);
 
   if (manquants.length === 0) {

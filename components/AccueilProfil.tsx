@@ -5,10 +5,11 @@ import { OfferMini } from "@/components/OfferCard";
 import { Barres, Dumbbell } from "@/components/Graphes";
 import { critereLabel, enLettres, lacunesRegroupees, meta, structureBulletin } from "@/lib/offers";
 import { SEUIL_BONNE_PISTE, volumeSuffisant } from "@/lib/simulation";
+import { CarteBesoins } from "@/components/CarteBesoins";
 import {
   competencesSimulablesPour,
   effetGlobalPour,
-  estParDefaut,
+  estVide,
   lireProfil,
   offresAuDessusPour,
   offresPour,
@@ -36,7 +37,12 @@ async function donnees() {
 
 /** La carte d'offre de l'ouverture : la mieux notée **pour ce profil**. */
 export async function CarteOuverture() {
-  const { reference } = await donnees();
+  const { profil, reference } = await donnees();
+
+  // « L'offre la mieux notée aujourd'hui » n'a de sens que si « notée » veut dire quelque chose.
+  // Sans profil, la place revient à la question qu'on aurait dû poser d'abord.
+  if (estVide(profil)) return <CarteBesoins compacte />;
+
   return (
     <>
       {/* La meilleure offre du jour, en vrai. L'espace à droite montre le produit
@@ -92,6 +98,25 @@ export function CarteOuvertureSquelette() {
 /** Les quatre sections de l'accueil qui dépendent du profil. */
 export async function SectionsProfil() {
   const { profil, notees, meilleures, reference } = await donnees();
+
+  // Les quatre sections racontent toutes la même histoire : « voilà où tu en es ». Sans profil,
+  // elles la racontent sur personne. Une seule invitation vaut mieux que quatre sections creuses.
+  if (estVide(profil)) {
+    return (
+      <section className="mx-auto max-w-3xl px-5 py-20 text-center">
+        <h2 className="titre-section">Les mêmes offres pour tout le monde</h2>
+        <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-ink-soft">
+          Ce qui change, c&apos;est l&apos;ordre. Dis ce que tu sais faire et les{" "}
+          <span className="num">{notees.length}</span> offres se classent pour toi, chacune avec le
+          détail de sa note.
+        </p>
+        <Link href="/profil" className="bouton-plein mt-7 inline-flex px-6 py-3 text-sm font-medium">
+          Commencer
+        </Link>
+      </section>
+    );
+  }
+
   const offers = notees;
   const lacunes = lacunesRegroupees(notees, 8);
   const dejaBonnes = offresAuDessusPour(profil);

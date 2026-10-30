@@ -40,9 +40,30 @@ export type Profil = {
 };
 
 /**
- * Le profil de départ : exactement celui que le pipeline applique aujourd'hui. Il n'invente rien,
- * il reprend `MES_ATOUTS`. Tant que personne n'a rien coché, le site affiche donc les mêmes notes
- * que celles vérifiées contre l'oracle — c'est ce qui rend le changement sans risque.
+ * Le profil de quelqu'un qui vient d'arriver : **vide**.
+ *
+ * Il a longtemps été l'inverse. Un nouveau venu héritait de `MES_ATOUTS` — les 31 compétences de
+ * Fanel sur les 75 du catalogue — et le site lui annonçait des notes calculées sur le profil de
+ * quelqu'un d'autre, avec des cases déjà cochées qu'il n'avait jamais cochées. C'était faux pour
+ * tout le monde sauf une personne, et ça contredisait la règle qui fonde le projet : une
+ * compétence jamais confirmée ne compte jamais.
+ *
+ * Vide ne veut pas dire cassé. `estVide()` distingue les deux, et les pages qui affichent une
+ * note demandent d'abord à qui elles parlent au lieu de le supposer.
+ */
+export const PROFIL_VIDE: Profil = {
+  competences: [],
+  zones: [],
+  niveau: "bac+3",
+  recherche: [],
+};
+
+/**
+ * Le profil de référence du pipeline, celui contre lequel l'oracle est vérifié.
+ *
+ * Ce n'est plus le profil d'un visiteur mais un point de comparaison : les tests s'en servent
+ * comme d'un profil bien garni, et `npm run verifier-scoring` note les offres avec ces atouts-là.
+ * Il reprend `MES_ATOUTS` et n'invente rien.
  */
 export const PROFIL_DEFAUT: Profil = {
   competences: [...new Set(ATOUTS_PAR_DEFAUT.map(([, nom]) => nom))],
@@ -83,27 +104,27 @@ export function encoderProfil(p: Profil): string {
  * trafiqué ou vieilli donne le profil par défaut, jamais une erreur ni une note fantaisiste.
  */
 export function decoderProfil(brut: string | undefined): Profil {
-  if (!brut) return PROFIL_DEFAUT;
+  if (!brut) return PROFIL_VIDE;
   try {
     const o = JSON.parse(brut) as Record<string, unknown>;
     const noms = new Set(CATALOGUE.map((c) => c.nom));
     const competences = Array.isArray(o.c)
       ? o.c.filter((x): x is string => typeof x === "string" && noms.has(x))
-      : PROFIL_DEFAUT.competences;
+      : PROFIL_VIDE.competences;
     const zones = Array.isArray(o.z)
       ? o.z.filter((x): x is Zone => typeof x === "string" && ZONES.includes(x as Zone))
-      : PROFIL_DEFAUT.zones;
+      : PROFIL_VIDE.zones;
     const recherche = Array.isArray(o.r)
       ? o.r.filter((x): x is TypeRecherche => typeof x === "string" && RECHERCHES.includes(x as TypeRecherche))
-      : PROFIL_DEFAUT.recherche;
+      : PROFIL_VIDE.recherche;
     return {
       competences,
       zones,
-      niveau: NIVEAUX.includes(o.n as NiveauEtudes) ? (o.n as NiveauEtudes) : PROFIL_DEFAUT.niveau,
-      recherche: recherche.length ? recherche : PROFIL_DEFAUT.recherche,
+      niveau: NIVEAUX.includes(o.n as NiveauEtudes) ? (o.n as NiveauEtudes) : PROFIL_VIDE.niveau,
+      recherche,
     };
   } catch {
-    return PROFIL_DEFAUT;
+    return PROFIL_VIDE;
   }
 }
 
@@ -113,9 +134,20 @@ export async function lireProfil(): Promise<Profil> {
   return decoderProfil(magasin.get(COOKIE_PROFIL)?.value);
 }
 
-/** A-t-on affaire à quelqu'un qui a vraiment réglé son profil, ou au réglage d'usine ? */
-export function estParDefaut(p: Profil): boolean {
-  return encoderProfil(p) === encoderProfil(PROFIL_DEFAUT);
+/**
+ * Ce profil est-il encore vierge ?
+ *
+ * Le critère est la liste de compétences, et non l'égalité stricte avec `PROFIL_VIDE` : quelqu'un
+ * qui a choisi sa zone et son niveau sans cocher une seule compétence ne peut toujours pas être
+ * noté. Il doit voir le parcours d'arrivée, pas un classement sans fondement.
+ */
+export function estVide(p: Profil): boolean {
+  return p.competences.length === 0;
+}
+
+/** Y a-t-il, pour cette requête, un profil sur lequel une note veut dire quelque chose ? */
+export async function profilRenseigne(): Promise<boolean> {
+  return !estVide(await lireProfil());
 }
 
 /* --------------------------------------------------------------- notation */

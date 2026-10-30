@@ -10,10 +10,25 @@ import {
 import { contratLabel, estNonRenseigne, signalFormationCitable } from "@/lib/offers";
 import type { Offer } from "@/lib/offers";
 
-/** Une ligne d'offre : dense, scannable, tout ce qui décide est visible sans cliquer. */
-export function OfferRow({ offre, rang }: { offre: Offer; rang?: number }) {
+/**
+ * Une ligne d'offre : dense, scannable, tout ce qui décide est visible sans cliquer.
+ *
+ * `sansNote` sert aux visiteurs qui n'ont pas encore de profil. Une note calculée sur un profil
+ * vide est un chiffre exact et un renseignement faux : elle dit « 12/100 » quand la vérité est
+ * « on ne sait pas encore ». Dans ce cas la pastille disparaît, et la ligne « absent de ton
+ * profil » aussi — il n'y a pas de profil dont être absent.
+ */
+export function OfferRow({
+  offre,
+  rang,
+  sansNote = false,
+}: {
+  offre: Offer;
+  rang?: number;
+  sansNote?: boolean;
+}) {
   const apercu = (offre.description ?? "").replace(/\s+/g, " ").trim().slice(0, 190);
-  const manquants = offre.skills?.missing ?? [];
+  const manquants = sansNote ? [] : (offre.skills?.missing ?? []);
 
   return (
     <article
@@ -69,9 +84,11 @@ export function OfferRow({ offre, rang }: { offre: Offer; rang?: number }) {
           ) : null}
         </div>
 
-        <div className="flex flex-col items-end gap-2">
-          <ScoreBadge score={offre.score} />
-        </div>
+        {sansNote ? null : (
+          <div className="flex flex-col items-end gap-2">
+            <ScoreBadge score={offre.score} />
+          </div>
+        )}
       </div>
     </article>
   );

@@ -19,7 +19,8 @@ import {
   decoderProfil,
   effetPour,
   encoderProfil,
-  estParDefaut,
+  PROFIL_VIDE,
+  estVide,
   manquantsPour,
   offresPour,
   type Profil,
@@ -56,9 +57,12 @@ describe("le profil de départ ne change rien", () => {
     expect(cles.length).toBeGreaterThan(PROFIL_DEFAUT.competences.length);
   });
 
-  it("se reconnaît comme réglage d'usine", () => {
-    expect(estParDefaut(PROFIL_DEFAUT)).toBe(true);
-    expect(estParDefaut(PAUVRE)).toBe(false);
+  it("reconnaît un profil vierge, et lui seul", () => {
+    expect(estVide(PROFIL_VIDE)).toBe(true);
+    expect(estVide(PROFIL_DEFAUT)).toBe(false);
+    expect(estVide(PAUVRE)).toBe(false);
+    // Régler sa zone et son niveau sans cocher une compétence ne suffit pas à pouvoir être noté.
+    expect(estVide({ ...PROFIL_VIDE, zones: ["toulouse"], recherche: ["stage"] })).toBe(true);
   });
 });
 
@@ -134,14 +138,25 @@ describe("le cookie est relu sans jamais faire confiance à son contenu", () => 
     const relu = decoderProfil(trafique);
     expect(relu.competences).toEqual(["JavaScript"]);
     expect(relu.zones).toEqual([]);
-    expect(relu.niveau).toBe(PROFIL_DEFAUT.niveau);
-    // Ne rien chercher viderait le site sans explication : on retombe sur le réglage de départ.
-    expect(relu.recherche).toEqual(PROFIL_DEFAUT.recherche);
+    expect(relu.niveau).toBe(PROFIL_VIDE.niveau);
+    // « cdi » n'est pas un type de recherche reconnu : on l'écarte sans rien inventer à la place.
+    expect(relu.recherche).toEqual([]);
   });
 
-  it("retombe sur le profil de départ devant un cookie illisible ou absent", () => {
+  it("retombe sur un profil vierge devant un cookie illisible ou absent", () => {
+    // Autrefois ce cas rendait MES_ATOUTS : un visiteur sans cookie héritait des 31 compétences
+    // de Fanel et lisait des notes calculées sur le profil de quelqu'un d'autre.
     for (const brut of [undefined, "", "{pas du json", "null"]) {
-      expect(decoderProfil(brut), String(brut)).toEqual(PROFIL_DEFAUT);
+      expect(decoderProfil(brut), String(brut)).toEqual(PROFIL_VIDE);
+    }
+  });
+
+  it("ne note rien tant qu'aucune compétence n'est confirmée", () => {
+    // L'invariant qui justifie tout le parcours d'arrivée : un profil vide ne couvre aucune
+    // exigence, donc aucune note affichée ne peut prétendre dire quoi que ce soit.
+    const classement = classementPour(PROFIL_VIDE);
+    for (const r of classement.values()) {
+      expect(r.exigences.every((e) => r.manquants.includes(e)), String(r.id)).toBe(true);
     }
   });
 

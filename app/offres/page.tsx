@@ -9,7 +9,7 @@ import {
   type Offer,
   type Zone,
 } from "@/lib/offers";
-import { estParDefaut, lireProfil, offresPour } from "@/lib/profil";
+import { estVide, lireProfil, offresPour } from "@/lib/profil";
 
 type Params = {
   zone?: string;
@@ -21,7 +21,7 @@ type Params = {
 
 const ZONES: Zone[] = ["toulouse", "idf", "remote", "autre"];
 
-function filtrer(offres: Offer[], p: Params): Offer[] {
+function filtrer(offres: Offer[], p: Params, sansNote = false): Offer[] {
   let out = offres;
 
   if (p.zone && ZONES.includes(p.zone as Zone)) {
@@ -37,7 +37,9 @@ function filtrer(offres: Offer[], p: Params): Offer[] {
   const min = Number(p.min ?? "");
   if (!Number.isNaN(min) && p.min) out = out.filter((o) => (o.score ?? 0) >= min);
 
-  const tri = p.tri ?? "score";
+  // Sans profil, trier par note reviendrait à ordonner la page sur un chiffre qui ne veut rien
+  // dire. La date, elle, reste vraie pour tout le monde.
+  const tri = p.tri ?? (sansNote ? "date" : "score");
   out = [...out].sort((a, b) =>
     tri === "date"
       ? Date.parse(b.published_at ?? b.first_seen_at ?? "") -
@@ -86,11 +88,12 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
   // Le classement est celui du profil en cours, recalculé à la lecture — jamais stocké.
   // C'est la règle du cahier de route : deux personnes voient la même offre, pas la même note.
   const profil = await lireProfil();
+  const sansNote = estVide(profil);
   const notees = offresPour(profil);
   const offresAvecContrat = notees.filter((o) => o.contract_known);
   const offresSansContrat = notees.filter((o) => !o.contract_known);
   const toutes = [...offresAvecContrat, ...offresSansContrat];
-  const liste = filtrer(toutes, p);
+  const liste = filtrer(toutes, p, sansNote);
   const vues = liste.slice(0, 120);
 
   const sources = [...new Set(offresAvecContrat.map((o) => o.source))].sort();
@@ -98,18 +101,18 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
 
   // Les comptes affichés sur les filtres de contrat tiennent compte du lieu, de la source et de
   // la note mini déjà choisis : un compte global mentirait dès qu'un autre filtre est actif.
-  const comptes = compterFamilles(filtrer(toutes, { ...p, type: undefined }));
+  const comptes = compterFamilles(filtrer(toutes, { ...p, type: undefined }, sansNote));
   // Le compte sur l'ensemble de la collecte, lui, sert à distinguer « ce filtre-ci ne donne
   // rien » de « cette collecte ne contient aucune offre de ce type ».
   const comptesCollecte = compterFamilles(toutes);
 
   // Comptes par zone et par source, calculés sans le filtre qu'ils annoncent : une puce
   // doit dire combien d'offres elle donnerait, pas combien il y en a en tout.
-  const baseZone = filtrer(toutes, { ...p, zone: undefined });
+  const baseZone = filtrer(toutes, { ...p, zone: undefined }, sansNote);
   const comptesZone = Object.fromEntries(
     ZONES.map((z) => [z, baseZone.filter((o) => o.location_zone === z).length]),
   ) as Record<Zone, number>;
-  const baseSource = filtrer(toutes, { ...p, source: undefined });
+  const baseSource = filtrer(toutes, { ...p, source: undefined }, sansNote);
   const comptesSource = baseSource.reduce<Record<string, number>>((acc, o) => {
     acc[o.source] = (acc[o.source] ?? 0) + 1;
     return acc;
@@ -132,12 +135,25 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
           </>
         ) : (
           <>
-            Classement calculé pour {estParDefaut(profil) ? "le profil de départ" : "ton profil"}, avec{" "}
-            <span className="num">{profil.competences.length}</span> compétences confirmées.{" "}
-            <Link href="/profil" className="lien-anime text-accent">
-              {estParDefaut(profil) ? "Règle ton profil" : "Le modifier"}
-            </Link>
-            . Chaque offre montre son bulletin, critère par critère.
+            {sansNote ? (
+              <>
+                Offres les plus récentes d&apos;abord. Dis ce que tu sais faire et chacune reçoit sa
+                note, critère par critère.{" "}
+                <Link href="/profil" className="lien-anime text-accent">
+                  Commencer
+                </Link>
+                .
+              </>
+            ) : (
+              <>
+                Classement pour ton profil, <span className="num">{profil.competences.length}</span>{" "}
+                compétences confirmées.{" "}
+                <Link href="/profil" className="lien-anime text-accent">
+                  Le modifier
+                </Link>
+                . Chaque offre montre son bulletin, critère par critère.
+              </>
+            )}
           </>
         )}
       </p>
@@ -294,7 +310,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
       ) : (
         <div className="mt-6 card overflow-hidden">
           {vues.map((o, i) => (
-            <OfferRow key={o.id} offre={o} rang={i + 1} />
+            <OfferRow key={o.id} offre={o} rang={i + 1} sansNote={sansNote} />
           ))}
         </div>
       )}

@@ -1,14 +1,14 @@
+import { connection } from "next/server";
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { CATALOGUE } from "@/lib/scoring";
 import { ZONE_LABEL, offers, type Zone } from "@/lib/offers";
+import { FAMILLES, competencesRangees } from "@/lib/competences";
 import {
   NIVEAU_LABEL,
-  PROFIL_DEFAUT,
   RECHERCHE_LABEL,
   classementPour,
-  estParDefaut,
+  estVide,
   lireProfil,
   type NiveauEtudes,
   type TypeRecherche,
@@ -58,9 +58,13 @@ function Case({
 async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre?: string; reinitialise?: string }> }) {
   const p = await searchParams;
   const profil = await lireProfil();
+  // `auth()` tire un aléa pour sa session, que le pré-rendu ne peut pas figer : sans cette ligne,
+  // Next signale « unstable value crypto.getRandomValues() while prerendering » et la page sort
+  // du pré-rendu partiel. `connection()` arrête le pré-rendu ici, la suite a lieu à la requête.
+  await connection();
   const session = await auth();
   const choisies = new Set(profil.competences);
-  const parDefaut = estParDefaut(profil);
+  const vierge = estVide(profil);
 
   // Ce que le profil change concrètement, dit en chiffres plutôt qu'en promesse.
   const classement = classementPour(profil);
@@ -93,29 +97,78 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
 
       <div className="card mt-6 p-5">
         <p className="text-sm text-ink-soft">
-          Avec ce profil : note moyenne{" "}
-          <strong className="num font-semibold text-ink">{moyenne}</strong> sur les{" "}
-          <span className="num">{offers.length}</span> offres, dont{" "}
-          <strong className="num font-semibold text-ink">{auDessusDe65}</strong> au-dessus de 65.
-          {parDefaut ? (
-            <span className="text-muted"> C&apos;est encore le réglage de départ.</span>
-          ) : null}
+          {vierge ? (
+            <>
+              Rien de coché pour l&apos;instant, donc aucune offre n&apos;est notée. Coche ce que tu
+              sais faire : les <span className="num">{offers.length}</span> offres se classent dès
+              l&apos;enregistrement.
+            </>
+          ) : (
+            <>
+              Avec ce profil : note moyenne{" "}
+              <strong className="num font-semibold text-ink">{moyenne}</strong> sur les{" "}
+              <span className="num">{offers.length}</span> offres, dont{" "}
+              <strong className="num font-semibold text-ink">{auDessusDe65}</strong> au-dessus de 65.
+            </>
+          )}
         </p>
       </div>
 
       <form action={enregistrerProfil} className="mt-10 space-y-10">
         <section>
-          <h2 className="label">Compétences confirmées</h2>
-          <p className="mt-2 text-sm text-muted">
+          <p className="max-w-2xl text-sm text-muted">
             Coche ce que tu sais utiliser aujourd&apos;hui. Décoche ce qui n&apos;est pas vrai : une
             liste trop généreuse donne des notes flatteuses et des candidatures perdues.
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {CATALOGUE.map((c) => (
-              <Case key={c.nom} name="competence" value={c.nom} defaultChecked={choisies.has(c.nom)}>
-                {c.nom}
-              </Case>
-            ))}
+
+          {/* Six familles au lieu d'un mur de 75 cases. Les variantes — « ML » à côté de
+              « machine learning », « IA générative » et sa forme sans accent — sont repliées :
+              les annonces emploient les deux, donc on ne peut pas les supprimer, mais les aligner
+              au même niveau donnait une liste qui avait l'air mal rangée. */}
+          <div className="mt-6 space-y-8">
+            {FAMILLES.map((f) => {
+              const cochees = [...f.principales, ...f.variantes].filter((n) => choisies.has(n)).length;
+              return (
+                <div key={f.id} id={f.id} className="scroll-mt-24">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <h3 className="text-[15px] font-medium text-ink">{f.question}</h3>
+                    {cochees > 0 ? (
+                      <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-accent">
+                        <span className="num">{cochees}</span> cochée{cochees > 1 ? "s" : ""}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {f.principales.map((nom) => (
+                      <Case key={nom} name="competence" value={nom} defaultChecked={choisies.has(nom)}>
+                        {nom}
+                      </Case>
+                    ))}
+                  </div>
+
+                  {f.variantes.length > 0 ? (
+                    <details className="mt-3" open={f.variantes.some((n) => choisies.has(n))}>
+                      <summary className="cursor-pointer text-xs text-muted transition hover:text-ink-soft">
+                        Autres formes employées par les annonces ({f.variantes.length})
+                      </summary>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {f.variantes.map((nom) => (
+                          <Case
+                            key={nom}
+                            name="competence"
+                            value={nom}
+                            defaultChecked={choisies.has(nom)}
+                          >
+                            {nom}
+                          </Case>
+                        ))}
+                      </div>
+                    </details>
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -214,9 +267,10 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
       ) : null}
 
       <p className="mt-10 text-xs leading-relaxed text-muted">
-        Le profil de départ reprend celui du pipeline ({PROFIL_DEFAUT.competences.length}{" "}
-        compétences). Tant que tu n&apos;y touches pas, les notes affichées sont exactement celles
-        que le moteur Python calcule, c&apos;est ce qui rend ce réglage sans risque.
+        Le catalogue compte <span className="num">{competencesRangees().length}</span>{" "}
+        compétences reconnues par le moteur, celui-là même que vérifie{" "}
+        <code className="text-ink-soft">npm run verifier-scoring</code> contre le pipeline Python.
+        Cocher une compétence couvre aussi ses alias : « SQL » vaut pour MySQL et PostgreSQL.
       </p>
     </div>
   );

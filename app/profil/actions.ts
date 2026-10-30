@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth, signOut } from "@/auth";
 import { base } from "@/lib/db";
+import { revoquerAccesGoogle } from "@/lib/google";
 import { CATALOGUE } from "@/lib/scoring";
 import {
   COOKIE_PROFIL,
@@ -65,9 +66,18 @@ export async function enregistrerProfil(donnees: FormData) {
 /**
  * Supprime le compte et tout ce qui s'y rattache.
  *
- * Une seule instruction suffit : `accounts` et `sessions` référencent `users (id) ON DELETE
- * CASCADE`, donc la ligne supprimée emporte les identités externes et les sessions ouvertes. La
- * cascade est dans le schéma plutôt que dans du code — c'est ce qui rend l'oubli impossible.
+ * Côté base, une seule instruction suffit : `accounts` et `sessions` référencent `users (id) ON
+ * DELETE CASCADE`, donc la ligne supprimée emporte les identités externes et les sessions
+ * ouvertes. La cascade est dans le schéma plutôt que dans du code — c'est ce qui rend l'oubli
+ * impossible.
+ *
+ * Mais effacer nos lignes ne suffisait pas. L'autorisation vit aussi chez Google, et elle y
+ * restait : se reconnecter juste après une suppression ne demandait plus aucun consentement et
+ * recréait un compte en un clic. On révoque donc **avant** de supprimer — après la cascade, les
+ * jetons n'existent plus et il serait trop tard.
+ *
+ * L'ordre importe, l'échec non : si Google ne répond pas, la suppression a lieu quand même.
+ * Retenir les données de quelqu'un parce qu'un tiers est injoignable serait le pire choix.
  *
  * Le cookie de profil est effacé dans la foulée : il vit dans le navigateur et ne serait pas
  * concerné par une suppression en base.
@@ -76,6 +86,12 @@ export async function supprimerCompte() {
   const session = await auth();
   const id = session?.user?.id;
   if (!id) redirect("/connexion");
+
+  const revocation = await revoquerAccesGoogle(id);
+  if (revocation.etat !== "revoque" && revocation.etat !== "rien-a-revoquer") {
+    // Journalisé sans jeton ni adresse : on veut savoir que c'est arrivé, pas sur qui.
+    console.warn(`[compte] révocation Google non aboutie : ${revocation.etat}`);
+  }
 
   await base().query("delete from users where id = $1", [id]);
 
