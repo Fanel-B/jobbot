@@ -50,23 +50,28 @@ export async function NoteDuProfil({ offreId }: { offreId: number }) {
 
   return (
     <>
-      <div className="flex items-start justify-between gap-4">
+      {/* L'en-tête d'un relevé nomme toujours qui est noté avant d'annoncer la note. Sans ça,
+          le chiffre a l'air d'une propriété de l'offre et non d'une rencontre entre deux choses. */}
+      <div className="flex items-start justify-between gap-4 border-b border-line-strong pb-4">
         <div className="min-w-0">
-          <p className="label">Note pour ton profil</p>
-          <p className="mt-1 text-sm text-ink-soft">{resume}</p>
+          <p className="label">Relevé de correspondance</p>
+          <p className="mt-1.5 text-sm text-ink-soft">{resume}</p>
+          <p className="mt-0.5 text-xs text-muted">
+            <span className="num">{profil.competences.length}</span> compétences confirmées
+          </p>
         </div>
         <ScoreBadge score={resultat?.total ?? null} taille="lg" />
       </div>
 
-      <div className="mt-6">
+      <div className="mt-5">
         <Bulletin breakdown={resultat?.breakdown ?? null} />
       </div>
 
       <p className="mt-4 text-xs text-muted">
-        Calculée à partir de tes {profil.competences.length} compétences confirmées.{" "}
         <Link href="/profil" className="lien-anime text-accent">
           Modifier le profil
-        </Link>
+        </Link>{" "}
+        et le relevé se recalcule.
       </p>
     </>
   );
