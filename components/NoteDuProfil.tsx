@@ -3,6 +3,7 @@ import { Bulletin } from "@/components/Bulletin";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { ZONE_LABEL } from "@/lib/offers";
 import { NIVEAU_LABEL, RECHERCHE_LABEL, classementPour, estVide, lireProfil } from "@/lib/profil";
+import { observationPour, rangDe, rangEnLettres, tranchePour } from "@/lib/classement";
 
 /**
  * La note de cette offre **pour le profil en cours**, avec son bulletin.
@@ -40,6 +41,8 @@ export async function NoteDuProfil({ offreId }: { offreId: number }) {
   }
 
   const resultat = classementPour(profil).get(offreId);
+  const place = rangDe(profil, offreId);
+  const observation = observationPour(profil, offreId);
 
   const zones = profil.zones.length
     ? profil.zones.map((z) => ZONE_LABEL[z]).join(", ")
@@ -52,6 +55,26 @@ export async function NoteDuProfil({ offreId }: { offreId: number }) {
     <>
       {/* L'en-tête d'un relevé nomme toujours qui est noté avant d'annoncer la note. Sans ça,
           le chiffre a l'air d'une propriété de l'offre et non d'une rencontre entre deux choses. */}
+      {place ? (
+        <div className="mb-5 border-b border-line pb-4">
+          <p className="text-sm text-ink-soft">
+            <strong className="font-display text-xl font-light text-ink">
+              {rangEnLettres(place)}
+            </strong>{" "}
+            parmi les offres que l&apos;on peut te noter
+            {tranchePour(place) ? `, ${tranchePour(place)}` : ""}.
+          </p>
+        </div>
+      ) : (
+        <div className="mb-5 border-b border-line pb-4">
+          <p className="text-sm leading-relaxed text-ink-soft">
+            Cette annonce ne cite aucune technologie reconnaissable : la correspondance avec ton
+            profil est <strong className="font-medium text-ink">incalculable</strong>, pas faible.
+            Le relevé ci-dessous ne note donc que l&apos;annonce elle-même.
+          </p>
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-4 border-b border-line-strong pb-4">
         <div className="min-w-0">
           <p className="label">Relevé de correspondance</p>
@@ -66,6 +89,33 @@ export async function NoteDuProfil({ offreId }: { offreId: number }) {
       <div className="mt-5">
         <Bulletin breakdown={resultat?.breakdown ?? null} />
       </div>
+
+      {observation ? (
+        <div className="mt-5 border-t border-line pt-4">
+          <p className="label">Observation</p>
+          <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+            Il te manque{" "}
+            <strong className="font-medium text-ink">{observation.manquants.join(", ")}</strong>{" "}
+            sur cette offre.
+            {observation.levier ? (
+              <>
+                {" "}
+                Cocher{" "}
+                <strong className="font-medium text-ink">{observation.levier.label}</strong> ferait
+                monter <span className="num">{observation.levier.montent}</span> offres de la
+                collecte
+                {observation.levier.franchissent > 0 ? (
+                  <>
+                    , dont <span className="num">{observation.levier.franchissent}</span> au-dessus
+                    du seuil
+                  </>
+                ) : null}
+                .
+              </>
+            ) : null}
+          </p>
+        </div>
+      ) : null}
 
       <p className="mt-4 text-xs text-muted">
         <Link href="/profil" className="lien-anime text-accent">

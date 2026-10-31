@@ -9,6 +9,7 @@
 import { describe, expect, it } from "vitest";
 import { offers } from "./offers";
 import {
+  correspondancePour,
   estNotable,
   rangDe,
   rangEnLettres,
@@ -69,16 +70,39 @@ describe("les rangs", () => {
     expect(sur.size).toBe(1);
   });
 
-  it("classe une meilleure note devant une moins bonne", () => {
+  it("classe sur la correspondance, et seulement ensuite sur l'annonce", () => {
+    // La règle exacte, et c'est elle qui fait la valeur du rang : une meilleure correspondance
+    // passe toujours devant, quelle que soit la qualité de l'annonce. Classer sur le total
+    // referait le défaut qu'on répare, puisque le total est aux sept dixièmes l'annonce.
     const classement = classementPour(PROFIL_DEFAUT);
-    const table = rangsPour(PROFIL_DEFAUT);
-    for (const [id, r] of table) {
-      for (const [autre, s] of table) {
-        const ta = classement.get(id)!.total;
-        const tb = classement.get(autre)!.total;
-        if (ta > tb) expect(r.rang, `${id} vs ${autre}`).toBeLessThan(s.rang);
+    const ordre = [...rangsPour(PROFIL_DEFAUT).entries()].sort((a, b) => a[1].rang - b[1].rang);
+
+    for (let i = 1; i < ordre.length; i++) {
+      const [idA] = ordre[i - 1];
+      const [idB] = ordre[i];
+      const a = correspondancePour(PROFIL_DEFAUT, idA)!;
+      const b = correspondancePour(PROFIL_DEFAUT, idB)!;
+      expect(a, `${idA} devant ${idB}`).toBeGreaterThanOrEqual(b);
+      if (a === b) {
+        // À correspondance égale, l'annonce la mieux notée passe devant.
+        expect(classement.get(idA)!.total, `${idA} vs ${idB}`).toBeGreaterThanOrEqual(
+          classement.get(idB)!.total,
+        );
       }
     }
+  });
+
+  it("ne classe pas sur le total, et la différence se voit", () => {
+    // Garde-fou : si quelqu'un remettait un tri sur le total, ce test tomberait. Il existe
+    // parce que les deux ordres se ressemblent assez pour qu'on ne voie pas la substitution.
+    const classement = classementPour(PROFIL_DEFAUT);
+    const parRang = [...rangsPour(PROFIL_DEFAUT).entries()]
+      .sort((a, b) => a[1].rang - b[1].rang)
+      .map(([id]) => id);
+    const parTotal = [...parRang].sort(
+      (x, y) => classement.get(y)!.total - classement.get(x)!.total || x - y,
+    );
+    expect(parRang).not.toEqual(parTotal);
   });
 
   it("reste stable d'un appel à l'autre", () => {

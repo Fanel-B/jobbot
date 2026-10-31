@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ScoreBadge } from "@/components/ScoreBadge";
+import type { Rang } from "@/lib/classement";
 import {
   ContractChip,
   FreshnessChip,
@@ -22,10 +23,13 @@ export function OfferRow({
   offre,
   rang,
   sansNote = false,
+  place = null,
 }: {
   offre: Offer;
   rang?: number;
   sansNote?: boolean;
+  /** La place de l'offre dans le classement complet, quand elle en a une. */
+  place?: Rang | null;
 }) {
   const apercu = (offre.description ?? "").replace(/\s+/g, " ").trim().slice(0, 190);
   const manquants = sansNote ? [] : (offre.skills?.missing ?? []);
@@ -85,8 +89,21 @@ export function OfferRow({
         </div>
 
         {sansNote ? null : (
-          <div className="flex flex-col items-end gap-2">
-            <ScoreBadge score={offre.score} />
+          <div className="flex flex-col items-end gap-1.5">
+            {place ? (
+              <div className="text-right">
+                {/* Le rang d'abord. La meme donnee, dite autrement, cesse de decourager sans
+                    mentir : une place se comprend et se vise, un pourcentage nu se subit. */}
+                <span className="font-display text-2xl font-light leading-none tabular-nums text-ink">
+                  {place.rang}
+                  <span className="text-base">{place.rang === 1 ? "re" : "e"}</span>
+                </span>
+                <div className="font-mono text-[10px] tracking-[0.08em] text-muted">
+                  sur {place.sur}
+                </div>
+              </div>
+            ) : null}
+            <ScoreBadge score={offre.score} taille={place ? "xs" : "md"} />
           </div>
         )}
       </div>

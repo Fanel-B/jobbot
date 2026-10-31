@@ -38,17 +38,19 @@ export function ScoreBadge({
   taille = "md",
 }: {
   score: number | null;
-  taille?: "md" | "lg";
+  /** « xs » sert quand le rang porte deja l'information et que la note vient en appui. */
+  taille?: "xs" | "md" | "lg";
 }) {
   const b = bande(score);
   const grand = taille === "lg";
+  const minuscule = taille === "xs";
 
   return (
     <div className="shrink-0 text-right" title={BANDE_TEXTE[b]}>
       <div className="flex items-baseline justify-end gap-1">
         <span
           className={`font-display font-light leading-none tracking-tight tabular-nums ${
-            grand ? "text-[3.25rem]" : "text-[1.75rem]"
+            grand ? "text-[3.25rem]" : minuscule ? "text-base" : "text-[1.75rem]"
           } ${ENCRE[b]}`}
         >
           {score ?? "–"}
@@ -58,7 +60,9 @@ export function ScoreBadge({
 
       {/* Le filet de qualité. `aria-hidden` : il double une information déjà écrite. */}
       <div
-        className={`mt-1.5 ml-auto h-0.5 rounded-full ${FILET[b]} ${grand ? "w-20" : "w-12"}`}
+        className={`ml-auto h-0.5 rounded-full ${FILET[b]} ${
+          grand ? "mt-1.5 w-20" : minuscule ? "mt-1 w-8" : "mt-1.5 w-12"
+        }`}
         aria-hidden
       />
 

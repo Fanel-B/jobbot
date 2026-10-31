@@ -18,8 +18,16 @@
  * Elles sortent donc du classement principal, en le disant, et restent affichées. C'est le motif
  * que le site applique déjà aux contrats non renseignés.
  */
-import { offers, type Offer } from "./offers";
-import { classementPour, encoderProfil, type Profil } from "./profil";
+import { familleLacune, offers, type Offer } from "./offers";
+import { enDeuxGroupes } from "./groupes";
+import {
+  classementPour,
+  competencesSimulablesPour,
+  effetGlobalPour,
+  encoderProfil,
+  manquantsPour,
+  type Profil,
+} from "./profil";
 import type { Resultat } from "./scoring";
 
 export type Rang = {
@@ -40,6 +48,24 @@ export function estNotable(r: Resultat | undefined): boolean {
   return Boolean(r && r.exigences.length > 0);
 }
 
+/**
+ * La valeur sur laquelle on classe : les points personnels, pas le total.
+ *
+ * Classer sur le total serait refaire le défaut qu'on répare. Le total est à sept dixièmes la
+ * qualité de l'annonce, donc un classement fondé sur lui annonce « 11e meilleure
+ * correspondance » là où il faudrait lire « 11e meilleure annonce ». Les deux phrases ne disent
+ * pas la même chose et une seule est vraie.
+ *
+ * Le total sert de départage. À correspondance égale, une annonce fraîche et complète passe
+ * devant une annonce vieille et bavarde : c'est une vraie information, elle a sa place, mais
+ * après la correspondance et jamais à sa place.
+ */
+export function correspondancePour(profil: Profil, id: number): number | null {
+  const r = classementPour(profil).get(id);
+  if (!estNotable(r)) return null;
+  return enDeuxGroupes(r!.breakdown).toi.points;
+}
+
 const cacheRangs = new Map<string, Map<number, Rang>>();
 
 /**
@@ -58,9 +84,15 @@ export function rangsPour(profil: Profil): Map<number, Rang> {
   const notables = offers
     .map((o) => classement.get(o.id))
     .filter((r): r is Resultat => estNotable(r))
-    // À égalité de total, l'identifiant départage : le rang doit être stable d'une requête à
-    // l'autre, sinon la même offre change de place sans que rien n'ait bougé.
-    .sort((a, b) => b.total - a.total || a.id - b.id);
+    // Correspondance d'abord, qualité de l'annonce ensuite, identifiant en dernier recours.
+    // Le dernier critère n'a rien d'arbitraire : il rend le rang stable d'une requête à
+    // l'autre, sinon la même offre changerait de place sans que rien n'ait bougé.
+    .sort(
+      (a, b) =>
+        enDeuxGroupes(b.breakdown).toi.points - enDeuxGroupes(a.breakdown).toi.points ||
+        b.total - a.total ||
+        a.id - b.id,
+    );
 
   const table = new Map<number, Rang>();
   notables.forEach((r, i) => table.set(r.id, { rang: i + 1, sur: notables.length }));
@@ -116,4 +148,47 @@ export function tranchePour(r: Rang): string | null {
   if (part <= 0.25) return "dans le premier quart";
   if (part <= 0.5) return "dans la première moitié";
   return null;
+}
+
+/* ------------------------------------------------- l'observation du relevé */
+
+/**
+ * Ce qu'un professeur écrirait dans la marge.
+ *
+ * C'est la pièce qui rend une note basse supportable sans la farder. Un relevé scolaire n'a
+ * jamais montré qu'un chiffre : il porte une appréciation et une observation, et « 8 sur 20,
+ * travailler les intégrales » ne se vit pas comme « 8 sur 20 » tout seul. La différence n'est
+ * pas le ton, c'est que la seconde phrase dit quoi faire.
+ *
+ * Tout ici vient de données réelles : les exigences que l'annonce cite et que le profil ne
+ * couvre pas, et l'effet mesuré d'ajouter la compétence correspondante sur toute la collecte.
+ * Aucune phrase n'est produite quand il n'y a rien de vrai à dire.
+ */
+export type Observation = {
+  /** Les exigences de cette annonce que le profil ne couvre pas, les plus parlantes d'abord. */
+  manquants: string[];
+  /** Le levier le plus rentable, mesuré sur l'ensemble de la collecte. */
+  levier: { label: string; montent: number; franchissent: number } | null;
+};
+
+export function observationPour(profil: Profil, id: number): Observation | null {
+  const manquants = manquantsPour(profil, id);
+  if (manquants.length === 0) return null;
+
+  // Le levier se choisit sur l'ensemble de la collecte, pas sur cette seule offre : apprendre
+  // une techno pour une annonce est un mauvais calcul, l'apprendre pour vingt en est un bon.
+  const candidates = competencesSimulablesPour(profil, 12);
+  const familles = new Set(manquants.map((m) => familleLacune(m)));
+  const utile = candidates.filter((c) => familles.has(c.label));
+
+  let levier: Observation["levier"] = null;
+  for (const c of utile) {
+    const e = effetGlobalPour(profil, c);
+    if (e.montent === 0) continue;
+    if (!levier || e.montent > levier.montent) {
+      levier = { label: c.label, montent: e.montent, franchissent: e.franchissent };
+    }
+  }
+
+  return { manquants: manquants.slice(0, 3), levier };
 }

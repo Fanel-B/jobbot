@@ -1,25 +1,31 @@
 import { bande, BANDE_TEXTE, critereLabel } from "@/lib/offers";
 import type { Bande, Breakdown } from "@/lib/offers";
+import { enDeuxGroupes, estConstant, type Groupe } from "@/lib/groupes";
 
 /**
- * Le bulletin, composé comme un relevé de notes.
+ * Le bulletin, composé comme un relevé de notes, en deux groupes de matières.
  *
- * JobBot affirme une chose qu'aucun concurrent n'affirme : **le total est exactement la somme de
- * ses lignes**. Tant que le bulletin ressemblait à une liste de barres de progression, cette
- * affirmation restait une phrase dans une page méthode. En relevé, elle se vérifie à l'œil.
+ * JobBot affirme une chose qu'aucun concurrent n'affirme : le total est exactement la somme de
+ * ses lignes. En relevé, cette affirmation se vérifie à l'oeil plutôt que de rester une phrase
+ * dans une page méthode.
  *
- * La forme est choisie, pas décorative. Un relevé de notes est le document que tout étudiant
- * français sait lire sans mode d'emploi : une colonne de matières, une colonne de notes, un
- * barème, un trait, une moyenne, une appréciation. Reprendre cette grammaire évite d'avoir à
- * expliquer comment lire la page — et aucun autre site d'emploi ne le fait.
+ * La forme est choisie, pas décorative. Un relevé est le document que tout étudiant français
+ * sait lire sans mode d'emploi. L'objection qui avait été posée, qu'un relevé n'a pas deux
+ * moyennes générales, tombe dès qu'on regarde un vrai bulletin : il porte des moyennes par
+ * groupe de matières, puis une moyenne générale. La convention autorise donc exactement ce dont
+ * le produit avait besoin.
  *
- * **Deux groupes au lieu d'un.** Les critères qui rapportent et les ajustements qui retranchent
- * étaient mêlés dans une seule liste, ce qui produisait des lignes « 0 sur 0 » impossibles à
- * interpréter : on les lisait comme un défaut d'affichage. Ils sont désormais séparés, avec leur
- * propre intitulé. Rien n'est retiré du total : les deux groupes s'additionnent toujours.
+ * Les deux groupes répondent au défaut central de la note. Sur cent points, trente seulement
+ * regardaient la personne ; les soixante-dix autres notaient l'annonce, identiques pour tout le
+ * monde. Mélangés, ils donnaient un chiffre flatteur à quelqu'un dont le profil était vide.
+ * Séparés, le lecteur voit enfin ce qui vient de lui.
+ *
+ * Les lignes qui ne départagent rien sont grisées et annotées plutôt que supprimées : les
+ * retirer du total ferait afficher au site un chiffre différent de celui du moteur Python, ce
+ * qu'un projet fondé sur l'accord des deux ne peut pas se permettre.
  */
 
-/** L'appréciation, en un mot. Elle suit la bande réelle, elle n'ajoute aucun jugement. */
+/** L'appréciation, en un mot. Elle suit la bande déjà calculée et n'ajoute aucun jugement. */
 const APPRECIATION: Record<Bande, string> = {
   excellent: "Très bonne piste",
   bon: "Bonne piste",
@@ -27,28 +33,74 @@ const APPRECIATION: Record<Bande, string> = {
   faible: "À examiner",
 };
 
-function Ligne({ b, ajustement }: { b: Breakdown; ajustement: boolean }) {
+function Ligne({ b }: { b: Breakdown }) {
+  const ajustement = b.max === 0;
+  const mort = estConstant(b.critere);
   const vide = b.points === 0;
+
   return (
-    <div className="grid grid-cols-[1fr_3.5rem_3.5rem] items-baseline gap-x-3 border-b border-line/50 py-2">
+    <div
+      className={`grid grid-cols-[1fr_auto] items-baseline gap-x-4 border-b border-line/50 py-2 sm:grid-cols-[1fr_3rem_3rem] ${
+        mort ? "opacity-55" : ""
+      }`}
+    >
       <div className="min-w-0">
-        <span className={`text-sm ${vide ? "text-muted" : "text-ink-soft"}`}>
+        <span className={`text-sm ${vide || mort ? "text-muted" : "text-ink-soft"}`}>
           {critereLabel(b.critere)}
         </span>
-        {b.detail ? <div className="text-xs text-muted">{b.detail}</div> : null}
+        {b.detail ? <div className="text-xs leading-snug text-muted">{b.detail}</div> : null}
+        {mort ? (
+          <div className="text-xs italic text-muted">ne départage aucune offre</div>
+        ) : null}
       </div>
-      <span
-        className={`text-right font-mono text-sm tabular-nums ${
-          vide ? "text-muted" : b.points < 0 ? "font-medium text-bad" : "font-medium text-ink"
-        }`}
-      >
-        {b.points > 0 && ajustement ? "+" : ""}
-        {b.points}
-      </span>
-      <span className="text-right font-mono text-sm tabular-nums text-muted">
-        {ajustement ? "—" : b.max}
-      </span>
+
+      {/* Sur un téléphone, note et barème partagent une seule cellule alignée à droite :
+          trois colonnes à 390 pixels poussent le nom du critère à se casser en quatre lignes. */}
+      <div className="flex items-baseline gap-1 font-mono text-sm tabular-nums sm:contents">
+        <span
+          className={`sm:text-right ${
+            vide || mort ? "text-muted" : b.points < 0 ? "font-medium text-bad" : "font-medium text-ink"
+          }`}
+        >
+          {b.points > 0 && ajustement ? "+" : ""}
+          {b.points}
+        </span>
+        <span className="text-muted sm:text-right">
+          <span className="sm:hidden">/</span>
+          {ajustement ? "—" : b.max}
+        </span>
+      </div>
     </div>
+  );
+}
+
+function SectionGroupe({ g }: { g: Groupe }) {
+  return (
+    <section className="mt-7 first:mt-0">
+      <div className="border-b border-line-strong pb-1.5">
+        <div className="grid grid-cols-[1fr_auto] gap-x-4 sm:grid-cols-[1fr_3rem_3rem]">
+          <span className="label text-ink">{g.titre}</span>
+          <span className="label hidden text-right sm:block">Note</span>
+          <span className="label hidden text-right sm:block">Barème</span>
+        </div>
+        <p className="mt-1 text-xs leading-snug text-muted">{g.explication}</p>
+      </div>
+
+      {g.lignes.map((l) => (
+        <Ligne key={l.critere} b={l} />
+      ))}
+
+      <div className="grid grid-cols-[1fr_auto] items-baseline gap-x-4 border-t border-line pt-2 sm:grid-cols-[1fr_3rem_3rem]">
+        <span className="text-xs text-muted">Sous-total</span>
+        <div className="flex items-baseline gap-1 font-mono text-sm tabular-nums sm:contents">
+          <span className="font-medium text-ink sm:text-right">{g.points}</span>
+          <span className="text-muted sm:text-right">
+            <span className="sm:hidden">/</span>
+            {g.max}
+          </span>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -62,48 +114,27 @@ export function Bulletin({ breakdown }: { breakdown: Breakdown[] | null }) {
     );
   }
 
-  // Un ajustement est une ligne dont le barème est nul : elle ne peut que retrancher.
-  const notes = breakdown.filter((b) => b.max > 0);
-  const ajustements = breakdown.filter((b) => b.max === 0);
-
-  const total = breakdown.reduce((s, b) => s + b.points, 0);
-  const max = breakdown.reduce((s, b) => s + b.max, 0);
-  const retire = ajustements.reduce((s, b) => s + b.points, 0);
-  const b = bande(total);
+  const r = enDeuxGroupes(breakdown);
+  const b = bande(r.total);
 
   return (
     <div>
-      <div className="grid grid-cols-[1fr_3.5rem_3.5rem] gap-x-3 border-b border-line-strong pb-1.5">
-        <span className="label">Critère</span>
-        <span className="label text-right">Note</span>
-        <span className="label text-right">Barème</span>
-      </div>
-
-      {notes.map((l) => (
-        <Ligne key={l.critere} b={l} ajustement={false} />
-      ))}
-
-      {ajustements.length > 0 ? (
-        <>
-          <div className="mt-5 border-b border-line-strong pb-1.5">
-            <span className="label">
-              Ajustements{retire !== 0 ? ` · ${retire} point${retire <= -2 ? "s" : ""}` : ""}
-            </span>
-          </div>
-          {ajustements.map((l) => (
-            <Ligne key={l.critere} b={l} ajustement />
-          ))}
-        </>
-      ) : null}
+      <SectionGroupe g={r.toi} />
+      <SectionGroupe g={r.annonce} />
 
       {/* Filet double : en comptabilité, il annonce qu'on additionne au-dessus. C'est ce qui
           transforme une liste en addition, et une affirmation en démonstration. */}
-      <div className="mt-1 grid grid-cols-[1fr_3.5rem_3.5rem] items-baseline gap-x-3 border-t-[3px] border-double border-line-strong pt-3">
+      <div className="mt-6 grid grid-cols-[1fr_auto] items-baseline gap-x-4 border-t-[3px] border-double border-line-strong pt-3.5 sm:grid-cols-[1fr_3rem_3rem]">
         <span className="label text-ink">Total</span>
-        <span className="text-right font-display text-xl font-light leading-none tabular-nums text-ink">
-          {total}
-        </span>
-        <span className="text-right font-mono text-sm tabular-nums text-muted">{max}</span>
+        <div className="flex items-baseline gap-1 tabular-nums sm:contents">
+          <span className="font-display text-2xl font-light leading-none text-ink sm:text-right">
+            {r.total}
+          </span>
+          <span className="font-mono text-sm text-muted sm:text-right">
+            <span className="sm:hidden">/</span>
+            {r.max}
+          </span>
+        </div>
       </div>
 
       <div className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
@@ -114,9 +145,10 @@ export function Bulletin({ breakdown }: { breakdown: Breakdown[] | null }) {
       </div>
 
       <p className="mt-4 border-t border-line pt-3 text-xs leading-relaxed text-muted">
-        Additionne la colonne « Note » : tu dois retrouver {total}. Aucun coefficient caché, aucun
-        arrondi de faveur. Ce chiffre dit la correspondance avec ton profil, pas tes chances
-        d&apos;être recruté : cette décision appartient à l&apos;employeur.
+        {r.toi.points} plus {r.annonce.points} font {r.total} : les deux sous-totaux
+        s&apos;additionnent, sans coefficient caché ni arrondi de faveur. Ce chiffre dit la
+        correspondance avec ton profil, pas tes chances d&apos;être recruté : cette décision
+        appartient à l&apos;employeur.
       </p>
     </div>
   );

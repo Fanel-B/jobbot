@@ -10,6 +10,7 @@ import {
   type Zone,
 } from "@/lib/offers";
 import { estVide, lireProfil, offresPour } from "@/lib/profil";
+import { rangsPour, separerNotables } from "@/lib/classement";
 
 type Params = {
   zone?: string;
@@ -21,7 +22,12 @@ type Params = {
 
 const ZONES: Zone[] = ["toulouse", "idf", "remote", "autre"];
 
-function filtrer(offres: Offer[], p: Params, sansNote = false): Offer[] {
+function filtrer(
+  offres: Offer[],
+  p: Params,
+  sansNote = false,
+  rangs: Map<number, { rang: number }> | null = null,
+): Offer[] {
   let out = offres;
 
   if (p.zone && ZONES.includes(p.zone as Zone)) {
@@ -40,12 +46,23 @@ function filtrer(offres: Offer[], p: Params, sansNote = false): Offer[] {
   // Sans profil, trier par note reviendrait à ordonner la page sur un chiffre qui ne veut rien
   // dire. La date, elle, reste vraie pour tout le monde.
   const tri = p.tri ?? (sansNote ? "date" : "score");
-  out = [...out].sort((a, b) =>
-    tri === "date"
-      ? Date.parse(b.published_at ?? b.first_seen_at ?? "") -
+  out = [...out].sort((a, b) => {
+    if (tri === "date") {
+      return (
+        Date.parse(b.published_at ?? b.first_seen_at ?? "") -
         Date.parse(a.published_at ?? a.first_seen_at ?? "")
-      : (b.score ?? 0) - (a.score ?? 0),
-  );
+      );
+    }
+    // La liste suit exactement l'ordre des rangs affichés. Trier sur le total ici alors que le
+    // rang se calcule sur la correspondance ferait apparaître la 11e en troisième position,
+    // et personne ne pourrait comprendre pourquoi.
+    if (rangs) {
+      const ra = rangs.get(a.id)?.rang ?? Number.MAX_SAFE_INTEGER;
+      const rb = rangs.get(b.id)?.rang ?? Number.MAX_SAFE_INTEGER;
+      return ra - rb;
+    }
+    return (b.score ?? 0) - (a.score ?? 0);
+  });
 
   return out;
 }
@@ -93,26 +110,34 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
   const offresAvecContrat = notees.filter((o) => o.contract_known);
   const offresSansContrat = notees.filter((o) => !o.contract_known);
   const toutes = [...offresAvecContrat, ...offresSansContrat];
-  const liste = filtrer(toutes, p, sansNote);
-  const vues = liste.slice(0, 120);
+  const rangs = sansNote ? null : rangsPour(profil);
+  const liste = filtrer(toutes, p, sansNote, rangs);
+
+  // Les annonces qui ne citent aucune technologie ne sont pas mal notées, elles sont
+  // incalculables. Les laisser dans le classement reviendrait a annoncer une correspondance
+  // qu'on n'a pas pu mesurer. Elles descendent dans leur propre bloc, et restent affichees.
+  const { notables, incalculables } = sansNote
+    ? { notables: liste, incalculables: [] as typeof liste }
+    : separerNotables(profil, liste);
+  const vues = notables.slice(0, 120);
 
   const sources = [...new Set(offresAvecContrat.map((o) => o.source))].sort();
   const nonRenseigne = (p.type ?? "").toLowerCase() === "non-renseigne";
 
   // Les comptes affichés sur les filtres de contrat tiennent compte du lieu, de la source et de
   // la note mini déjà choisis : un compte global mentirait dès qu'un autre filtre est actif.
-  const comptes = compterFamilles(filtrer(toutes, { ...p, type: undefined }, sansNote));
+  const comptes = compterFamilles(filtrer(toutes, { ...p, type: undefined }, sansNote, rangs));
   // Le compte sur l'ensemble de la collecte, lui, sert à distinguer « ce filtre-ci ne donne
   // rien » de « cette collecte ne contient aucune offre de ce type ».
   const comptesCollecte = compterFamilles(toutes);
 
   // Comptes par zone et par source, calculés sans le filtre qu'ils annoncent : une puce
   // doit dire combien d'offres elle donnerait, pas combien il y en a en tout.
-  const baseZone = filtrer(toutes, { ...p, zone: undefined }, sansNote);
+  const baseZone = filtrer(toutes, { ...p, zone: undefined }, sansNote, rangs);
   const comptesZone = Object.fromEntries(
     ZONES.map((z) => [z, baseZone.filter((o) => o.location_zone === z).length]),
   ) as Record<Zone, number>;
-  const baseSource = filtrer(toutes, { ...p, source: undefined }, sansNote);
+  const baseSource = filtrer(toutes, { ...p, source: undefined }, sansNote, rangs);
   const comptesSource = baseSource.reduce<Record<string, number>>((acc, o) => {
     acc[o.source] = (acc[o.source] ?? 0) + 1;
     return acc;
@@ -226,7 +251,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
 
         <Groupe titre="Classement">
           <Filtre actif={(p.tri ?? "score") === "score"} href={lien({ ...p, tri: undefined })}>
-            Par note
+            Par correspondance
           </Filtre>
           <Filtre actif={p.tri === "date"} href={lien({ ...p, tri: "date" })}>
             Par date de publication
@@ -250,7 +275,13 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
           <p className="text-sm text-ink-soft">
             <span className="num font-medium text-ink">{liste.length}</span> offre
             {liste.length > 1 ? "s" : ""}
-            {liste.length > vues.length ? (
+            {incalculables.length > 0 ? (
+              <span className="text-muted">
+                {" "}
+                · dont <span className="num">{incalculables.length}</span> hors classement
+              </span>
+            ) : null}
+            {notables.length > vues.length ? (
               <span className="text-muted">
                 {" "}
                 · <span className="num">{vues.length}</span> affichées
@@ -285,7 +316,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
         </div>
       ) : null}
 
-      {vues.length === 0 ? (
+      {vues.length === 0 && incalculables.length === 0 ? (
         <div className="py-16 text-center">
           {alternanceVide ? (
             /* Une liste vide sans explication laisse croire à une panne. Ici l'absence est une
@@ -310,15 +341,50 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
       ) : (
         <div className="mt-6 card overflow-hidden">
           {vues.map((o, i) => (
-            <OfferRow key={o.id} offre={o} rang={i + 1} sansNote={sansNote} />
+            <OfferRow
+              key={o.id}
+              offre={o}
+              rang={i + 1}
+              sansNote={sansNote}
+              place={rangs?.get(o.id) ?? null}
+            />
           ))}
         </div>
       )}
 
-      {liste.length > vues.length ? (
+      {notables.length > vues.length ? (
         <p className="mt-4 text-center text-xs text-muted">
-          Les {vues.length} premières sur {liste.length}, affine les filtres pour voir le reste.
+          Les {vues.length} premières sur {notables.length}, affine les filtres pour voir le reste.
         </p>
+      ) : null}
+
+      {/* Les annonces muettes, dans leur propre bloc.
+          Le site applique deja ce motif aux contrats non renseignes : quand une donnee manque,
+          on le dit et on met a part, plutot que de combler le trou par une valeur par defaut
+          qui aurait l'air d'une mesure. Ici, une annonce qui ne cite aucune technologie ne
+          permet pas de mesurer une correspondance ; lui donner des points reviendrait a
+          pretendre avoir verifie ce qui ne l'a pas ete. */}
+      {incalculables.length > 0 ? (
+        <section className="mt-12 border-t border-line pt-8">
+          <h2 className="titre-section">Annonces que l&apos;on ne peut pas te noter</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
+            Ces <span className="num">{incalculables.length}</span> annonces ne citent aucune
+            technologie reconnaissable. La correspondance avec ton profil n&apos;est donc pas
+            faible : elle est <strong className="font-medium text-ink">incalculable</strong>.
+            Elles restent affichées, hors du classement, parce qu&apos;une bonne offre peut être
+            mal rédigée.
+          </p>
+          <div className="card mt-5 overflow-hidden">
+            {incalculables.slice(0, 40).map((o) => (
+              <OfferRow key={o.id} offre={o} sansNote />
+            ))}
+          </div>
+          {incalculables.length > 40 ? (
+            <p className="mt-3 text-center text-xs text-muted">
+              Les 40 premières sur {incalculables.length}.
+            </p>
+          ) : null}
+        </section>
       ) : null}
 
       {!nonRenseigne && nbNonRenseigne > 0 ? (
