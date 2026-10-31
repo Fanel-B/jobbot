@@ -12,7 +12,23 @@ export function SourceChip({ source }: { source: string }) {
   );
 }
 
-export function ZoneChip({ zone }: { zone: Zone }) {
+/**
+ * La zone de l'offre.
+ *
+ * `sansLieu` existe parce que 26 annonces sur 290 ne donnent aucun lieu. Le calcul de zone les
+ * range dans « autre », ce qui est le bon comportement pour le moteur, et la pastille les
+ * affichait alors « France ». C'était une affirmation que la source ne permet pas : on ne sait
+ * pas où est le poste, pas même s'il est en France. La distinction se fait ici, à l'affichage,
+ * et surtout pas dans `zoneDe` : cette fonction est vérifiée ligne à ligne contre le moteur
+ * Python par `npm run verifier-eligibility`, et la corriger la ferait diverger.
+ */
+export function ZoneChip({ zone, sansLieu = false }: { zone: Zone; sansLieu?: boolean }) {
+  if (sansLieu) {
+    return (
+      <span className={`${BASE} border-line bg-paper-deep text-muted`}>Lieu non précisé</span>
+    );
+  }
+
   const carte: Record<Zone, string> = {
     toulouse: "border-accent/25 bg-accent-soft text-accent-ink",
     idf: "border-line bg-paper-deep text-ink-soft",

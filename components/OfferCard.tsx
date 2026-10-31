@@ -31,8 +31,8 @@ export function OfferRow({
   /** La place de l'offre dans le classement complet, quand elle en a une. */
   place?: Rang | null;
 }) {
-  const apercu = (offre.description ?? "").replace(/\s+/g, " ").trim().slice(0, 190);
   const manquants = sansNote ? [] : (offre.skills?.missing ?? []);
+  const couvertes = sansNote ? [] : (offre.skills?.covered ?? []);
 
   return (
     <article
@@ -62,7 +62,7 @@ export function OfferRow({
           <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
             <ContractChip offre={offre} />
             <SourceChip source={offre.source} />
-            <ZoneChip zone={offre.location_zone} />
+            <ZoneChip zone={offre.location_zone} sansLieu={!offre.location?.trim()} />
             {offre.duration ? (
               <span className="inline-flex items-center rounded-[6px] border border-line bg-surface px-2 py-0.5 text-xs text-muted num">
                 {offre.duration}
@@ -72,19 +72,27 @@ export function OfferRow({
             <FreshnessChip offre={offre} />
           </div>
 
-          {apercu ? (
-            <p className="mt-2.5 line-clamp-2 max-w-3xl text-sm leading-relaxed text-muted">
-              {apercu}
-            </p>
-          ) : null}
-
-          {manquants.length > 0 ? (
-            <p className="mt-2 text-xs text-muted">
-              <span className="text-ink-soft">Demande : </span>
-              {manquants.slice(0, 5).join(", ")}
-              {manquants.length > 5 ? ` (+${manquants.length - 5})` : ""}
-              <span className="text-muted"> · absent de ton profil</span>
-            </p>
+          {/* L'aperçu de l'annonce a été retiré. Les offres d'un même employeur ouvrent
+              presque toujours sur la même accroche d'entreprise, donc deux lignes de texte ne
+              distinguaient rien. Ce qui distingue, c'est ce que l'offre demande et que tu as
+              déjà, face à ce qu'elle demande et qui te manque. */}
+          {couvertes.length > 0 || manquants.length > 0 ? (
+            <div className="mt-2 space-y-0.5 text-xs leading-relaxed">
+              {couvertes.length > 0 ? (
+                <p className="text-muted">
+                  <span className="text-good">Tu as</span>{" "}
+                  <span className="text-ink-soft">{couvertes.slice(0, 5).join(", ")}</span>
+                  {couvertes.length > 5 ? ` +${couvertes.length - 5}` : ""}
+                </p>
+              ) : null}
+              {manquants.length > 0 ? (
+                <p className="text-muted">
+                  <span className="text-bad">Il manque</span>{" "}
+                  <span className="text-ink-soft">{manquants.slice(0, 5).join(", ")}</span>
+                  {manquants.length > 5 ? ` +${manquants.length - 5}` : ""}
+                </p>
+              ) : null}
+            </div>
           ) : null}
         </div>
 

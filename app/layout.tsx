@@ -62,22 +62,25 @@ export default function RootLayout({
               <span className="text-[15px] font-medium tracking-tight">JobBot</span>
             </Link>
 
-            <nav className="hidden items-center gap-1 text-sm text-ink-soft sm:flex">
+            {/* Visible aussi sur téléphone. Les liens étaient en `hidden sm:flex`, donc sur un
+                écran étroit le pied de page devenait le seul chemin vers les offres et la
+                méthode : il fallait traverser toute la page pour changer d'écran. */}
+            <nav className="flex items-center gap-0.5 text-sm text-ink-soft sm:gap-1">
               <Link
                 href="/offres"
-                className="rounded-md px-3 py-1.5 transition hover:bg-paper-deep hover:text-ink"
+                className="rounded-md px-2 py-1.5 transition hover:bg-paper-deep hover:text-ink sm:px-3"
               >
                 Offres
               </Link>
               <Link
                 href="/profil"
-                className="rounded-md px-3 py-1.5 transition hover:bg-paper-deep hover:text-ink"
+                className="rounded-md px-2 py-1.5 transition hover:bg-paper-deep hover:text-ink sm:px-3"
               >
                 Profil
               </Link>
               <Link
                 href="/methode"
-                className="rounded-md px-3 py-1.5 transition hover:bg-paper-deep hover:text-ink"
+                className="rounded-md px-2 py-1.5 transition hover:bg-paper-deep hover:text-ink sm:px-3"
               >
                 Méthode
               </Link>

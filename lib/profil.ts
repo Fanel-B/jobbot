@@ -77,9 +77,9 @@ const RECHERCHES: TypeRecherche[] = ["stage", "alternance"];
 const ZONES: Zone[] = ["toulouse", "idf", "remote", "autre"];
 
 export const NIVEAU_LABEL: Record<NiveauEtudes, string> = {
-  "bac+3": "Bac+3 — L3 / Licence",
-  "bac+4": "Bac+4 — M1",
-  "bac+5": "Bac+5 — M2",
+  "bac+3": "Bac+3, L3 ou Licence",
+  "bac+4": "Bac+4, M1",
+  "bac+5": "Bac+5, M2",
 };
 
 export const RECHERCHE_LABEL: Record<TypeRecherche, string> = {

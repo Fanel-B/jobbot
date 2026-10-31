@@ -65,10 +65,16 @@ function Ligne({ b }: { b: Breakdown }) {
           {b.points > 0 && ajustement ? "+" : ""}
           {b.points}
         </span>
-        <span className="text-muted sm:text-right">
-          <span className="sm:hidden">/</span>
-          {ajustement ? "—" : b.max}
-        </span>
+        {/* Un ajustement n'a pas de barème : la cellule reste vide plutôt que de porter un
+            signe qui ferait croire à une valeur. L'intitulé du groupe le dit déjà. */}
+        {ajustement ? (
+          <span className="hidden sm:block" aria-hidden />
+        ) : (
+          <span className="text-muted sm:text-right">
+            <span className="sm:hidden">/</span>
+            {b.max}
+          </span>
+        )}
       </div>
     </div>
   );

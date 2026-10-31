@@ -101,7 +101,7 @@ export default async function Page({
           <div className="mt-4 flex flex-wrap items-center gap-1.5">
             <ContractChip offre={offre} />
             <SourceChip source={offre.source} />
-            <ZoneChip zone={offre.location_zone} />
+            <ZoneChip zone={offre.location_zone} sansLieu={!offre.location?.trim()} />
             {signalFormationCitable(offre) ? <TrainingChip /> : null}
             <FreshnessChip offre={offre} />
             {offre.miage_mentioned ? <InfoChip>MIAGE mentionné</InfoChip> : null}
