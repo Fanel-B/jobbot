@@ -20,6 +20,7 @@ pourquoi. Les suivantes sont pour quand tu voudras continuer.
 | Sous le relevé | rien | une observation : ce qui te manque, et ce que cocher changerait |
 | « diversité » et « dossier » | 18 points invisibles | grisés, annotés « ne départage aucune offre » |
 | 26 offres sans lieu | « Ailleurs en France » | « Lieu non précisé » |
+| L'écran du profil | des cases à cocher | ce que vaut ton profil, et ce que cocher changerait |
 | Navigation sur téléphone | invisible | visible |
 | L'aperçu dans la liste | la même accroche Airbus partout | les compétences couvertes et manquantes |
 
@@ -28,6 +29,7 @@ Captures, à ouvrir côte à côte :
 - La fiche : [avant](docs/captures/fiche-avant.jpeg) · [après](docs/captures/fiche-apres.jpeg)
 - La liste : [avant](docs/captures/liste-avant.jpeg) · [après](docs/captures/liste-apres.jpeg)
 - Sur téléphone : [avant](docs/captures/mobile-avant.jpeg) · [après](docs/captures/mobile-apres.jpeg)
+- Le profil vide, après : [capture](docs/captures/profil-vide-apres.jpeg)
 
 Les captures « avant » viennent du site en production, qui sert encore `main`.
 
@@ -128,6 +130,29 @@ qu'il faudrait modifier le Python pour y arriver. Le regroupement a suffi.
 
 ---
 
+## 3 bis. L'écran du profil
+
+La page servait à cocher des cases et s'arrêtait là. Rien n'y disait ce que le profil valait sur
+la collecte entière. Il fallait ouvrir une offre pour avoir une réponse, et cette réponse ne
+parlait que de cette offre.
+
+**Profil vide.** Montrer un écran de zéros n'a jamais donné envie à personne. La page montre donc
+ce que cocher les cinq compétences les plus demandées changerait : **169 offres montent, de 15,3
+points en moyenne, et 26 passent le seuil**. Les cinq compétences sont nommées, et les trois
+offres qui gagneraient le plus sont listées avec leur lien. Ce sont de vraies offres et de vrais
+calculs.
+
+L'effet des cinq est mesuré **d'un bloc** et non compétence par compétence. Additionner des
+effets séparés compterait deux fois les offres que plusieurs d'entre elles concernent, et
+annoncerait un chiffre trop beau.
+
+**Profil rempli.** Combien d'offres sont notables, combien sont dans ton premier quart, et les
+lacunes classées **par effet réel** sur la collecte plutôt que par fréquence. Une techno citée
+partout mais déjà couverte par ton profil ne te rapporte rien : la trier par fréquence
+l'aurait pourtant mise en tête.
+
+---
+
 ## 4. Le design
 
 ### Pourquoi le relevé reste
@@ -175,16 +200,16 @@ service `systemd` sur ton VPS, et je n'y ai pas accès depuis cette machine. Les
 remplacent la comparaison côte à côte. Pour la monter toi-même, la branche est poussée et
 `npm run build` passe.
 
-**L'écran du profil.** La section de ton brief sur `/profil` n'est pas faite : montrer l'effet
-de chaque compétence sur toute la collecte, classer les lacunes par impact, et donner envie de
-cocher à quelqu'un qui arrive. Le calcul existe déjà (`lacunesRegroupees`, `effetGlobalPour`),
-c'est l'écran qui manque. C'était le dernier point de ta liste de priorités et la nuit s'est
-arrêtée avant.
-
 **Les tirets cadratins hors interface.** Il en reste environ cent cinquante dans les commentaires
 de code et dans les libellés que produit le moteur Python. Ton brief disait de ne toucher qu'aux
 textes d'interface : c'est fait, il n'en reste aucun de visible. Ceux du moteur ne peuvent pas
 changer ici sans casser l'oracle.
+
+**Un piège rencontré, à connaître.** `npm run build` a échoué en fin de nuit sur
+« Module not found: @vercel/turbopack-next/internal/font/google/font ». Le message accuse les
+polices Google, le réseau et le code étaient sains : c'était le cache Turbopack, corrompu par
+les allers-retours entre branches. `rm -rf .next` puis rebuild, et tout repasse. Si ça
+t'arrive, ne cherche pas du côté des polices.
 
 **Un détail que je laisse ouvert.** Le filtre de lieu affiche toujours « Ailleurs en France 29 »,
 alors que 26 de ces 29 offres n'ont simplement aucun lieu. La pastille de chaque offre dit

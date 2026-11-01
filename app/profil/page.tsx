@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ZONE_LABEL, offers, type Zone } from "@/lib/offers";
 import { FAMILLES, competencesRangees } from "@/lib/competences";
+import { EtatDuProfil } from "@/components/EtatDuProfil";
 import {
   NIVEAU_LABEL,
   RECHERCHE_LABEL,
@@ -113,6 +114,8 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
           )}
         </p>
       </div>
+
+      <EtatDuProfil profil={profil} vierge={vierge} />
 
       <form action={enregistrerProfil} className="mt-10 space-y-10">
         <section>

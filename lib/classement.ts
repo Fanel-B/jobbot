@@ -20,6 +20,7 @@
  */
 import { familleLacune, offers, type Offer } from "./offers";
 import { enDeuxGroupes } from "./groupes";
+import { SEUIL_BONNE_PISTE } from "./simulation";
 import {
   classementPour,
   competencesSimulablesPour,
@@ -191,4 +192,62 @@ export function observationPour(profil: Profil, id: number): Observation | null 
   }
 
   return { manquants: manquants.slice(0, 3), levier };
+}
+
+/* ------------------------------------------- l'effet d'un groupe de compétences */
+
+/**
+ * Ce que cocher plusieurs compétences d'un coup changerait sur toute la collecte.
+ *
+ * Pourquoi d'un coup, et pas une par une. L'effet de compétences prises ensemble n'est pas la
+ * somme de leurs effets séparés : deux technos qui apparaissent dans les mêmes annonces se
+ * recouvrent, et additionner leurs gains compterait deux fois les mêmes offres. Un écran qui
+ * annonce « ces cinq compétences feraient monter 140 offres » doit le mesurer, pas l'estimer.
+ *
+ * Sert à montrer à quelqu'un qui arrive ce que cocher lui apporterait, avec de vraies offres.
+ */
+export type EffetGroupe = {
+  /** Combien d'offres notables gagnent des points. */
+  montent: number;
+  /** Combien passent au-dessus du seuil de bonne piste. */
+  franchissent: number;
+  /** Le gain moyen de correspondance, en points, sur celles qui bougent. */
+  gainMoyen: number;
+  /** Les trois offres qui gagnent le plus, pour pouvoir les montrer. */
+  meilleures: { id: number; gain: number }[];
+};
+
+export function effetDeGroupe(
+  profil: Profil,
+  formes: readonly string[],
+  seuil = SEUIL_BONNE_PISTE,
+): EffetGroupe {
+  const avant = classementPour(profil);
+  const apres = classementPour(profil, formes);
+
+  let montent = 0;
+  let franchissent = 0;
+  let total = 0;
+  const gains: { id: number; gain: number }[] = [];
+
+  for (const [id, a] of avant) {
+    if (!estNotable(a)) continue;
+    const b = apres.get(id);
+    if (!b) continue;
+    const gain = enDeuxGroupes(b.breakdown).toi.points - enDeuxGroupes(a.breakdown).toi.points;
+    if (gain > 0) {
+      montent += 1;
+      total += gain;
+      gains.push({ id, gain });
+    }
+    if (a.total < seuil && b.total >= seuil) franchissent += 1;
+  }
+
+  gains.sort((x, y) => y.gain - x.gain || x.id - y.id);
+  return {
+    montent,
+    franchissent,
+    gainMoyen: montent ? Math.round((total / montent) * 10) / 10 : 0,
+    meilleures: gains.slice(0, 3),
+  };
 }
