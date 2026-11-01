@@ -21,7 +21,7 @@ import {
   ordreDuPipeline,
   type Resultat,
 } from "./scoring";
-import { familleLacune, meta, offers, type Zone } from "./offers";
+import { familleLacune, meta, offers, type Couverture, type OffreNotee, type Zone } from "./offers";
 import { SEUIL_BONNE_PISTE } from "./simulation";
 import type { Competence, EffetGlobal, EffetOffre, LigneQuiBouge } from "./simulation";
 
@@ -290,17 +290,44 @@ export function effetGlobalPour(
 }
 
 /** Les offres, renotées pour ce profil. Même forme que `offers`, donc interchangeable. */
-export function offresPour(p: Profil) {
+export function offresPour(p: Profil): OffreNotee[] {
   const classement = classementPour(p);
   return offers.map((o) => {
     const r = classement.get(o.id);
-    if (!r) return o;
+    // Toujours une couverture, même vide : un écran qui en reçoit une sait qu'elle a été
+    // calculée pour la personne présente. C'est tout l'intérêt du type.
+    if (!r) {
+      return { ...o, couverture: { exigences: [], couvertes: [], manquants: [] } };
+    }
+    const manquants = new Set(r.manquants);
     return {
       ...o,
       score: r.total,
       score_breakdown: r.breakdown,
       score_reasons: r.raisons,
-      skills: { required: r.exigences, covered: r.exigences.filter((e) => !r.manquants.includes(e)), missing: r.manquants },
+      couverture: {
+        exigences: r.exigences,
+        couvertes: r.exigences.filter((e) => !manquants.has(e)),
+        manquants: r.manquants,
+      },
     };
   });
+}
+
+/**
+ * La couverture d'une offre pour ce profil, recalculée à la lecture.
+ *
+ * À préférer à `offresPour` quand on n'a besoin que d'une offre : la fiche, par exemple, qui
+ * lisait jusqu'ici le champ figé de l'export et annonçait les compétences de Fanel à tout le
+ * monde.
+ */
+export function couverturePour(p: Profil, id: number): Couverture {
+  const r = classementPour(p).get(id);
+  if (!r) return { exigences: [], couvertes: [], manquants: [] };
+  const manquants = new Set(r.manquants);
+  return {
+    exigences: r.exigences,
+    couvertes: r.exigences.filter((e) => !manquants.has(e)),
+    manquants: r.manquants,
+  };
 }

@@ -81,6 +81,9 @@ function Ligne({ b }: { b: Breakdown }) {
 }
 
 function SectionGroupe({ g }: { g: Groupe }) {
+  const gagnes = g.lignes.reduce((t, l) => t + Math.max(0, l.points), 0);
+  const retires = g.lignes.reduce((t, l) => t + Math.min(0, l.points), 0);
+
   return (
     <section className="mt-7 first:mt-0">
       <div className="border-b border-line-strong pb-1.5">
@@ -99,13 +102,34 @@ function SectionGroupe({ g }: { g: Groupe }) {
       <div className="grid grid-cols-[1fr_auto] items-baseline gap-x-4 border-t border-line pt-2 sm:grid-cols-[1fr_3rem_3rem]">
         <span className="text-xs text-muted">Sous-total</span>
         <div className="flex items-baseline gap-1 font-mono text-sm tabular-nums sm:contents">
-          <span className="font-medium text-ink sm:text-right">{g.points}</span>
+          <span className={`font-medium sm:text-right ${g.points < 0 ? "text-bad" : "text-ink"}`}>
+            {g.points}
+          </span>
           <span className="text-muted sm:text-right">
             <span className="sm:hidden">/</span>
             {g.max}
           </span>
         </div>
       </div>
+
+      {/* Un sous-total négatif, et c'est fréquent : sur un profil vide, 100 des 191 offres
+          notables en affichent un, jusqu'à moins vingt et un. Un relevé scolaire n'a pas de
+          note négative, donc le nombre nu ne veut rien dire pour qui le lit.
+
+          Le choix retenu est de ne pas le ramener à zéro. Un plancher ferait afficher un
+          sous-total qui ne serait plus la somme de ses lignes, c'est-à-dire exactement la
+          promesse que le produit tient et que personne d'autre ne tient. On garde donc le
+          chiffre vrai et on montre d'où il vient : tant de points gagnés, tant de retirés. */}
+      {retires < 0 ? (
+        <p className="mt-1.5 text-xs leading-relaxed text-muted">
+          <span className="num text-good">{gagnes}</span> gagné{gagnes > 1 ? "s" : ""} et{" "}
+          <span className="num text-bad">{retires}</span> retiré{retires < -1 ? "s" : ""} par les
+          ajustements.
+          {g.points < 0
+            ? " Ce n'est pas une note sur toi : l'annonce exige plus que ce que tu as confirmé."
+            : ""}
+        </p>
+      ) : null}
     </section>
   );
 }

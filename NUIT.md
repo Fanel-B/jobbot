@@ -117,8 +117,10 @@ Mesurés sur les 191 offres notables, pas estimés. Le sous-total « toi » est 
 | 10 compétences | 7,2 | 33 | 38 | 45,9 |
 | 31 compétences | 8,4 | 35 | 40 | 47,0 |
 
-**Ce qu'il faut lire.** Le sous-total « toi » vaut zéro quand tu n'as rien confirmé. Le total,
-lui, affiche encore 38,5. C'est le sous-total qui dit la vérité, et le total qui la masquait.
+**Ce qu'il faut lire.** Le sous-total « toi » tourne autour de zéro quand tu n'as rien
+confirmé, là où le total affiche encore 38,5. C'est le sous-total qui dit la vérité, et le total
+qui la masquait. Voir la section 8 pour la formulation exacte : « tourne autour de zéro » et
+« vaut zéro » ne sont pas la même chose, et j'avais d'abord écrit la seconde.
 
 La colonne des valeurs distinctes dit si le classement sert à quelque chose : de 27 à 40 valeurs
 différentes selon le profil, là où « diversité » n'en avait qu'une sur 290 offres.
@@ -264,3 +266,108 @@ Elles sont maintenant hors classement mais toujours affichées. Un tiers de la p
 offres qu'on ne sait pas évaluer. Si tu préfères un site plus court et plus sûr, le pipeline peut
 les écarter à la collecte. Je ne l'ai pas décidé à ta place parce que jeter un tiers des offres
 n'est pas un réglage d'affichage.
+
+---
+
+# Correctif du 1er novembre 2026
+
+Trois points relevés en relecture. Les deux premiers étaient des défauts réels, le troisième une
+question que j'avais posée et qui a reçu sa réponse.
+
+## 1. Trois écrans montraient le profil de Fanel à tout le monde
+
+**Ce qu'on voyait.** Sur ma propre capture, la colonne de gauche de la fiche annonçait « Python,
+déjà dans ton profil » pendant que le relevé, à droite, comptait « 0 sur 3 exigences » et mettait
+4 sur 30. Les deux moitiés de la même page parlaient de deux personnes différentes.
+
+**La cause.** La droite recalculait pour le profil connecté, la gauche lisait `offre.skills` dans
+l'export. Ce champ est calculé une fois pour toutes par le pipeline, avec les 31 compétences de
+Fanel figées dans le moteur. Il ne dépend pas de qui regarde.
+
+**Ce que j'ai vérifié avant de corriger**, parce que la relecture visait trois fichiers et que
+je ne voulais pas réparer ce qui n'était pas cassé :
+
+| Écran | Verdict mesuré |
+| --- | --- |
+| La fiche | **cassée**. `parId(id)` rend l'offre brute, donc le champ figé. |
+| La liste | déjà juste. Elle reçoit `offresPour(profil)`, qui reconstruit la couverture. |
+| L'accueil | déjà juste, pour la même raison. |
+
+Mais le fond du reproche tient, et c'est le point important : **le champ restait lisible, et je
+l'avais moi-même relu dans `OfferCard` sans m'en apercevoir.** Ça ne marchait que par chance du
+site d'appel. Un jour quelqu'un l'aurait relu ailleurs.
+
+**La correction va donc plus loin que la fiche.** Le champ s'appelle maintenant
+`skills_pipeline`, et le type `Offer` n'expose plus rien d'affichable. Ce qui s'affiche vient
+d'un type distinct, `OffreNotee`, que seule une fonction prenant un profil peut produire. Passer
+une offre brute à un composant qui affiche une couverture est désormais **une erreur de
+compilation**, plus un oubli silencieux. Le compilateur a d'ailleurs désigné les trois sites
+exactement, ce qui a confirmé le diagnostic.
+
+**Le test qui aurait attrapé le défaut tout seul** est écrit : pour un même profil et une même
+offre, le nombre de compétences couvertes affiché à gauche doit égaler le « x sur y exigences »
+que le moteur écrit dans le relevé. Vérifié sur les 290 offres et trois profils. Un second test
+exige que deux profils différents fassent bouger les deux colonnes ensemble.
+
+Je l'ai muté pour m'assurer qu'il n'était pas creux : en rebranchant le champ figé, il échoue en
+nommant le coupable, `offre 913: expected [ 'Python', 'JavaScript', 'Agile' ] to deeply equal
+[]`. Ce sont exactement les trois compétences de la capture.
+
+**La preuve visuelle**, même offre, deux profils :
+
+| | [3 compétences](docs/captures/fiche-profil-3competences.jpeg) | [8 compétences](docs/captures/fiche-profil-8competences.jpeg) |
+| --- | --- | --- |
+| Colonne de gauche | « pas encore dans ton profil » | « déjà dans ton profil » |
+| Relevé, à droite | 4 sur 30, 0 sur 3 exigences | 30 sur 30, 3 sur 3 exigences |
+| Rang | 26e sur 191 | 1re sur 191 |
+
+La liste aussi, pour les deux mêmes profils :
+[3 compétences](docs/captures/liste-profil-3competences.jpeg) ·
+[8 compétences](docs/captures/liste-profil-8competences.jpeg).
+
+## 2. Ma phrase sur le sous-total était fausse
+
+J'avais écrit « le sous-total toi vaut 0 quand tu n'as rien coché ». Mesuré sur les 191 offres
+notables avec un profil vide :
+
+| Mesure | Valeur |
+| --- | --- |
+| Moyenne | -0,18 |
+| Minimum et maximum | -21 et +22 |
+| Offres exactement à 0 | 10 sur 191 |
+| Strictement positives | 81 |
+| Strictement négatives | 100 |
+
+La moyenne s'arrondit à zéro, donc mon tableau n'était pas faux. Ma phrase en prose, si : le
+sous-total **tourne autour** de zéro, il ne vaut pas zéro. La section 3 est rectifiée.
+
+**Et la vraie question que personne n'avait posée : un sous-total peut descendre à -21.** Un
+relevé scolaire n'a pas de note négative, et le nombre nu ne veut rien dire pour qui le lit.
+
+Mon choix : **ne pas le ramener à zéro.** Un plancher ferait afficher un sous-total qui ne serait
+plus la somme de ses lignes, c'est-à-dire précisément la promesse que le produit tient et que
+personne d'autre ne tient. Je garde donc le chiffre vrai et je montre d'où il vient. Sous chaque
+groupe qui en a, une ligne dit « 12 gagnés et -33 retirés par les ajustements », et quand le
+sous-total passe sous zéro elle ajoute : « Ce n'est pas une note sur toi : l'annonce exige plus
+que ce que tu as confirmé. » Le chiffre reste négatif, mais il cesse d'être un jugement.
+
+## 3. La fraîcheur, signalée sans retirer de points
+
+Tu as raison, et la raison que tu nommes est meilleure que ma question : la fraîcheur n'est pas
+une qualité de l'annonce au même titre que sa source, c'est la probabilité qu'elle **existe
+encore**. Une offre de trois mois parfaitement adaptée vaut peut-être zéro candidature possible.
+
+Elle n'entre donc pas dans le classement, et aucune note ne change. Au-delà du seuil, l'annonce
+porte une mention : « Publiée il y a 94 jours, vérifie qu'elle est encore ouverte. »
+
+**Le seuil est à 30 jours**, et il se justifie sur la collecte réelle plutôt que sur une
+intuition. La médiane est à 10 jours, 13 annonces dépassent 30 jours, **une seule dépasse 45**.
+Un seuil plus haut ne signalerait presque rien ; un seuil plus bas crierait au loup sur des
+annonces fraîches. Un mois est aussi l'horizon habituel d'une offre de stage. La constante
+s'appelle `SEUIL_ANNONCE_AGEE` et porte cette justification en commentaire.
+
+## Vérifications
+
+255 tests sur 13 fichiers, `verifier-scoring` et `verifier-eligibility` à zéro désaccord sur 290
+offres, `tsc` propre, build à 300 pages. Aucun calcul n'a été modifié, et `reference/` n'a pas
+été touché.

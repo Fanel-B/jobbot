@@ -8,8 +8,8 @@ import {
   TrainingChip,
   ZoneChip,
 } from "@/components/Chips";
-import { contratLabel, estNonRenseigne, signalFormationCitable } from "@/lib/offers";
-import type { Offer } from "@/lib/offers";
+import { annonceAgee, contratLabel, estNonRenseigne, signalFormationCitable } from "@/lib/offers";
+import type { Offer, OffreNotee } from "@/lib/offers";
 
 /**
  * Une ligne d'offre : dense, scannable, tout ce qui décide est visible sans cliquer.
@@ -25,14 +25,18 @@ export function OfferRow({
   sansNote = false,
   place = null,
 }: {
-  offre: Offer;
+  /** `OffreNotee` quand on affiche la couverture : elle seule la porte, calculée pour le
+   *  profil présent. Une `Offer` brute ne peut donc plus se glisser ici par distraction. */
+  offre: Offer | OffreNotee;
   rang?: number;
   sansNote?: boolean;
   /** La place de l'offre dans le classement complet, quand elle en a une. */
   place?: Rang | null;
 }) {
-  const manquants = sansNote ? [] : (offre.skills?.missing ?? []);
-  const couvertes = sansNote ? [] : (offre.skills?.covered ?? []);
+  const couverture = "couverture" in offre ? offre.couverture : null;
+  const agee = annonceAgee(offre);
+  const manquants = sansNote ? [] : (couverture?.manquants ?? []);
+  const couvertes = sansNote ? [] : (couverture?.couvertes ?? []);
 
   return (
     <article
@@ -76,6 +80,15 @@ export function OfferRow({
               presque toujours sur la même accroche d'entreprise, donc deux lignes de texte ne
               distinguaient rien. Ce qui distingue, c'est ce que l'offre demande et que tu as
               déjà, face à ce qu'elle demande et qui te manque. */}
+          {/* La fraicheur ne change aucun point et ne touche pas au classement : elle dit si
+              l'annonce a des chances d'exister encore. Voir SEUIL_ANNONCE_AGEE. */}
+          {agee !== null ? (
+            <p className="mt-1.5 text-xs text-warn">
+              Publiée il y a <span className="num">{agee}</span> jours, vérifie qu&apos;elle est
+              encore ouverte.
+            </p>
+          ) : null}
+
           {couvertes.length > 0 || manquants.length > 0 ? (
             <div className="mt-2 space-y-0.5 text-xs leading-relaxed">
               {couvertes.length > 0 ? (

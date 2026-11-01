@@ -48,8 +48,31 @@ export type Offer = {
   score: number | null;
   score_breakdown: Breakdown[] | null;
   score_reasons: string[] | null;
-  skills: Skills | null;
+  /**
+   * La couverture calculée **par le pipeline**, avec les 31 compétences de Fanel figées dans le
+   * moteur. Elle ne dépend pas de qui regarde l'écran.
+   *
+   * Ne jamais l'afficher. Elle porte ce nom long et laid exprès : la fiche d'offre l'affichait
+   * sous l'intitulé « face à ton profil », si bien qu'un ami connecté lisait « Python, déjà dans
+   * ton profil » pendant que le relevé, à côté, comptait « 0 sur 3 exigences ». Les deux moitiés
+   * de la même page se contredisaient.
+   *
+   * Ce qui s'affiche vient de `classementPour(profil)`, recalculé pour la personne présente. Le
+   * type `OffreNotee` porte ce résultat, et les composants d'affichage l'exigent : passer une
+   * offre brute est désormais une erreur de compilation, plus un oubli silencieux.
+   */
+  skills_pipeline: Skills | null;
 };
+
+/** Ce que l'annonce demande, vu par le profil en cours. Jamais figé dans l'export. */
+export type Couverture = {
+  exigences: string[];
+  couvertes: string[];
+  manquants: string[];
+};
+
+/** Une offre renotée pour un profil précis. Seul ce type porte une couverture affichable. */
+export type OffreNotee = Offer & { couverture: Couverture };
 
 export type Zone = "toulouse" | "idf" | "remote" | "autre";
 
@@ -79,9 +102,16 @@ const recalcul = new Map(
 );
 
 export const offers: Offer[] = data.offers.map((o) => {
+  // Le champ `skills` de l'export est renommé dès l'entrée. Il porte la couverture calculée
+  // avec les compétences de Fanel, et sous son nom court il se relisait comme « les
+  // compétences de cette offre ». Le nom long le rend impossible à confondre, et le type
+  // `Offer` n'expose plus rien d'affichable : l'affichage passe par `OffreNotee`.
+  const { skills, ...reste } = o as typeof o & { skills: Skills | null };
+  const brut = { ...reste, skills_pipeline: skills ?? null } as Offer;
+
   const r = recalcul.get(o.id);
-  if (!r) return o;
-  return { ...o, score: r.total, score_breakdown: r.breakdown, score_reasons: r.raisons };
+  if (!r) return brut;
+  return { ...brut, score: r.total, score_breakdown: r.breakdown, score_reasons: r.raisons };
 });
 
 /* ---------------------------------------------------------------- libellés */
@@ -241,6 +271,30 @@ export function fraicheur(o: Offer, reference: Date = referenceCollecte): string
 
 export function ageJours(o: Offer, reference: Date = referenceCollecte): number | null {
   return joursDepuis(o.published_at ?? o.first_seen_at, reference);
+}
+
+/**
+ * Au-delà de combien de jours une annonce mérite une mise en garde.
+ *
+ * Trente, et le chiffre se justifie sur la collecte réelle plutôt que sur une intuition : la
+ * médiane est à dix jours, treize annonces dépassent trente jours, une seule dépasse
+ * quarante-cinq. Un seuil plus haut ne signalerait presque rien, un seuil plus bas crierait au
+ * loup sur des annonces fraîches. Un mois est aussi l'horizon habituel d'une offre de stage.
+ */
+export const SEUIL_ANNONCE_AGEE = 30;
+
+/**
+ * L'âge d'une annonce quand il devient une information, sinon `null`.
+ *
+ * La fraîcheur n'est pas une qualité de l'annonce au même titre que sa source ou sa
+ * complétude : c'est la probabilité qu'elle **existe encore**. Une offre de trois mois
+ * parfaitement adaptée vaut peut-être zéro candidature possible. Ce n'est donc pas un critère
+ * de correspondance, et elle n'entre pas dans le classement. Elle se signale, elle ne juge pas,
+ * et elle ne retire aucun point.
+ */
+export function annonceAgee(o: Offer, reference: Date = referenceCollecte): number | null {
+  const jours = ageJours(o, reference);
+  return jours !== null && jours > SEUIL_ANNONCE_AGEE ? jours : null;
 }
 
 export function dateCourte(iso: string | null): string {
@@ -444,13 +498,13 @@ export function familleLacune(brut: string): string {
 
 /** Ce qui manque le plus souvent, regroupé par famille. `n` compte des **offres**. */
 export function lacunesRegroupees(
-  source: Offer[],
+  source: OffreNotee[],
   max = 8,
 ): { label: string; n: number }[] {
   const familles = new Map<string, { label: string; offres: Set<number>; formes: Map<string, number> }>();
 
   for (const o of source) {
-    for (const m of o.skills?.missing ?? []) {
+    for (const m of o.couverture.manquants) {
       const norm = sansAccents(m);
       const nom = FAMILLES_LACUNES.find((f) => f.motif.test(norm))?.nom ?? m;
       const entree =

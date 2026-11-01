@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Bulletin } from "@/components/Bulletin";
 import { Simulant, SimulantSquelette } from "@/components/Simulant";
+import { ExigencesDuProfil, ExigencesSquelette } from "@/components/ExigencesDuProfil";
 import { NoteDuProfil, NoteSquelette } from "@/components/NoteDuProfil";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import {
@@ -15,6 +16,7 @@ import {
   ZoneChip,
 } from "@/components/Chips";
 import {
+  annonceAgee,
   contratLabel,
   dateCourte,
   estNonRenseigne,
@@ -71,8 +73,6 @@ export default async function Page({
   const offre = parId(id);
   if (!offre) notFound();
 
-  const exigences = offre.skills?.required ?? [];
-  const manquants = new Set((offre.skills?.missing ?? []).map((m) => m.toLowerCase()));
   const cvRecommande = estNonRenseigne(offre)
     ? "À définir après lecture de l'annonce d'origine"
     : (offre.contract_kinds ?? []).includes("stage")
@@ -178,50 +178,23 @@ export default async function Page({
             </dl>
           </section>
 
-          {/* Compétences */}
-          {exigences.length > 0 ? (
-            <section className="mt-9">
-              <h2 className="label">
-                Ce que l&apos;offre demande, face à ton profil
-              </h2>
-              <ul className="mt-4 space-y-2">
-                {exigences.map((e) => {
-                  const manque = manquants.has(e.toLowerCase());
-                  return (
-                    /* Un filet vertical plutôt qu'une pastille cochée : la petite coche verte
-                       dans un carré est le motif de liste le plus vu, et la couleur n'y porte
-                       jamais seule l'information — le texte dit déjà lequel manque. */
-                    <li key={e} className="flex items-start gap-3.5 text-sm">
-                      <span
-                        className={`mt-1 h-4 w-0.5 shrink-0 rounded-sm ${
-                          manque ? "bg-bad" : "bg-good"
-                        }`}
-                        aria-hidden
-                      />
-                      <span className={manque ? "text-ink-soft" : "text-ink"}>
-                        {e}
-                        {manque ? (
-                          <span className="text-muted">
-                            {" "}
-                            · demandé, absent de ton profil aujourd&apos;hui
-                          </span>
-                        ) : (
-                          <span className="text-muted"> · déjà dans ton profil</span>
-                        )}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-              {manquants.size > 0 ? (
-                <p className="mt-4 text-xs text-muted">
-                  Ces cases ne sont pas éliminatoires : elles servent à savoir ce qu&apos;il faut
-                  travailler avant de postuler, et à choisir les offres où l&apos;écart est le plus
-                  faible.
-                </p>
-              ) : null}
-            </section>
+          {/* Ce que l'offre demande, face au profil vivant.
+              Ce bloc lisait `offre.skills`, le champ que le pipeline calcule avec les
+              compétences de Fanel : il annonçait donc à tout le monde « déjà dans ton profil »
+              pendant que le relevé, en face, comptait zéro. Une seule source désormais, la
+              même que le relevé, et dans une frontière <Suspense> puisqu'elle lit un cookie. */}
+          {annonceAgee(offre) !== null ? (
+            <p className="mt-6 rounded-card border border-warn/30 bg-warn-soft px-4 py-3 text-sm text-warn">
+              Cette annonce a été publiée il y a{" "}
+              <span className="num font-medium">{annonceAgee(offre)}</span> jours. Elle reste
+              notée comme les autres, l&apos;âge ne retire aucun point, mais vérifie sur le site
+              de l&apos;employeur qu&apos;elle est encore ouverte avant de préparer un dossier.
+            </p>
           ) : null}
+
+          <Suspense fallback={<ExigencesSquelette />}>
+            <ExigencesDuProfil offreId={offre.id} />
+          </Suspense>
 
           {/* Le simulant : « et si j'apprenais X ? » */}
           <Suspense fallback={<SimulantSquelette />}>
