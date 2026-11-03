@@ -1,40 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, Newsreader } from "next/font/google";
 import { Suspense } from "react";
 import Link from "next/link";
 import { Compte, CompteSquelette } from "@/components/Compte";
 import "./globals.css";
 import { meta } from "@/lib/offers";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-/**
- * Newsreader, en graisse 300, pour tous les titres.
- *
- * Elle remplace Outfit, un grotesque géométrique. Ce n'était pas un mauvais choix en soi, mais
- * c'est la police la plus employée par les gabarits engendrés automatiquement : un titre gras en
- * grotesque géométrique sur fond clair est devenu l'image même du site fait à la chaîne. Changer
- * la famille est le seul geste typographique qui se voit immédiatement sur toutes les pages.
- *
- * Le choix suit le relevé de design/cedaorg.net.md : grand et **maigre**, pas grand et gras. À
- * 80 px la forme des lettres porte déjà l'emphase, et la graisse en plus ne fait qu'un mur.
- * Newsreader a un axe optique — à grande taille elle s'affine d'elle-même, ce que ne fait aucune
- * police à graisses figées.
- *
- * Deux serifs ont été volontairement écartées, Fraunces et Instrument Serif : ce sont celles que
- * les modèles proposent par réflexe, donc exactement ce qu'on cherche à fuir.
- */
-const display = Newsreader({
-  subsets: ["latin", "latin-ext"],
-  weight: ["300", "400"],
-  style: ["normal", "italic"],
-  variable: "--font-display-latin",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "JobBot, les offres qui te correspondent vraiment",
@@ -48,7 +17,7 @@ export default function RootLayout({
   const collecte = new Date(meta.generated_at);
 
   return (
-    <html lang="fr" className={`${inter.variable} ${display.variable}`}>
+    <html lang="fr">
       {/* min-h-dvh et non min-h-screen : 100vh ignore la barre d'adresse des navigateurs
           mobiles, qui se rétracte au défilement. Le pied de page se retrouvait alors poussé
           sous le pli d'une centaine de pixels. dvh suit la hauteur réellement visible. */}
