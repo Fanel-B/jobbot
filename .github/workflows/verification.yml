@@ -29,6 +29,9 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Run collector tests (Python, no database)
+        run: python3 -m unittest discover -s tools -v
+
       - name: Verify scoring oracle
         run: npm run verifier-scoring
 

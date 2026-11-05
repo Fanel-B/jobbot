@@ -101,7 +101,15 @@ et 6.
 Mon schéma est rejouable (`IF NOT EXISTS` partout, aucune suppression) : je peux le relancer sans rien casser.
 Il s'exécute dans une transaction : en cas d'erreur, rien n'est créé chez moi non plus.
 
-Je vérifie que les six tables sont là :
+Sur une base déjà en service avant novembre 2026, j'applique aussi la migration T6 (numéro du
+pipeline, compétences souhaitées, table `collectes`). Elle ne fait que des ajouts `IF NOT EXISTS`
+et ne perd aucune donnée :
+
+```sh
+( set -a; . ~/.hermes/.env; set +a; psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migration-t6.sql )
+```
+
+Je vérifie que les tables sont là (`npm run verifier-db` en donne la liste attendue) :
 
 ```sh
 ( set -a; . ~/.hermes/.env; set +a; psql "$DATABASE_URL" -c '\dt' )
@@ -115,9 +123,12 @@ D'abord à blanc — **aucune connexion** à PostgreSQL, `DATABASE_URL` n'est m�
 ~/.hermes/venv-jobbot-db/bin/python tools/collecteur_postgres.py --dry-run
 ```
 
-Mon collecteur lit ma base du pipeline (en lecture seule), table `offers`, statut
-`to_review`, et montre un aperçu des offres qui seraient écrites, puis un résumé (lues, à écrire,
-ignorées et pourquoi).
+Mon collecteur lit ma base du pipeline (en lecture seule), table `offers`, et retient les offres
+avec la règle de `charger()` dans `export_site.py` : toutes sauf les rejetées, plus les 40 offres
+sans type de contrat les plus récentes, 400 au plus. Une seule différence avec l'export : il ne
+garde que les contrats qui contiennent un des mots de `CONTRATS_COPIES` (aujourd'hui « stage »,
+ce qui inclut « stage ou alternance »). Il montre un aperçu des offres qui seraient écrites, puis
+un résumé (lues, à écrire, ignorées et pourquoi).
 
 Puis pour de vrai :
 
@@ -134,7 +145,6 @@ Options utiles :
 |---|---|
 | `--dry-run` | montre ce qui serait écrit, sans se connecter |
 | `--sqlite CHEMIN` | une autre base SQLite que celle par défaut |
-| `--statut STATUT` | un autre statut que `to_review` |
 | `--apercu N` | nombre d'offres montrées par `--dry-run` |
 
 **Idempotence.** L'écriture est un « insérer ou mettre à jour » sur `canonical_url`, dans une
@@ -142,6 +152,10 @@ seule transaction. Relancer le collecteur juste après donne `insérées : 0`, `
 toutes les offres en `inchangées`. Une mise à jour ne recule jamais les dates : on garde la plus
 ancienne première collecte et la plus récente dernière collecte. Le collecteur n'efface aucune
 offre de PostgreSQL.
+
+**Date de la copie.** Chaque passage réussi ajoute une ligne à `collectes` (heure de fin, lues,
+insérées, mises à jour, inchangées), dans la même transaction que les offres. Une copie qui ne
+change rien est datée aussi. Une copie qui échoue ne laisse aucune ligne.
 
 ### 6. Je vérifie le nombre de lignes
 
@@ -159,15 +173,8 @@ Ce que j'attends :
 - `offres` = la somme `insérées` des passages du collecteur ;
 - après une relance immédiate du collecteur, `offres` ne bouge pas.
 
-Pour comparer avec la base du pipeline (lecture seule) :
-
-```sh
-sqlite3 "file:$HOME/.hermes/data/job-search/database.sqlite?mode=ro" \
-  "SELECT count(DISTINCT canonical_url) FROM offers WHERE status = 'to_review' AND trim(coalesce(canonical_url, '')) <> '';"
-```
-
-Ce nombre est égal à `insérées + mises à jour + inchangées` du dernier passage (hors offres
-ignorées pour compétences illisibles, comptées dans le résumé).
+Le nombre d'offres retenues est affiché en tête du résumé du collecteur. Il est égal à
+`insérées + mises à jour + inchangées + ignorées` du même passage.
 
 Répartition par zone, à rapprocher de `meta.zones` dans `data/offers.json` :
 
@@ -175,9 +182,8 @@ Répartition par zone, à rapprocher de `meta.zones` dans `data/offers.json` :
 ( set -a; . ~/.hermes/.env; set +a; psql "$DATABASE_URL" -c "SELECT location_zone, count(*) FROM offers GROUP BY 1 ORDER BY 2 DESC;" )
 ```
 
-Les chiffres ne seront pas identiques : le JSON contient aussi les offres sans type de contrat
-plafonnées à 40 et toutes les offres non rejetées, alors que le collecteur prend le statut
-`to_review`.
+Les chiffres ne seront pas identiques : le JSON retient aussi l'alternance et l'apprentissage, que
+le collecteur ne copie pas tant que `CONTRATS_COPIES` ne contient que « stage ».
 
 ---
 

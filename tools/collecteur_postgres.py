@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Collecteur : base SQLite du pipeline → PostgreSQL (Neon) du site JobBot V2.
 
-Lit les offres à examiner (`status = 'to_review'`) de la base SQLite du pipeline et les écrit dans
-la table `offers` de PostgreSQL (schéma : `db/schema.sql`).
+Choisit les offres de la base SQLite du pipeline avec la règle de `charger()` dans
+`reference/export_site.py` (le périmètre de contrat mis à part, voir `CONTRATS_COPIES`) et les écrit
+dans la table `offers` de PostgreSQL (schéma : `db/schema.sql`). Chaque copie réussie laisse une
+ligne dans `collectes`, écrite dans la même transaction : c'est la date que le site affiche.
 
     python3 tools/collecteur_postgres.py --dry-run          # montre ce qui serait écrit, sans connexion
     python3 tools/collecteur_postgres.py                    # écrit dans la base désignée par DATABASE_URL
@@ -36,18 +38,33 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+# Le périmètre du produit, et la seule règle de sélection qui diffère de l'export JSON.
+#
+# Une offre est copiée si l'un de ces mots apparaît dans son type de contrat, avec le test de
+# `est_offre_du_site()` dans `reference/export_site.py` : « stage » retient donc aussi
+# « stage ou alternance ». L'export, lui, retient stage, alternance et apprentissage.
+#
+# On y ajoutera l'alternance (« alternance », « apprentissage ») vers janvier 2027, quand le site
+# l'ouvrira de nouveau. Rien d'autre n'est à changer ailleurs dans ce fichier pour ça.
+CONTRATS_COPIES = {"stage"}
+
 SQLITE_PAR_DEFAUT = Path.home() / ".hermes" / "data" / "job-search" / "database.sqlite"
-STATUT_PAR_DEFAUT = "to_review"
-DESCRIPTION_MAX = 1500                    # même plafond que l'export JSON (export_site.py)
+# Même plafond que l'export JSON (`DESCRIPTION_MAX = 4000` dans `reference/export_site.py`). Il
+# valait 1 500 ici, alors que ce commentaire disait déjà « même plafond » : 105 des 290 offres de la
+# collecte du 25 octobre dépassaient 1 500 caractères, et le moteur de note lit la description.
+DESCRIPTION_MAX = 4000
+SANS_CONTRAT_MAX = 40                     # comme l'export : offres sans contrat gardées, les plus récentes
+OFFRES_MAX = 400                          # comme l'export (option --max, 400 par défaut)
 APERCU_PAR_DEFAUT = 10                    # lignes montrées par --dry-run
 
-# Colonnes indispensables dans la table SQLite : sans elles, impossible de dédoublonner.
-COLONNES_REQUISES = ("canonical_url", "source", "status")
+# Colonnes indispensables dans la table SQLite : sans elles, impossible de dédoublonner, de garder
+# le numéro du pipeline (`id`, qui sert d'adresse aux fiches du site) ou d'écarter les rejets.
+COLONNES_REQUISES = ("id", "canonical_url", "source", "status")
 # Colonnes lues si elles existent ; une colonne absente donne NULL (et c'est signalé).
 COLONNES_LUES = (
-    "canonical_url", "source", "title", "company", "location", "contract_type", "duration",
-    "start_date", "education_required", "description", "skills_required", "published_at",
-    "first_seen_at", "last_seen_at", "miage_mentioned",
+    "id", "status", "canonical_url", "source", "title", "company", "location", "contract_type",
+    "duration", "start_date", "education_required", "description", "skills_required",
+    "skills_optional", "published_at", "first_seen_at", "last_seen_at", "miage_mentioned",
 )
 
 # Zones géographiques : copie conforme de `reference/export_site.py` (à garder synchronisée).
@@ -63,11 +80,21 @@ ZONE_REMOTE = re.compile(r"t[eé]l[eé]travail|remote|à distance|a distance|hom
 
 # Colonnes écrites dans `offers`, dans l'ordre de la requête.
 COLONNES_PG = (
-    "canonical_url", "source", "source_offer_id", "title", "company", "location", "location_zone",
-    "contract_type", "contract_known", "duration", "start_date", "education_required",
-    "description", "skills_required", "published_at", "first_seen_at", "last_seen_at",
-    "miage_mentioned",
+    "pipeline_id", "canonical_url", "source", "source_offer_id", "title", "company", "location",
+    "location_zone", "contract_type", "contract_known", "duration", "start_date",
+    "education_required", "description", "skills_required", "skills_optional", "published_at",
+    "first_seen_at", "last_seen_at", "miage_mentioned",
 )
+# Colonnes JSON : psycopg doit les recevoir enveloppées dans `Jsonb`.
+COLONNES_JSON = ("skills_required", "skills_optional")
+
+# La trace de la copie, dans la même transaction que les offres : si la copie échoue, aucune date
+# n'est écrite, et le site ne peut pas annoncer une collecte qui n'a pas eu lieu.
+# `clock_timestamp()` et non `now()` : `now()` est l'heure du **début** de la transaction.
+REQUETE_COLLECTE = """
+INSERT INTO collectes (terminee_a, lues, inserees, mises_a_jour, inchangees)
+VALUES (clock_timestamp(), %(lues)s, %(inserees)s, %(mises_a_jour)s, %(inchangees)s)
+"""
 # Colonnes simplement remplacées par la dernière valeur collectée lors d'une mise à jour.
 # `first_seen_at` et `last_seen_at` sont traitées à part : on garde la plus ancienne première
 # collecte et la plus récente dernière collecte, pour qu'une relance avec une base plus ancienne
@@ -106,6 +133,33 @@ def zone_de(location: str | None) -> str:
         if motif.search(location or ""):
             return nom
     return "autre"
+
+
+# ---------------------------------------------------------------- sélection
+
+def contrats(offre: dict) -> list[str]:
+    """Copie de `contrats()` dans `reference/export_site.py`."""
+    brut = offre.get("contract_type") or ""
+    return [c.strip().lower() for c in re.split(r"[,/]", brut) if c.strip()]
+
+
+def est_offre_copiee(offre: dict) -> bool:
+    """`est_offre_du_site()` de l'export, avec `CONTRATS_COPIES` pour seul périmètre."""
+    types = " ".join(contrats(offre))
+    return any(mot in types for mot in CONTRATS_COPIES)
+
+
+def retenir(offres: list[dict]) -> list[dict]:
+    """La règle de `charger()` (export, sans `--tout`), puis le plafond `--max` de son `main()`.
+
+    Les offres du périmètre, sauf les rejetées ; plus les offres **sans type de contrat**, les
+    `SANS_CONTRAT_MAX` plus récentes, quel que soit leur statut, exactement comme l'export.
+    """
+    du_site = [o for o in offres if est_offre_copiee(o) and o.get("status") != "rejected"]
+    sans_contrat = sorted(
+        (o for o in offres if not est_offre_copiee(o) and not (o.get("contract_type") or "").strip()),
+        key=lambda o: (o.get("published_at") or o.get("first_seen_at") or ""), reverse=True)
+    return (du_site + sans_contrat[:SANS_CONTRAT_MAX])[:OFFRES_MAX]
 
 
 def _texte(valeur) -> str | None:
@@ -147,6 +201,19 @@ def _jour(valeur, champ: str, anomalies: Counter) -> date | None:
         return None
 
 
+def _liste_json(brut, champ: str) -> tuple[list, str | None]:
+    """Une liste JSON stockée en texte dans SQLite. Absente ou vide : liste vide."""
+    if brut is None or (isinstance(brut, str) and not brut.strip()):
+        return [], None
+    try:
+        valeur = json.loads(brut) if isinstance(brut, str) else brut
+    except (TypeError, ValueError):
+        return [], f"{champ} illisible"
+    if not isinstance(valeur, list):
+        return [], f"{champ} n'est pas une liste"
+    return valeur, None
+
+
 def transformer(offre: dict, anomalies: Counter) -> tuple[dict | None, str | None]:
     """Une ligne SQLite → une ligne `offers`, ou (None, raison) si elle doit être ignorée."""
     url = _texte(offre.get("canonical_url"))
@@ -156,22 +223,25 @@ def transformer(offre: dict, anomalies: Counter) -> tuple[dict | None, str | Non
     if source is None:
         return None, "sans source"
 
-    brut = offre.get("skills_required")
-    if brut is None or (isinstance(brut, str) and not brut.strip()):
-        competences: list = []
-    else:
-        try:
-            competences = json.loads(brut) if isinstance(brut, str) else brut
-        except (TypeError, ValueError):
-            return None, "skills_required illisible"
-        if not isinstance(competences, list):
-            return None, "skills_required n'est pas une liste"
+    try:
+        pipeline_id = int(offre.get("id"))
+    except (TypeError, ValueError):
+        return None, "sans id du pipeline"
+
+    competences, erreur = _liste_json(offre.get("skills_required"), "skills_required")
+    if erreur:
+        return None, erreur
+    # Souhaitées : lues par le moteur (`priorites._exigences`) au même titre que les exigées.
+    optionnelles, erreur = _liste_json(offre.get("skills_optional"), "skills_optional")
+    if erreur:
+        return None, erreur
 
     contrat = _texte(offre.get("contract_type"))
-    # Tronquée sur le texte brut, comme l'export JSON (pas de `strip()` : mêmes 1 500 caractères).
+    # Tronquée sur le texte brut, comme l'export JSON (pas de `strip()` : mêmes 4 000 caractères).
     description = str(offre.get("description") or "")
     description = description if description.strip() else None
     return {
+        "pipeline_id": pipeline_id,
         "canonical_url": url,
         "source": source,
         "source_offer_id": url.rstrip("/").split("/")[-1] or None,
@@ -186,6 +256,7 @@ def transformer(offre: dict, anomalies: Counter) -> tuple[dict | None, str | Non
         "education_required": _texte(offre.get("education_required")),
         "description": description[:DESCRIPTION_MAX] if description else None,
         "skills_required": competences,
+        "skills_optional": optionnelles,
         "published_at": _horodatage(offre.get("published_at"), "published_at", anomalies),
         "first_seen_at": _horodatage(offre.get("first_seen_at"), "first_seen_at", anomalies),
         "last_seen_at": _horodatage(offre.get("last_seen_at"), "last_seen_at", anomalies),
@@ -213,8 +284,11 @@ def preparer(offres: list[dict], anomalies: Counter) -> tuple[list[dict], Counte
 
 # ---------------------------------------------------------------- lecture SQLite
 
-def lire_sqlite(chemin: Path, statut: str) -> tuple[list[dict], list[str]]:
-    """Lit les offres au statut demandé, en lecture seule. Renvoie (offres, colonnes absentes)."""
+def lire_sqlite(chemin: Path) -> tuple[list[dict], list[str]]:
+    """Lit toutes les offres, en lecture seule. Renvoie (offres, colonnes absentes).
+
+    Tous les statuts : c'est `retenir()` qui choisit ensuite, comme `charger()` dans l'export.
+    """
     if not chemin.is_file():
         raise FileNotFoundError(f"base SQLite introuvable : {chemin}")
     # `mode=ro` : le collecteur ne peut pas modifier la base du pipeline, même par erreur.
@@ -229,9 +303,8 @@ def lire_sqlite(chemin: Path, statut: str) -> tuple[list[dict], list[str]]:
             raise RuntimeError("colonnes indispensables absentes de « offers » : " + ", ".join(manquantes))
         lues = [c for c in COLONNES_LUES if c in presentes]
         absentes = [c for c in COLONNES_LUES if c not in presentes]
-        ordre = " ORDER BY id" if "id" in presentes else ""
-        requete = f"SELECT {', '.join(lues)} FROM offers WHERE status = ?{ordre}"
-        offres = [dict(r) for r in conn.execute(requete, (statut,))]
+        requete = f"SELECT {', '.join(lues)} FROM offers ORDER BY id"
+        offres = [dict(r) for r in conn.execute(requete)]
     finally:
         conn.close()
     return offres, absentes
@@ -255,33 +328,41 @@ def _masquer(message: str, url: str) -> str:
     return message
 
 
-def ecrire_postgres(lignes: list[dict], url: str) -> tuple[int, int, int]:
-    """Écrit les lignes dans une seule transaction. Renvoie (insérées, mises à jour, inchangées)."""
+def ecrire_postgres(lignes: list[dict], url: str, lues: int) -> tuple[int, int, int]:
+    """Écrit les lignes **et** la trace de la copie dans une seule transaction.
+
+    Renvoie (insérées, mises à jour, inchangées). `lues` est le nombre d'offres lues dans SQLite.
+    """
     import psycopg                       # importé ici : --dry-run ne doit pas en dépendre
     from psycopg.types.json import Jsonb
 
     inserees = mises_a_jour = inchangees = 0
     with psycopg.connect(url, connect_timeout=15, application_name="jobbot-collecteur") as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT to_regclass('public.offers') IS NOT NULL")
+            cur.execute("SELECT to_regclass('public.offers') IS NOT NULL"
+                        " AND to_regclass('public.collectes') IS NOT NULL")
             if not cur.fetchone()[0]:
-                raise RuntimeError("la table « offers » n'existe pas : appliquer d'abord db/schema.sql")
-            if not lignes:
-                return 0, 0, 0
-            parametres = [{**l, "skills_required": Jsonb(l["skills_required"])} for l in lignes]
-            # Un jeu de résultats par ligne : une ligne renvoyée = insérée ou mise à jour,
-            # aucune ligne renvoyée = conflit sans changement (clause WHERE du DO UPDATE).
-            cur.executemany(_requete_upsert(), parametres, returning=True)
-            while True:
-                resultat = cur.fetchone()
-                if resultat is None:
-                    inchangees += 1
-                elif resultat[0]:
-                    inserees += 1
-                else:
-                    mises_a_jour += 1
-                if not cur.nextset():
-                    break
+                raise RuntimeError("table « offers » ou « collectes » absente : "
+                                   "appliquer d'abord db/migration-t6.sql")
+            if lignes:
+                parametres = [{**l, **{c: Jsonb(l[c]) for c in COLONNES_JSON}} for l in lignes]
+                # Un jeu de résultats par ligne : une ligne renvoyée = insérée ou mise à jour,
+                # aucune ligne renvoyée = conflit sans changement (clause WHERE du DO UPDATE).
+                cur.executemany(_requete_upsert(), parametres, returning=True)
+                while True:
+                    resultat = cur.fetchone()
+                    if resultat is None:
+                        inchangees += 1
+                    elif resultat[0]:
+                        inserees += 1
+                    else:
+                        mises_a_jour += 1
+                    if not cur.nextset():
+                        break
+            # Même curseur, même transaction : la date n'existe que si les offres sont écrites.
+            # Une copie qui ne change rien est quand même une copie réussie, et elle est datée.
+            cur.execute(REQUETE_COLLECTE, {"lues": lues, "inserees": inserees,
+                                           "mises_a_jour": mises_a_jour, "inchangees": inchangees})
         # La sortie du bloc `with psycopg.connect` valide la transaction (ou l'annule sur erreur).
     return inserees, mises_a_jour, inchangees
 
@@ -324,8 +405,6 @@ def main() -> int:
         description="Copie les offres de la base SQLite du pipeline vers PostgreSQL (DATABASE_URL).")
     ap.add_argument("--sqlite", type=Path, default=SQLITE_PAR_DEFAUT,
                     help=f"base SQLite du pipeline (par défaut : {SQLITE_PAR_DEFAUT})")
-    ap.add_argument("--statut", default=STATUT_PAR_DEFAUT,
-                    help=f"statut des offres à copier (par défaut : {STATUT_PAR_DEFAUT})")
     ap.add_argument("--dry-run", action="store_true",
                     help="montrer ce qui serait écrit, sans se connecter à PostgreSQL")
     ap.add_argument("--apercu", type=int, default=APERCU_PAR_DEFAUT,
@@ -342,14 +421,16 @@ def main() -> int:
             return 2
 
     try:
-        offres, absentes = lire_sqlite(args.sqlite.expanduser(), args.statut)
+        offres, absentes = lire_sqlite(args.sqlite.expanduser())
     except (OSError, RuntimeError, sqlite3.Error) as erreur:
         print(f"Erreur de lecture SQLite : {erreur}", file=sys.stderr)
         return 1
 
     anomalies: Counter = Counter()
-    lignes, ignorees = preparer(offres, anomalies)
-    print(f"{len(offres)} offres au statut « {args.statut} » lues dans {args.sqlite}")
+    retenues = retenir(offres)
+    lignes, ignorees = preparer(retenues, anomalies)
+    print(f"{len(offres)} offres lues dans {args.sqlite}, {len(retenues)} retenues "
+          f"(contrats : {', '.join(sorted(CONTRATS_COPIES))}, et sans contrat renseigné)")
 
     if args.dry_run:
         print("Mode --dry-run : aucune connexion à PostgreSQL, rien n'est écrit.")
@@ -358,7 +439,7 @@ def main() -> int:
         return 0
 
     try:
-        ecrit = ecrire_postgres(lignes, url)
+        ecrit = ecrire_postgres(lignes, url, len(offres))
     except ImportError:
         print("Erreur : psycopg n'est pas installé (pip install -r db/requirements.txt).", file=sys.stderr)
         return 1

@@ -20,6 +20,10 @@ BEGIN;
 -- bulletin.
 CREATE TABLE IF NOT EXISTS offers (
     id                  bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    -- Le numéro de l'offre dans la base SQLite du pipeline (`id` de `data/offers.json`). C'est lui
+    -- que le site affiche dans ses adresses (`/offres/913`) et qui départage deux rangs égaux :
+    -- `id`, numéroté par cette base, ne correspond à rien côté pipeline. Unicité : voir plus bas.
+    pipeline_id         bigint,
     canonical_url       text        NOT NULL,
     source              text        NOT NULL,             -- « linkedin », « airbus », « thales »…
     source_offer_id     text,                             -- identifiant de l'annonce chez la source
@@ -34,6 +38,8 @@ CREATE TABLE IF NOT EXISTS offers (
     education_required  text,                             -- niveau demandé
     description         text,
     skills_required     jsonb       NOT NULL DEFAULT '[]'::jsonb,
+    -- Compétences souhaitées : le moteur de note les compte parmi les exigences.
+    skills_optional     jsonb       NOT NULL DEFAULT '[]'::jsonb,
     published_at        timestamp,                        -- heure locale de la source, sans fuseau
     first_seen_at       timestamp,                        -- première collecte (pipeline)
     last_seen_at        timestamp,                        -- dernière collecte (pipeline)
@@ -55,6 +61,42 @@ CREATE TABLE IF NOT EXISTS offers (
 CREATE INDEX IF NOT EXISTS offers_location_zone_idx ON offers (location_zone);
 CREATE INDEX IF NOT EXISTS offers_source_idx        ON offers (source);
 CREATE INDEX IF NOT EXISTS offers_last_seen_at_idx  ON offers (last_seen_at DESC);
+
+-- ------------------------------------------------- évolutions de `offers` (T6, novembre 2026)
+
+-- Pour une table créée avant ces colonnes. Même contenu que `db/migration-t6.sql`, qui existe
+-- seul pour être appliqué à la base en service sans rejouer tout le schéma.
+ALTER TABLE offers ADD COLUMN IF NOT EXISTS pipeline_id bigint;
+ALTER TABLE offers ADD COLUMN IF NOT EXISTS skills_optional jsonb NOT NULL DEFAULT '[]'::jsonb;
+
+-- Un index unique plutôt qu'une contrainte : il accepte `IF NOT EXISTS`. Plusieurs NULL restent
+-- permis, ce qui laisse en place les lignes copiées avant que le collecteur écrive ce numéro.
+CREATE UNIQUE INDEX IF NOT EXISTS offers_pipeline_id_key ON offers (pipeline_id);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'offers_skills_optional_check') THEN
+        ALTER TABLE offers ADD CONSTRAINT offers_skills_optional_check
+            CHECK (jsonb_typeof(skills_optional) = 'array');
+    END IF;
+END $$;
+
+-- ---------------------------------------------------------------- collectes
+
+-- Une ligne par copie réussie du collecteur, écrite dans la même transaction que les offres.
+-- La plus récente est la date « Dernière collecte » du site. `max(offers.updated_at)` ne
+-- convient pas : une copie qui ne change aucune offre ne touche aucune ligne, et le site se
+-- croirait alors en retard alors que la copie a bien tourné.
+CREATE TABLE IF NOT EXISTS collectes (
+    id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    terminee_a    timestamptz NOT NULL,
+    lues          integer     NOT NULL CHECK (lues >= 0),          -- offres lues dans SQLite
+    inserees      integer     NOT NULL CHECK (inserees >= 0),
+    mises_a_jour  integer     NOT NULL CHECK (mises_a_jour >= 0),
+    inchangees    integer     NOT NULL CHECK (inchangees >= 0)
+);
+
+CREATE INDEX IF NOT EXISTS collectes_terminee_a_idx ON collectes (terminee_a DESC);
 
 -- ---------------------------------------------------------------- comptes
 

@@ -84,6 +84,9 @@ export const TABLES_ATTENDUES = [
   "resumes",
   "saved_offers",
   "ai_usage",
+  // Une ligne par copie réussie du collecteur (db/migration-t6.sql). Absente : la migration T6
+  // n'a pas été appliquée, et le site ne peut pas dater ses offres en mode base.
+  "collectes",
 ] as const;
 
 export type EtatBase = {
