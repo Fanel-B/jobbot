@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { Bulletin } from "@/components/Bulletin";
 import { ScoreBadge } from "@/components/ScoreBadge";
-import { ZONE_LABEL } from "@/lib/offers";
-import { NIVEAU_LABEL, RECHERCHE_LABEL, classementPour, estVide, lireProfil } from "@/lib/profil";
+import { classementPour, estVide, lireProfil } from "@/lib/profil";
 import { observationPour, rangDe, rangEnLettres, tranchePour } from "@/lib/classement";
 
 /**
@@ -44,13 +43,6 @@ export async function NoteDuProfil({ offreId }: { offreId: number }) {
   const place = rangDe(profil, offreId);
   const observation = observationPour(profil, offreId);
 
-  const zones = profil.zones.length
-    ? profil.zones.map((z) => ZONE_LABEL[z]).join(", ")
-    : "toutes zones";
-  const resume = `${NIVEAU_LABEL[profil.niveau]} · ${profil.recherche
-    .map((r) => RECHERCHE_LABEL[r].toLowerCase())
-    .join(" et ")} · ${zones}`;
-
   return (
     <>
       {/* L'en-tête d'un relevé nomme toujours qui est noté avant d'annoncer la note. Sans ça,
@@ -78,8 +70,13 @@ export async function NoteDuProfil({ offreId }: { offreId: number }) {
       <div className="flex items-start justify-between gap-4 border-b border-line-strong pb-4">
         <div className="min-w-0">
           <p className="label">Relevé de correspondance</p>
-          <p className="mt-1.5 text-sm text-ink-soft">{resume}</p>
-          <p className="mt-0.5 text-xs text-muted">
+          {/* Seules les compétences sont rappelées ici, parce que seules elles entrent dans le
+              calcul : le moteur ne reçoit rien d'autre du profil. Cet en-tête affichait avant
+              « Bac+5, M2 · stage · Toulouse », comme si la note était calculée pour ce niveau,
+              cette zone et ce type de recherche. Elle ne l'était pas. Ces réglages restent
+              enregistrés sur la page profil, mais rien ne les lit encore. `lib/entete.test.ts`
+              échoue si quelqu'un les réaffiche ici sans les brancher sur le moteur. */}
+          <p className="mt-1.5 text-sm text-ink-soft">
             <span className="num">{profil.competences.length}</span> compétences confirmées
           </p>
         </div>
