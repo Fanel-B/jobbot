@@ -1,4 +1,11 @@
-/* Keep production builds independent of Google's font service. */
+/* Polices hébergées avec le site (@fontsource) : le build ne dépend plus du service de
+   Google, ce qui fiabilise l'intégration continue.
+
+   Newsreader pour les titres, en graisse 300. Le choix suit design/cedaorg.net.md : grand
+   et maigre plutôt que grand et gras, parce qu'à cette taille la forme des lettres porte
+   déjà l'emphase et que la graisse en plus ne fait qu'un mur. Fraunces et Instrument Serif
+   sont écartées volontairement : ce sont les serifs que les modèles proposent par réflexe.
+   Inter reste la police du texte courant. */
 @import "@fontsource-variable/inter/wght.css";
 @import "@fontsource-variable/newsreader/wght.css";
 @import "@fontsource-variable/newsreader/wght-italic.css";
