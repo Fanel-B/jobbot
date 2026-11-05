@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { critereLabel, enLettres, meta, nbSignalFormation, offers, sourceLabel, structureBulletin } from "@/lib/offers";
+import { critereLabel, enLettres, meta, nbSignalFormation, offers, sourceLabel } from "@/lib/offers";
+import { estConstant } from "@/lib/groupes";
+import { chiffresMethode, type GroupeMethode } from "@/lib/methode";
 
 const SOURCES_DETAIL: Record<string, string> = {
   "sopra-steria": "Site carrière de l'entreprise (interface publique de recrutement).",
@@ -15,12 +17,53 @@ const SOURCES_DETAIL: Record<string, string> = {
   france_travail: "Interface publique France Travail (offres d'emploi et de stage).",
 };
 
+/** Un groupe du relevé : son titre, son barème, ses critères et ses ajustements. */
+function BlocGroupe({ titre, intro, g }: { titre: string; intro: string; g: GroupeMethode }) {
+  return (
+    <div className="card p-5">
+      <div className="flex items-baseline justify-between gap-3">
+        <h4 className="text-[15px] font-medium text-ink">{titre}</h4>
+        <span className="font-mono text-xs tabular-nums text-muted">
+          sur <span className="num text-ink">{g.max}</span>
+        </span>
+      </div>
+      <p className="mt-1 text-xs leading-relaxed text-muted">{intro}</p>
+
+      <ul className="mt-4 divide-y divide-line border-y border-line text-sm">
+        {g.criteres.map((c) => (
+          <li key={c.critere} className="flex items-baseline justify-between gap-3 py-2">
+            <span className={estConstant(c.critere) ? "text-muted" : "text-ink-soft"}>
+              {critereLabel(c.critere)}
+              {estConstant(c.critere) ? (
+                <span className="text-xs italic"> · ne départage aucune offre</span>
+              ) : null}
+            </span>
+            <span className="font-mono tabular-nums text-muted">{c.max}</span>
+          </li>
+        ))}
+      </ul>
+
+      {g.ajustements.length > 0 ? (
+        <p className="mt-3 text-xs leading-relaxed text-muted">
+          Ajustements, sans barème :{" "}
+          {g.ajustements.map((c) => critereLabel(c).toLowerCase()).join(", ")}.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 export default function Page() {
   const sources = Object.entries(meta.sources).sort((a, b) => b[1] - a[1]);
   const nbFormation = nbSignalFormation(offers);
-  // Décrit à partir de l'export, pas écrit en dur : le pipeline ajoute des critères, et une
-  // phrase figée devient fausse sans que personne ne le voie.
-  const bulletin = structureBulletin;
+  // Les chiffres de la note se déduisent du moteur et de l'export, ils ne sont pas écrits en
+  // dur : une phrase figée devient fausse sans que personne ne le voie. `lib/methode.test.ts`
+  // épingle ce que la page cite et que le moteur garde en constantes privées.
+  const m = chiffresMethode();
+  const nbAjustements = m.toi.ajustements.length + m.annonce.ajustements.length;
+  const diversite = m.constants.find((c) => c.critere === "diversité");
+  const dossier = m.constants.find((c) => c.critere === "dossier");
+  const coherence = m.toi.criteres.find((c) => c.critere === "cohérence");
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-12">
@@ -108,36 +151,150 @@ export default function Page() {
       <section className="mt-12">
         <h2 className="titre-section">Comment la note est fabriquée</h2>
         <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-          La note est calculée par du <strong className="font-medium">code déterministe</strong>, pas
-          par un modèle de langage : {enLettres(bulletin.notes.length)} critères notés, chacun avec
-          son maximum, additionnés sur <span className="num">{bulletin.total}</span>. Deux personnes
-          avec le même profil obtiennent exactement la même note, et n&apos;importe qui peut refaire
-          le calcul à la main.
+          La note est calculée par du <strong className="font-medium">code déterministe</strong>,
+          pas par un modèle de langage. Deux personnes avec le même profil obtiennent exactement la
+          même note, et n&apos;importe qui peut refaire le calcul à la main : sur chaque fiche, le
+          total est la somme exacte des lignes du relevé.
+        </p>
+
+        <h3 className="mt-10 font-display text-2xl font-light leading-tight text-ink">
+          Un relevé en deux groupes
+        </h3>
+        <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+          Le relevé d&apos;une fiche se lit comme un bulletin scolaire : des matières rangées en
+          deux groupes, un sous-total pour chacun, puis le total sur{" "}
+          <span className="num">{m.total}</span>. Les deux sous-totaux s&apos;additionnent, sans
+          coefficient caché ni arrondi de faveur.
+        </p>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <BlocGroupe
+            titre="Toi, face à cette offre"
+            intro="Ce qui compare l'annonce à un candidat."
+            g={m.toi}
+          />
+          <BlocGroupe
+            titre="L'annonce elle-même"
+            intro="Sa fraîcheur, sa source, ce qu'elle dit. Identique pour tout le monde."
+            g={m.annonce}
+          />
+        </div>
+
+        <h3 className="mt-10 font-display text-2xl font-light leading-tight text-ink">
+          Ce qui suit ton profil, et ce qui ne le suit pas encore
+        </h3>
+        <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+          Une seule ligne lit ce que tu as confirmé : la{" "}
+          <strong className="font-medium">cohérence</strong>
+          {coherence ? (
+            <>
+              , <span className="num">{coherence.max}</span> points,
+            </>
+          ) : null}{" "}
+          qui compte combien des technologies citées par l&apos;annonce figurent dans tes
+          compétences cochées. C&apos;est la seule partie de la note qui change d&apos;une personne
+          à l&apos;autre.
         </p>
         <p className="mt-3 text-sm leading-relaxed text-muted">
-          Les critères notés : {bulletin.notes.map((c) => critereLabel(c).toLowerCase()).join(", ")}.
+          Les autres lignes du groupe « toi » comparent l&apos;annonce à une situation fixe, celle de
+          Fanel, l&apos;auteur du site : un niveau Bac+3, disponible à partir du 29 mars 2027, avec
+          un stage à finir avant la rentrée de Master de septembre 2027 (une fin au 31 juillet 2027
+          au plus tard est jugée compatible). Le niveau, la zone et le type de recherche que tu
+          règles sur la page profil ne changent donc pas la note pour l&apos;instant.
+        </p>
+
+        <h3 className="mt-10 font-display text-2xl font-light leading-tight text-ink">
+          Les ajustements
+        </h3>
+        <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+          Aux critères notés s&apos;ajoutent {enLettres(nbAjustements)} lignes d&apos;
+          <strong className="font-medium">ajustement</strong>, sans barème : elles ajoutent ou
+          retirent des points après coup. Un niveau de diplôme hors de portée en retire ; un
+          bloqueur administratif, comme une habilitation de sécurité, plafonne la note à 55.
         </p>
         <p className="mt-3 text-sm leading-relaxed text-muted">
-          S&apos;y ajoutent {enLettres(bulletin.ajustements.length)} lignes d&apos;
-          <strong className="font-medium text-ink-soft">ajustement</strong>, sans maximum propre :
-          elles ajoutent ou retirent des points après coup, à savoir{" "}
-          {bulletin.ajustements.map((c) => critereLabel(c).toLowerCase()).join(", ")}. Un niveau de
-          diplôme hors de portée retire des points ; un bloqueur administratif, comme une
-          habilitation de sécurité, plafonne la note. Elles figurent au bulletin comme les autres,
-          pour que le total reste la somme de ce qui est affiché.
+          Un sous-total peut donc être négatif quand les ajustements retirent plus que le groupe ne
+          rapporte. Le relevé affiche alors le chiffre vrai, avec ce qui a été gagné et ce qui a été
+          retiré, plutôt qu&apos;un zéro qui ne serait plus la somme de ses lignes.
         </p>
-        {/* Le plafond par groupe a été retiré le 21/10/2026. Le critère reste dans le bulletin —
-            l'en retirer casserait la promesse que le total est la somme de ses lignes — et son
-            détail reste informatif (le rang chez l'employeur), mais il ne retire plus de points.
-            Le dire ici évite qu'on se demande pourquoi cette ligne est pleine partout. */}
-        <p className="mt-3 text-sm leading-relaxed text-muted">
-          Un mot sur la <strong className="font-medium text-ink-soft">diversité des candidatures</strong> :
-          elle comptait le rang d&apos;une offre parmi celles d&apos;un même employeur, et retirait des
-          points au-delà de la troisième. Ce plafond a été retiré le 21 octobre 2026. La ligne reste
-          au bulletin, et son détail dit toujours le rang, mais elle ne retire plus rien, et affiche
-          donc son maximum sur toutes les offres.
+
+        <h3 className="mt-10 font-display text-2xl font-light leading-tight text-ink">
+          Le rang avant la note
+        </h3>
+        <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+          Les offres sont classées sur le sous-total « toi », jamais sur le total. Le groupe
+          « l&apos;annonce » pèse <span className="num">{m.annonce.max}</span> points sur{" "}
+          <span className="num">{m.total}</span> et vaut pareil pour tout le monde : classer sur le
+          total annoncerait « 11e meilleure correspondance » pour ce qui est en réalité la 11e
+          meilleure annonce. À sous-total égal, la note de l&apos;annonce départage.
         </p>
         <p className="mt-3 text-sm leading-relaxed text-muted">
+          Le rang s&apos;écrit parmi les <span className="num">{m.notables}</span> annonces que
+          l&apos;on peut noter (« 11e sur {m.notables} ») et passe devant la note : une place se
+          comprend et se vise, un pourcentage nu se subit.
+        </p>
+
+        <h3 className="mt-10 font-display text-2xl font-light leading-tight text-ink">
+          Deux lignes qui ne départagent rien
+        </h3>
+        <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+          Deux lignes valent la même chose sur toutes les annonces de la collecte : la{" "}
+          <strong className="font-medium">diversité des candidatures</strong>,{" "}
+          <span className="num">{diversite?.points}</span> sur{" "}
+          <span className="num">{diversite?.max}</span> partout, et le{" "}
+          <strong className="font-medium">dossier déjà prêt</strong>,{" "}
+          <span className="num">{dossier?.points}</span> sur{" "}
+          <span className="num">{dossier?.max}</span> partout. Elles s&apos;affichent en gris, avec
+          la mention « ne départage aucune offre ».
+        </p>
+        {/* Le plafond par groupe a été retiré le 21/10/2026. Le critère reste au bulletin, parce
+            que l'en retirer casserait la promesse que le total est la somme de ses lignes, et son
+            détail reste informatif (le rang chez l'employeur). Le dire évite qu'on se demande
+            pourquoi cette ligne est pleine partout. */}
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          La diversité comptait le rang d&apos;une offre parmi celles d&apos;un même employeur et
+          retirait des points au-delà de la troisième. Ce plafond a été retiré le 21 octobre 2026 :
+          la ligne affiche donc son maximum partout, et son détail dit toujours le rang. Le dossier
+          lit les démarches que tu aurais enregistrées sur le site, et le site n&apos;en enregistre
+          encore aucune.
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          Elles restent comprises dans le total : les en retirer ferait afficher au site une note
+          différente de celle que calcule le moteur de référence, et l&apos;accord entre les deux
+          est ce qui fait la valeur du projet.
+        </p>
+
+        <h3 className="mt-10 font-display text-2xl font-light leading-tight text-ink">
+          Les annonces qu&apos;on ne peut pas noter
+        </h3>
+        <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+          <span className="num">{m.incalculables}</span> annonces sur{" "}
+          <span className="num">{m.collecte}</span> ne citent aucune technologie reconnue. Pour
+          elles, la correspondance avec ton profil n&apos;est pas faible : elle est{" "}
+          <strong className="font-medium">incalculable</strong>, et lui donner des points par
+          défaut reviendrait à prétendre avoir vérifié ce qui ne l&apos;a pas été.
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          Elles sortent donc du classement et s&apos;affichent dans un bloc à part, sous la liste,
+          avec cette explication. Le classement porte sur les{" "}
+          <span className="num">{m.notables}</span> autres.
+        </p>
+
+        <h3 className="mt-10 font-display text-2xl font-light leading-tight text-ink">
+          La fraîcheur : un signal, pas une note
+        </h3>
+        <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+          Une annonce publiée il y a plus de <span className="num">{m.seuilAge}</span> jours porte
+          une mention : « vérifie qu&apos;elle est encore ouverte ». À la dernière collecte,{" "}
+          <span className="num">{m.nbAgees}</span> annonces sont dans ce cas.
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          La mention ne retire aucun point et ne change pas le classement : l&apos;âge dit si
+          l&apos;annonce a des chances d&apos;exister encore, pas si elle te correspond. La ligne
+          « fraîcheur » du relevé existe toujours, dans le groupe « l&apos;annonce », mais elle
+          n&apos;entre pas dans le rang.
+        </p>
+
+        <p className="mt-10 text-sm leading-relaxed text-muted">
           Ce que la note ne prend pas en compte, faute de pouvoir le mesurer honnêtement : la
           rémunération, le temps de trajet, la concurrence sur le poste et le « potentiel
           d&apos;entretien ». Ces critères sont écartés plutôt qu&apos;estimés au doigt mouillé.
@@ -152,6 +309,10 @@ export default function Page() {
             Deviner un type de contrat : une annonce sans contrat affiché porte
             «{" "}
             <em>Type de contrat non renseigné</em> » et sort du classement principal.
+          </li>
+          <li>
+            Noter une annonce dont on ne peut pas mesurer la correspondance : elle est signalée
+            incalculable, pas notée faible.
           </li>
           <li>Ajouter une compétence à ton CV parce qu&apos;une offre la demande.</li>
           <li>
