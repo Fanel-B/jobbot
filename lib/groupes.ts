@@ -19,15 +19,25 @@
 import type { Breakdown } from "./offers";
 
 /**
- * Les critères qui dépendent de la personne.
+ * Les critères qui comparent l'annonce à un candidat.
  *
- * Le départ se fait sur une seule question : « ce chiffre changerait-il si quelqu'un d'autre
- * regardait la même annonce ? » Si oui, le critère est ici.
+ * Le départ se fait sur une seule question : « ce critère mesure-t-il l'annonce contre la
+ * situation de quelqu'un ? » Si oui, il est ici, qu'il suive déjà le lecteur ou non.
  *
- * Le calendrier et les dates en font partie parce qu'ils se mesurent contre une disponibilité,
- * celle de l'année universitaire de la personne. Le dossier aussi : il décrit ce qu'elle a déjà
- * préparé. Les ajustements de diplôme, de prérequis et de compétences comparent l'exigence de
- * l'annonce à ce qu'elle a confirmé savoir faire.
+ * Et aujourd'hui, **seule la cohérence suit le lecteur** : le moteur ne reçoit que les
+ * compétences confirmées. Tout le reste du groupe se mesure contre la situation fixe de
+ * Fanel, quel que soit le profil réglé sur le site : disponible le 29 mars 2027, Master en
+ * septembre 2027, niveau Bac+3 pour le diplôme, et des référentiels fixés dans le moteur pour
+ * les prérequis et les compétences exigées (dont une copie des compétences confirmées de
+ * Fanel). Le dossier décrit ce que la personne a préparé, mais le site n'enregistre aucune
+ * démarche : il vaut 0 partout.
+ *
+ * Une première version de ce commentaire disait le contraire : que le calendrier et les dates
+ * se mesuraient contre la disponibilité de la personne, et les ajustements contre ce qu'elle a
+ * confirmé. C'était faux, et la phrase de l'interface qui en découlait l'était aussi. Le rangement
+ * reste le bon (ces critères comparent bien l'annonce à un candidat), mais il ne dit pas que le
+ * lecteur y est déjà pris en compte. `lib/methode.test.ts` vérifie que le moteur ne lit toujours
+ * que les compétences, pour que cette phrase ne devienne pas fausse à son tour.
  */
 export const CRITERES_TOI = [
   "cohérence",
@@ -43,9 +53,11 @@ export const CRITERES_TOI = [
 /**
  * Les critères qui décrivent l'annonce, identiques pour tout le monde.
  *
- * Le plafond de groupe est ici et non dans l'autre famille : il regarde combien d'annonces du
- * même groupe d'entreprises figurent déjà dans la collecte, ce qui est une propriété du corpus
- * et non du lecteur.
+ * Le « plafond » est ici, et il ne s'agit pas du plafond par groupe d'entreprises, retiré le
+ * 21 octobre 2026 : c'est le plafond administratif, qui ramène la note à 55 quand l'annonce
+ * exige une habilitation ou une condition de nationalité. Il ne lit que le texte de l'annonce,
+ * pas le lecteur, donc il va avec elle. Une première version de ce commentaire le confondait
+ * avec le plafond de groupe.
  */
 export const CRITERES_ANNONCE = [
   "métier",
@@ -127,7 +139,7 @@ export function enDeuxGroupes(breakdown: Breakdown[]): Releve {
     toi: {
       id: "toi",
       titre: "Toi, face à cette offre",
-      explication: "Ce qui change si quelqu'un d'autre regarde la même annonce.",
+      explication: "Ce qui compare l'annonce à un candidat. Aujourd'hui, seule la cohérence suit tes compétences.",
       lignes: toi,
       points: somme(toi, "points"),
       max: somme(toi, "max"),

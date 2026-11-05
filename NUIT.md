@@ -53,8 +53,9 @@ dont le produit avait besoin.
 
 Le départ entre les deux groupes se fait sur une seule question, et c'est elle qui rend le
 rangement vérifiable plutôt qu'arbitraire : **ce chiffre changerait-il si quelqu'un d'autre
-regardait la même annonce ?** Si oui, il est à toi. Le calendrier et les dates en sont, parce
-qu'ils se mesurent contre ta disponibilité. La fraîcheur et la source n'en sont pas.
+regardait la même annonce ?** Si oui, il est à toi. La fraîcheur et la source n'en sont pas.
+Attention : la phrase qui suivait ici, sur le calendrier et les dates « mesurés contre ta
+disponibilité », était fausse. Voir l'erratum du 5 novembre en bas de ce fichier.
 
 Sur l'offre 913, avec trois compétences : 7 sur 42 côté toi, 47 sur 58 côté annonce, total 54.
 Le même 54 qu'avant, mais on voit enfin d'où il vient.
@@ -371,3 +372,52 @@ s'appelle `SEUIL_ANNONCE_AGEE` et porte cette justification en commentaire.
 255 tests sur 13 fichiers, `verifier-scoring` et `verifier-eligibility` à zéro désaccord sur 290
 offres, `tsc` propre, build à 300 pages. Aucun calcul n'a été modifié, et `reference/` n'a pas
 été touché.
+
+---
+
+# Erratum du 5 novembre 2026
+
+En réécrivant la page `/methode` à partir du code du moteur, j'ai constaté que deux choses que
+j'avais écrites plus haut étaient fausses. La première change ce que le site promet.
+
+## Une seule ligne de la note suit le lecteur
+
+J'avais écrit que le calendrier et les dates « se mesurent contre ta disponibilité », et que le
+groupe « toi » contenait ce qui change d'une personne à l'autre. **Seule la cohérence le fait.**
+
+Mesuré dans le code : `classementPour` ne transmet au moteur que les compétences du profil. Le
+niveau, la zone et le type de recherche saisis sur `/profil` n'atteignent jamais le calcul. Et le
+reste du groupe « toi » est calculé contre la situation fixe de Fanel :
+
+| Ligne | Ce qu'elle mesure vraiment |
+| --- | --- |
+| Calendrier, dates | début et disponibilité au 29 mars 2027 |
+| Date de fin | fin de stage compatible jusqu'au 31 juillet 2027, Master en septembre 2027 |
+| Diplôme | Bac+3 demandé donne un bonus, Bac+4 ou Bac+5 exigé retire 8 points (88 annonces) |
+| Prérequis, compétences exigées | des référentiels fixés dans le moteur, dont une copie des compétences confirmées de Fanel |
+| Dossier | les démarches enregistrées par le site, aucune : 0 partout |
+
+Conséquence : un lecteur en Bac+5 voit « Bac+5 exigé (-8) » sur une offre qui le vise, et le
+relevé affiche pourtant son niveau en en-tête. **Cet en-tête laisse croire que la note est
+calculée pour ce niveau, cette zone et ce type de recherche. Elle ne l'est pas.**
+
+Sur les 30 points de cohérence, la note suit bien le lecteur. Le reste du groupe « toi », soit 12
+points de barème et tous les ajustements, est calibré sur Fanel.
+
+**Ce que j'ai corrigé** : la phrase de l'interface qui disait « ce qui change si quelqu'un d'autre
+regarde la même annonce », les commentaires de `lib/groupes.ts` qui disaient la même chose, et la
+page `/methode`, qui dit maintenant la vérité. Un test vérifie que le moteur ne lit toujours que
+les compétences, pour qu'on ne puisse pas rendre la page fausse en changeant le moteur.
+
+**Ce que je n'ai pas corrigé, parce que c'est une décision et pas un correctif** : l'en-tête du
+relevé affiche toujours le niveau, la zone et le type de recherche. Soit on les branche sur le
+moteur (changement côté Python, avec un nouveau paramètre par profil), soit on cesse de les
+afficher dans le relevé tant qu'ils n'y servent à rien.
+
+## Le « plafond » n'est pas le plafond de groupe
+
+Mon commentaire dans `lib/groupes.ts` décrivait la ligne « plafond » comme portant sur le groupe
+d'entreprises. C'est le **plafond administratif** : la note est ramenée à 55 quand l'annonce exige
+une habilitation ou une condition de nationalité. Le plafond par groupe d'entreprises a été retiré
+le 21 octobre 2026, ce qui explique que la diversité vaille 14 sur 14 partout. Le rangement de la
+ligne dans le groupe « l'annonce » reste correct, puisqu'elle ne lit que le texte de l'annonce.
