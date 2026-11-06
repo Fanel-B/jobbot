@@ -162,23 +162,34 @@ base n'est écrite nulle part dans le dépôt, et je n'en écris pas une pour co
 ### 5.3 Le collecteur vers Neon
 
 **[dépôt]** : `db/README.md`, section 5, et l'en-tête de `tools/collecteur_postgres.py`. Il copie la
-base SQLite vers la table `offers` de Neon. **Le site ne lit pas encore cette table** : il lit
-`data/offers.json`. Relancer ce collecteur ne rafraîchit donc pas le site. Il prépare la bascule
-vers la base.
+base SQLite vers la table `offers` de Neon, et écrit une ligne dans `collectes` à chaque copie
+réussie. Le site peut désormais lire cette table (section 7), mais **par défaut il lit encore
+`data/offers.json`** : relancer ce collecteur ne rafraîchit le site qu'une fois `OFFERS_SOURCE=db`
+posée.
 
 Le 30 octobre, `npm run verifier-db` comptait **zéro offre** dans cette table.
 
+**Avant le premier passage, appliquer la migration T6** (numéro du pipeline, compétences
+souhaitées, table `collectes`). Elle ne fait que des ajouts `IF NOT EXISTS` et ne perd aucune
+donnée ; le collecteur refuse d'écrire tant que `collectes` n'existe pas.
+
 ```bash
 cd ~/jobbot-v2                                 # racine du dépôt : db/README.md l'exige
+( set -a; . ~/.hermes/.env; set +a; psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migration-t6.sql )
 ~/.hermes/venv-jobbot-db/bin/python tools/collecteur_postgres.py --dry-run
 ( set -a; . ~/.hermes/.env; set +a; ~/.hermes/venv-jobbot-db/bin/python tools/collecteur_postgres.py )
 ```
+
+La migration passe par `psql` et la chaîne de `~/.hermes/.env`, comme `db/schema.sql` dans
+`db/README.md`, section 4. Le collecteur ne copie plus que les **stages** (`CONTRATS_COPIES`, en
+tête du fichier) et les 40 offres sans contrat les plus récentes, avec la règle de l'export. On y
+ajoutera l'alternance vers janvier 2027.
 
 Prérequis écrits dans `db/README.md` : l'environnement Python `~/.hermes/venv-jobbot-db` créé avec
 `db/requirements.txt`, et `DATABASE_URL` dans `~/.hermes/.env` avec les droits `600`. Le premier
 passage se fait **à blanc** (`--dry-run`), qui ne se connecte à rien. Le collecteur est idempotent :
 le relancer ne crée pas de doublon. **[à vérifier sur le VPS]** que l'environnement et le fichier
-existent toujours.
+existent toujours, et que `psql` est installé.
 
 ---
 
@@ -218,7 +229,66 @@ fichier qui est servi.
 
 ---
 
-## 7. Ce que ce document ne peut pas dire
+## 7. Passer Vercel en lecture depuis Neon (`OFFERS_SOURCE=db`)
+
+Le site lit `data/offers.json` tant que la variable `OFFERS_SOURCE` n'est pas exactement `db`. En
+mode `db`, il lit la table `offers`, met la lecture en cache **quinze minutes**, et se rabat sur le
+fichier si la base est vide, sans collecte datée ou injoignable. Le pied de page le dit alors
+(« Offres lues dans le fichier de secours »). La date « Dernière collecte » est celle de la
+dernière ligne de `collectes`.
+
+### 7.1 Prérequis, dans cet ordre
+
+1. **La migration T6 est appliquée et le collecteur a tourné au moins une fois** (section 5.3).
+2. **`DATABASE_URL` est dans les réglages Vercel**, avec la chaîne **pooled** (l'hôte contient
+   `-pooler`) : Vercel, projet `jobbot`, *Settings*, *Environment Variables*, environnement
+   *Production*. **[à vérifier]** : la connexion Google passe déjà par Neon, donc elle y est
+   probablement déjà. Ne la colle jamais dans le dépôt ni dans un message.
+3. **`npm run verifier-db` donne un nombre d'offres supérieur à 0**, depuis un clone où `.env.local`
+   contient la chaîne pooled. Il liste aussi les tables attendues, dont `collectes` : une table
+   manquante veut dire que la migration n'est pas passée. Ce nombre compte toutes les lignes ;
+   pour celles que le site lira vraiment (celles qui portent un numéro de pipeline) :
+
+```bash
+( set -a; . ~/.hermes/.env; set +a; psql "$DATABASE_URL" -c "
+  SELECT count(*) FILTER (WHERE pipeline_id IS NOT NULL) AS lues_par_le_site,
+         count(*) FILTER (WHERE pipeline_id IS NULL)     AS sans_numero,
+         (SELECT max(terminee_a) FROM collectes)         AS derniere_copie
+  FROM offers;" )
+```
+
+`lues_par_le_site` doit être supérieur à 0 et `derniere_copie` doit être une date. Si
+`lues_par_le_site` vaut 0, le site se rabattra sur le fichier : relance le collecteur d'abord.
+
+### 7.2 Le changement
+
+Dans *Environment Variables* du projet Vercel : ajouter `OFFERS_SOURCE` avec la valeur `db`, pour
+*Production* seulement. **Un changement de variable ne s'applique qu'aux déploiements suivants** :
+lancer ensuite un nouveau déploiement (*Deployments*, le dernier, *Redeploy*). Aucun code à pousser.
+
+### 7.3 Vérifier la date affichée
+
+Ouvrir le site de production, descendre au pied de page :
+
+- « Dernière collecte » doit afficher la date de la dernière copie (`derniere_copie` ci-dessus,
+  sans compter le fuseau d'affichage), **pas** le 25 octobre ;
+- il ne doit **pas** y avoir la ligne « Offres lues dans le fichier de secours » : si elle est là,
+  le site lit le fichier et son motif dit pourquoi (base vide, base injoignable, `DATABASE_URL`
+  absente, aucune collecte datée) ;
+- la ligne « Ces offres ont plus de 24 heures » apparaît si la dernière copie date de plus d'un
+  jour, ce qui veut dire que le collecteur ne tourne plus.
+
+Le cache dure quinze minutes : après une nouvelle copie, la date change au plus quinze minutes plus
+tard. Une offre apparue après le déploiement répond 404 jusque-là, puis s'affiche.
+
+### 7.4 Retour arrière
+
+Dans les mêmes réglages, supprimer `OFFERS_SOURCE` (ou la remettre à `file`), puis *Redeploy*. Le
+site relit `data/offers.json`, qui n'a jamais été touché. Rien n'est à défaire dans la base.
+
+---
+
+## 8. Ce que ce document ne peut pas dire
 
 - Si la collecte horaire tourne encore sur le VPS.
 - Si le rafraîchissement quotidien existe encore, comment il s'appelle, et s'il pousse sur GitHub.
