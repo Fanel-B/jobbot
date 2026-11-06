@@ -4,6 +4,7 @@ import { OfferRow } from "@/components/OfferCard";
 import {
   compterFamilles,
   filtrerParContrat,
+  referenceDe,
   sourceLabel,
   ZONE_LABEL,
   type Offer,
@@ -108,6 +109,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
   const [profil, d] = await Promise.all([lireProfil(), chargerDonnees()]);
   const sansNote = estVide(profil);
   const notees = offresPour(d, profil);
+  const reference = referenceDe(d.meta);
   const offresAvecContrat = notees.filter((o) => o.contract_known);
   const offresSansContrat = notees.filter((o) => !o.contract_known);
   const toutes = [...offresAvecContrat, ...offresSansContrat];
@@ -343,6 +345,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
         <div className="mt-6 card overflow-hidden">
           {vues.map((o, i) => (
             <OfferRow
+              reference={reference}
               key={o.id}
               offre={o}
               rang={i + 1}
@@ -377,7 +380,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
           </p>
           <div className="card mt-5 overflow-hidden">
             {incalculables.slice(0, 40).map((o) => (
-              <OfferRow key={o.id} offre={o} sansNote />
+              <OfferRow key={o.id} offre={o} sansNote reference={reference} />
             ))}
           </div>
           {incalculables.length > 40 ? (

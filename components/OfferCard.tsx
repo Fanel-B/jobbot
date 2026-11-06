@@ -24,6 +24,7 @@ export function OfferRow({
   rang,
   sansNote = false,
   place = null,
+  reference,
 }: {
   /** `OffreNotee` quand on affiche la couverture : elle seule la porte, calculée pour le
    *  profil présent. Une `Offer` brute ne peut donc plus se glisser ici par distraction. */
@@ -32,9 +33,11 @@ export function OfferRow({
   sansNote?: boolean;
   /** La place de l'offre dans le classement complet, quand elle en a une. */
   place?: Rang | null;
+  /** L'heure de la collecte affichée : l'âge de l'annonce se compte depuis elle. */
+  reference: Date;
 }) {
   const couverture = "couverture" in offre ? offre.couverture : null;
-  const agee = annonceAgee(offre);
+  const agee = annonceAgee(offre, reference);
   const manquants = sansNote ? [] : (couverture?.manquants ?? []);
   const couvertes = sansNote ? [] : (couverture?.couvertes ?? []);
 
@@ -73,7 +76,7 @@ export function OfferRow({
               </span>
             ) : null}
             {signalFormationCitable(offre) ? <TrainingChip /> : null}
-            <FreshnessChip offre={offre} />
+            <FreshnessChip offre={offre} reference={reference} />
           </div>
 
           {/* L'aperçu de l'annonce a été retiré. Les offres d'un même employeur ouvrent

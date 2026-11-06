@@ -517,8 +517,8 @@ export function nbSignalFormation(offres: Offer[]): number {
 
 /* ------------------------------------------------------------- recherche */
 
-export function parId(id: string): Offer | undefined {
-  return offers.find((o) => String(o.id) === id);
+export function parId(offres: Offer[], id: string): Offer | undefined {
+  return offres.find((o) => String(o.id) === id);
 }
 
 /** Offres utilisables par défaut : type de contrat connu (les autres ont leur bloc). */

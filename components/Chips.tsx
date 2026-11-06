@@ -62,8 +62,9 @@ export function ContractChip({ offre }: { offre: Offer }) {
   );
 }
 
-export function FreshnessChip({ offre }: { offre: Offer }) {
-  const age = fraicheur(offre);
+/** `reference` : l'heure de la collecte affichée (`referenceDe(meta)`), jamais l'horloge. */
+export function FreshnessChip({ offre, reference }: { offre: Offer; reference: Date }) {
+  const age = fraicheur(offre, reference);
   const recent = age === "vue aujourd'hui" || age === "il y a 1 jour";
   return (
     <span className={`${BASE} ${recent ? "border-good/25 bg-good-soft text-good" : "border-line bg-paper-deep text-muted"}`}>
