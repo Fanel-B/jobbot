@@ -11,6 +11,10 @@
  *   - la **diversité** (14 points), parce que le plafond par entreprise se distribue selon l'ordre
  *     des notes — une note qui monte peut donc en déplacer une autre.
  * Les sept autres critères ne dépendent pas du profil et ne bougent jamais.
+ *
+ * Les fonctions de ce module simulent sur le **profil d'usine** et sur le fichier : ce sont des
+ * références pour les tests. Les pages simulent pour la personne présente, sur les données de
+ * `chargerDonnees()`, avec les fonctions `…Pour` de `lib/profil.ts`.
  */
 import { familleLacune, meta, offers } from "./offers";
 import {
@@ -198,9 +202,9 @@ export function offresAuDessus(seuil: number = SEUIL_BONNE_PISTE): number {
   return n;
 }
 
-/** Y a-t-il assez d'offres pour qu'un comptage veuille dire quelque chose ? */
-export function volumeSuffisant(): boolean {
-  return offers.length >= VOLUME_MINIMAL;
+/** Y a-t-il assez d'offres (`n`, celles de la collecte affichée) pour qu'un comptage veuille dire quelque chose ? */
+export function volumeSuffisant(n: number): boolean {
+  return n >= VOLUME_MINIMAL;
 }
 
 /* ------------------------------------------------------------------- URL */

@@ -13,9 +13,13 @@ import { describe, expect, it } from "vitest";
 import { structureBulletin, offers } from "./offers";
 import { PROFIL_DEFAUT, PROFIL_VIDE, classementPour } from "./profil";
 import { chiffresMethode } from "./methode";
+import { donneesFichier } from "./offers";
+
+/** Les données de référence : le fichier, comme avant le mode base. */
+const D = donneesFichier();
 
 const moteur = readFileSync(new URL("./scoring.ts", import.meta.url), "utf8");
-const c = chiffresMethode();
+const c = chiffresMethode(D);
 
 describe("les barèmes annoncés", () => {
   it("font 42 points pour « toi » et 58 pour « l'annonce »", () => {
@@ -42,7 +46,7 @@ describe("les barèmes annoncés", () => {
     // les offres et de tous les profils, ce que ce test vérifie sur la collecte entière.
     for (const profil of [PROFIL_VIDE, PROFIL_DEFAUT]) {
       const maxVus = new Map<string, Set<number>>();
-      for (const r of classementPour(profil).values()) {
+      for (const r of classementPour(D, profil).values()) {
         for (const l of r.breakdown) {
           const s = maxVus.get(l.critere) ?? new Set<number>();
           s.add(l.max);
@@ -103,7 +107,7 @@ describe("les constantes du moteur que la page cite en clair", () => {
     // Tant que `classementPour` ne transmet que des atouts au moteur, c'est vrai. Si un jour
     // il en transmet davantage, ce test tombe et la phrase de la page doit être réécrite.
     const profil = readFileSync(new URL("./profil.ts", import.meta.url), "utf8");
-    const debut = profil.indexOf("classer(ordreDuPipeline(offers)");
+    const debut = profil.indexOf("classer(ordreDuPipeline(d.offers)");
     const appel = debut >= 0 ? profil.slice(debut, profil.indexOf(";", debut)) : "";
     expect(appel, "l'appel au moteur est introuvable").not.toBe("");
     expect(appel).toContain("atoutsDuProfil(p)");

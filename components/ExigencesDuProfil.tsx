@@ -1,4 +1,5 @@
 import { couverturePour, estVide, lireProfil } from "@/lib/profil";
+import { chargerDonnees } from "@/lib/donnees";
 
 /**
  * Ce que l'annonce demande, face au profil de la personne qui regarde.
@@ -21,8 +22,8 @@ import { couverturePour, estVide, lireProfil } from "@/lib/profil";
  * sans jugement : il n'y a pas de profil dont ces technologies seraient absentes.
  */
 export async function ExigencesDuProfil({ offreId }: { offreId: number }) {
-  const profil = await lireProfil();
-  const { exigences, manquants } = couverturePour(profil, offreId);
+  const [profil, d] = await Promise.all([lireProfil(), chargerDonnees()]);
+  const { exigences, manquants } = couverturePour(d, profil, offreId);
   if (exigences.length === 0) return null;
 
   const vierge = estVide(profil);

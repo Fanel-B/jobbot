@@ -11,6 +11,7 @@ import {
 } from "@/lib/offers";
 import { estVide, lireProfil, offresPour } from "@/lib/profil";
 import { rangsPour, separerNotables } from "@/lib/classement";
+import { chargerDonnees } from "@/lib/donnees";
 
 type Params = {
   zone?: string;
@@ -104,13 +105,13 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
 
   // Le classement est celui du profil en cours, recalculé à la lecture — jamais stocké.
   // C'est la règle du cahier de route : deux personnes voient la même offre, pas la même note.
-  const profil = await lireProfil();
+  const [profil, d] = await Promise.all([lireProfil(), chargerDonnees()]);
   const sansNote = estVide(profil);
-  const notees = offresPour(profil);
+  const notees = offresPour(d, profil);
   const offresAvecContrat = notees.filter((o) => o.contract_known);
   const offresSansContrat = notees.filter((o) => !o.contract_known);
   const toutes = [...offresAvecContrat, ...offresSansContrat];
-  const rangs = sansNote ? null : rangsPour(profil);
+  const rangs = sansNote ? null : rangsPour(d, profil);
   const liste = filtrer(toutes, p, sansNote, rangs);
 
   // Les annonces qui ne citent aucune technologie ne sont pas mal notées, elles sont
@@ -118,7 +119,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
   // qu'on n'a pas pu mesurer. Elles descendent dans leur propre bloc, et restent affichees.
   const { notables, incalculables } = sansNote
     ? { notables: liste, incalculables: [] as typeof liste }
-    : separerNotables(profil, liste);
+    : separerNotables(d, profil, liste);
   const vues = notables.slice(0, 120);
 
   const sources = [...new Set(offresAvecContrat.map((o) => o.source))].sort();

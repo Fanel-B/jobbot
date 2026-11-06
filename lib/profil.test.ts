@@ -25,6 +25,10 @@ import {
   offresPour,
   type Profil,
 } from "./profil";
+import { donneesFichier } from "./offers";
+
+/** Les données de référence : le fichier, comme avant le mode base. */
+const D = donneesFichier();
 
 const PAUVRE: Profil = {
   competences: ["JavaScript", "Git", "Excel", "HTML", "CSS"],
@@ -42,7 +46,7 @@ const RICHE: Profil = {
 
 describe("le profil de départ ne change rien", () => {
   it("rend exactement les notes du pipeline", () => {
-    const classement = classementPour(PROFIL_DEFAUT);
+    const classement = classementPour(D, PROFIL_DEFAUT);
     const ecarts = offers
       .filter((o) => classement.get(o.id)?.total !== o.score)
       .map((o) => `#${o.id} : ${o.score} vs ${classement.get(o.id)?.total}`);
@@ -73,7 +77,7 @@ describe("la note reste la somme de son bulletin", () => {
       string,
       Profil,
     ][]) {
-      for (const r of classementPour(p).values()) {
+      for (const r of classementPour(D, p).values()) {
         const somme = r.breakdown.reduce((s, l) => s + l.points, 0);
         if (somme !== r.total) fautes.push(`[${nom}] #${r.id} : ${r.total} ≠ ${somme}`);
       }
@@ -85,7 +89,7 @@ describe("la note reste la somme de son bulletin", () => {
 describe("le profil change vraiment le classement", () => {
   it("retirer des compétences fait baisser la note moyenne", () => {
     const moyenne = (p: Profil) => {
-      const n = [...classementPour(p).values()].map((r) => r.total);
+      const n = [...classementPour(D, p).values()].map((r) => r.total);
       return n.reduce((a, b) => a + b, 0) / n.length;
     };
     expect(moyenne(PAUVRE)).toBeLessThan(moyenne(PROFIL_DEFAUT));
@@ -94,7 +98,7 @@ describe("le profil change vraiment le classement", () => {
 
   it("un profil plus pauvre laisse plus de compétences à travailler", () => {
     const avecManquants = (p: Profil) =>
-      offers.filter((o) => manquantsPour(p, o.id).length > 0).length;
+      offers.filter((o) => manquantsPour(D, p, o.id).length > 0).length;
     expect(avecManquants(PAUVRE)).toBeGreaterThan(avecManquants(PROFIL_DEFAUT));
   });
 
@@ -106,25 +110,25 @@ describe("le profil change vraiment le classement", () => {
   });
 
   it("offresPour rend des offres de la même forme, renotées", () => {
-    const liste = offresPour(PAUVRE);
+    const liste = offresPour(D, PAUVRE);
     expect(liste).toHaveLength(offers.length);
     const une = liste.find((o) => o.id === offers[0].id)!;
     expect(une.canonical_url).toBe(offers[0].canonical_url);
-    expect(une.score).toBe(classementPour(PAUVRE).get(une.id)!.total);
+    expect(une.score).toBe(classementPour(D, PAUVRE).get(une.id)!.total);
   });
 });
 
 describe("le simulant part du profil, pas du réglage d'usine", () => {
   it("mesure l'écart depuis la note de ce profil", () => {
-    const cible = offers.find((o) => manquantsPour(PAUVRE, o.id).length > 0)!;
-    const effet = effetPour(PAUVRE, cible.id, manquantsPour(PAUVRE, cible.id))!;
-    expect(effet.totalAvant).toBe(classementPour(PAUVRE).get(cible.id)!.total);
+    const cible = offers.find((o) => manquantsPour(D, PAUVRE, o.id).length > 0)!;
+    const effet = effetPour(D, PAUVRE, cible.id, manquantsPour(D, PAUVRE, cible.id))!;
+    expect(effet.totalAvant).toBe(classementPour(D, PAUVRE).get(cible.id)!.total);
     expect(effet.manquantsApres).toEqual([]);
     expect(effet.bulletinApres.reduce((s, l) => s + l.points, 0)).toBe(effet.totalApres);
   });
 
   it("renvoie null sur une offre inconnue plutôt qu'un effet inventé", () => {
-    expect(effetPour(PAUVRE, -1, ["Docker"])).toBeNull();
+    expect(effetPour(D, PAUVRE, -1, ["Docker"])).toBeNull();
   });
 });
 
@@ -154,7 +158,7 @@ describe("le cookie est relu sans jamais faire confiance à son contenu", () => 
   it("ne note rien tant qu'aucune compétence n'est confirmée", () => {
     // L'invariant qui justifie tout le parcours d'arrivée : un profil vide ne couvre aucune
     // exigence, donc aucune note affichée ne peut prétendre dire quoi que ce soit.
-    const classement = classementPour(PROFIL_VIDE);
+    const classement = classementPour(D, PROFIL_VIDE);
     for (const r of classement.values()) {
       expect(r.exigences.every((e) => r.manquants.includes(e)), String(r.id)).toBe(true);
     }

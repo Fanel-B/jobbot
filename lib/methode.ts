@@ -17,7 +17,7 @@
  */
 import { CRITERES_CONSTANTS, groupeDe } from "./groupes";
 import { separerNotables } from "./classement";
-import { SEUIL_ANNONCE_AGEE, annonceAgee, offers } from "./offers";
+import { SEUIL_ANNONCE_AGEE, annonceAgee, referenceDe, type Donnees } from "./offers";
 import { PROFIL_VIDE, classementPour } from "./profil";
 
 export type LigneDeGroupe = { critere: string; max: number };
@@ -45,8 +45,8 @@ export type ChiffresMethode = {
   nbAgees: number;
 };
 
-export function chiffresMethode(): ChiffresMethode {
-  const classement = classementPour(PROFIL_VIDE);
+export function chiffresMethode(d: Donnees): ChiffresMethode {
+  const classement = classementPour(d, PROFIL_VIDE);
 
   // Chaque critère, dans l'ordre du premier bulletin qui le porte, avec son barème.
   const maxParCritere = new Map<string, number>();
@@ -81,17 +81,17 @@ export function chiffresMethode(): ChiffresMethode {
     max: maxParCritere.get(critere) ?? 0,
   }));
 
-  const { notables, incalculables } = separerNotables(PROFIL_VIDE, [...offers]);
+  const { notables, incalculables } = separerNotables(d, PROFIL_VIDE, [...d.offers]);
 
   return {
     toi,
     annonce,
     total: toi.max + annonce.max,
     constants,
-    collecte: offers.length,
+    collecte: d.offers.length,
     notables: notables.length,
     incalculables: incalculables.length,
     seuilAge: SEUIL_ANNONCE_AGEE,
-    nbAgees: offers.filter((o) => annonceAgee(o) !== null).length,
+    nbAgees: d.offers.filter((o) => annonceAgee(o, referenceDe(d.meta)) !== null).length,
   };
 }

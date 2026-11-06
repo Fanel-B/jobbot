@@ -21,7 +21,7 @@ import {
   ordreDuPipeline,
   type Resultat,
 } from "./scoring";
-import { familleLacune, meta, offers, type Couverture, type OffreNotee, type Zone } from "./offers";
+import { familleLacune, type Couverture, type Donnees, type OffreNotee, type Zone } from "./offers";
 import { SEUIL_BONNE_PISTE } from "./simulation";
 import type { Competence, EffetGlobal, EffetOffre, LigneQuiBouge } from "./simulation";
 
@@ -167,16 +167,31 @@ export function atoutsDuProfil(p: Profil): (readonly [string, string])[] {
   return paires;
 }
 
-const MAINTENANT = maintenantDeLExport(meta.generated_at);
 const cache = new Map<string, Map<number, Resultat>>();
 
+/**
+ * La clé d'un classement : la version des données, puis le profil, puis les ajouts simulés.
+ *
+ * La version d'abord. Indexé par le profil seul, ce cache resservait après une copie du
+ * collecteur le classement calculé sur les offres d'avant : de nouvelles offres sans rang, des
+ * offres retirées encore classées. `lib/cache-version.test.ts` le vérifie.
+ */
+export function cleClassement(d: Donnees, p: Profil, ajouts: readonly string[] = []): string {
+  return `${d.version}|${encoderProfil(p)}|${[...ajouts].sort().join(",")}`;
+}
+
 /** Le classement complet vu par ce profil. Mis en cache : une page en demande plusieurs fois. */
-export function classementPour(p: Profil, ajouts: readonly string[] = []): Map<number, Resultat> {
-  const cle = encoderProfil(p) + "|" + [...ajouts].sort().join(",");
+export function classementPour(
+  d: Donnees,
+  p: Profil,
+  ajouts: readonly string[] = [],
+): Map<number, Resultat> {
+  const cle = cleClassement(d, p, ajouts);
   const connu = cache.get(cle);
   if (connu) return connu;
+  const maintenant = maintenantDeLExport(d.meta.generated_at);
   const calcule = new Map(
-    classer(ordreDuPipeline(offers), MAINTENANT, new Map(), ajouts, atoutsDuProfil(p)).map((r) => [
+    classer(ordreDuPipeline(d.offers), maintenant, new Map(), ajouts, atoutsDuProfil(p)).map((r) => [
       r.id,
       r,
     ]),
@@ -186,8 +201,8 @@ export function classementPour(p: Profil, ajouts: readonly string[] = []): Map<n
 }
 
 /** Les exigences de cette offre que le profil ne couvre pas. */
-export function manquantsPour(p: Profil, id: number): string[] {
-  return classementPour(p).get(id)?.manquants ?? [];
+export function manquantsPour(d: Donnees, p: Profil, id: number): string[] {
+  return classementPour(d, p).get(id)?.manquants ?? [];
 }
 
 /**
@@ -198,12 +213,13 @@ export function manquantsPour(p: Profil, id: number): string[] {
  * profil » puis mesurerait l'écart depuis un autre.
  */
 export function effetPour(
+  d: Donnees,
   p: Profil,
   id: number,
   ajouts: readonly string[],
 ): EffetOffre | null {
-  const avant = classementPour(p).get(id);
-  const apres = classementPour(p, ajouts).get(id);
+  const avant = classementPour(d, p).get(id);
+  const apres = classementPour(d, p, ajouts).get(id);
   if (!avant || !apres) return null;
 
   const pointsAvant = new Map(avant.breakdown.map((l) => [l.critere, l.points]));
@@ -237,9 +253,9 @@ export function effetPour(
  * Même regroupement par famille que `competencesSimulables`, mais la base de calcul est le
  * profil de la personne : quelqu'un qui maîtrise déjà Docker ne doit pas se le voir proposer.
  */
-export function competencesSimulablesPour(p: Profil, max = 6): Competence[] {
+export function competencesSimulablesPour(d: Donnees, p: Profil, max = 6): Competence[] {
   const parFamille = new Map<string, { offres: Set<number>; formes: Set<string> }>();
-  for (const r of classementPour(p).values()) {
+  for (const r of classementPour(d, p).values()) {
     for (const m of r.manquants) {
       const nom = familleLacune(m);
       const e = parFamille.get(nom) ?? { offres: new Set<number>(), formes: new Set<string>() };
@@ -255,20 +271,21 @@ export function competencesSimulablesPour(p: Profil, max = 6): Competence[] {
 }
 
 /** Combien d'offres ce profil place déjà au-dessus du seuil. */
-export function offresAuDessusPour(p: Profil, seuil: number = SEUIL_BONNE_PISTE): number {
+export function offresAuDessusPour(d: Donnees, p: Profil, seuil: number = SEUIL_BONNE_PISTE): number {
   let n = 0;
-  for (const r of classementPour(p).values()) if (r.total >= seuil) n += 1;
+  for (const r of classementPour(d, p).values()) if (r.total >= seuil) n += 1;
   return n;
 }
 
 /** Ce qu'une compétence changerait sur toute la collecte, pour ce profil. */
 export function effetGlobalPour(
+  d: Donnees,
   p: Profil,
   competence: Competence,
   seuil: number = SEUIL_BONNE_PISTE,
 ): EffetGlobal {
-  const avant = classementPour(p);
-  const apres = classementPour(p, competence.formes);
+  const avant = classementPour(d, p);
+  const apres = classementPour(d, p, competence.formes);
   let franchissent = 0;
   let montent = 0;
   let gain = 0;
@@ -290,9 +307,9 @@ export function effetGlobalPour(
 }
 
 /** Les offres, renotées pour ce profil. Même forme que `offers`, donc interchangeable. */
-export function offresPour(p: Profil): OffreNotee[] {
-  const classement = classementPour(p);
-  return offers.map((o) => {
+export function offresPour(d: Donnees, p: Profil): OffreNotee[] {
+  const classement = classementPour(d, p);
+  return d.offers.map((o) => {
     const r = classement.get(o.id);
     // Toujours une couverture, même vide : un écran qui en reçoit une sait qu'elle a été
     // calculée pour la personne présente. C'est tout l'intérêt du type.
@@ -321,8 +338,8 @@ export function offresPour(p: Profil): OffreNotee[] {
  * lisait jusqu'ici le champ figé de l'export et annonçait les compétences de Fanel à tout le
  * monde.
  */
-export function couverturePour(p: Profil, id: number): Couverture {
-  const r = classementPour(p).get(id);
+export function couverturePour(d: Donnees, p: Profil, id: number): Couverture {
+  const r = classementPour(d, p).get(id);
   if (!r) return { exigences: [], couvertes: [], manquants: [] };
   const manquants = new Set(r.manquants);
   return {

@@ -3,7 +3,8 @@ import { Bulletin } from "@/components/Bulletin";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { OfferMini } from "@/components/OfferCard";
 import { Barres, Dumbbell } from "@/components/Graphes";
-import { critereLabel, enLettres, lacunesRegroupees, meta, structureBulletin } from "@/lib/offers";
+import { critereLabel, enLettres, lacunesRegroupees, structureDe } from "@/lib/offers";
+import { chargerDonnees } from "@/lib/donnees";
 import { SEUIL_BONNE_PISTE, volumeSuffisant } from "@/lib/simulation";
 import { CarteBesoins } from "@/components/CarteBesoins";
 import {
@@ -28,11 +29,11 @@ import {
  * de quelqu'un d'autre.
  */
 async function donnees() {
-  const profil = await lireProfil();
-  const notees = offresPour(profil);
+  const [profil, d] = await Promise.all([lireProfil(), chargerDonnees()]);
+  const notees = offresPour(d, profil);
   const avecContrat = notees.filter((o) => o.contract_known);
   const meilleures = [...avecContrat].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).slice(0, 6);
-  return { profil, notees, meilleures, reference: meilleures[0] };
+  return { d, profil, notees, meilleures, reference: meilleures[0] };
 }
 
 /** La carte d'offre de l'ouverture : la mieux notée **pour ce profil**. */
@@ -97,7 +98,7 @@ export function CarteOuvertureSquelette() {
 
 /** Les quatre sections de l'accueil qui dépendent du profil. */
 export async function SectionsProfil() {
-  const { profil, notees, meilleures, reference } = await donnees();
+  const { d, profil, notees, meilleures, reference } = await donnees();
 
   // Les quatre sections racontent toutes la même histoire : « voilà où tu en es ». Sans profil,
   // elles la racontent sur personne. Une seule invitation vaut mieux que quatre sections creuses.
@@ -119,10 +120,11 @@ export async function SectionsProfil() {
 
   const offers = notees;
   const lacunes = lacunesRegroupees(notees, 8);
-  const dejaBonnes = offresAuDessusPour(profil);
-  const leviers = volumeSuffisant()
-    ? competencesSimulablesPour(profil, 4)
-        .map((c) => ({ competence: c, effet: effetGlobalPour(profil, c) }))
+  const structureBulletin = structureDe(d.offers);
+  const dejaBonnes = offresAuDessusPour(d, profil);
+  const leviers = volumeSuffisant(d.offers.length)
+    ? competencesSimulablesPour(d, profil, 4)
+        .map((c) => ({ competence: c, effet: effetGlobalPour(d, profil, c) }))
         .filter((l) => l.effet.franchissent > 0 || l.effet.montent > 0)
         .sort((a, b) => b.effet.franchissent - a.effet.franchissent || b.effet.montent - a.effet.montent)
     : [];
@@ -139,7 +141,7 @@ export async function SectionsProfil() {
         </p>
       </div>
       <Link href="/offres" className="text-sm text-accent underline decoration-accent/30">
-        Voir les {meta.count} offres
+        Voir les {d.meta.count} offres
       </Link>
     </div>
 

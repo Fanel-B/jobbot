@@ -16,12 +16,16 @@
 import { describe, expect, it } from "vitest";
 import { offers } from "./offers";
 import { PROFIL_DEFAUT, PROFIL_VIDE, classementPour, couverturePour, type Profil } from "./profil";
+import { donneesFichier } from "./offers";
+
+/** Les données de référence : le fichier, comme avant le mode base. */
+const D = donneesFichier();
 
 const TROIS: Profil = { ...PROFIL_VIDE, competences: ["React", "SQL", "Git"] };
 
 /** Le « 2/3 » que le moteur écrit dans le détail de la ligne de cohérence. */
 function decompteDuBulletin(profil: Profil, id: number): { couvertes: number; exigences: number } | null {
-  const ligne = classementPour(profil)
+  const ligne = classementPour(D, profil)
     .get(id)
     ?.breakdown.find((l) => l.critere === "cohérence");
   const m = ligne?.detail?.match(/^(\d+)\/(\d+) exigences/);
@@ -39,7 +43,7 @@ describe("la gauche de la fiche dit la même chose que son relevé", () => {
       for (const o of offers) {
         const attendu = decompteDuBulletin(profil, o.id);
         if (!attendu) continue;
-        const c = couverturePour(profil, o.id);
+        const c = couverturePour(D, profil, o.id);
         expect(c.exigences.length, `offre ${o.id}, total des exigences`).toBe(attendu.exigences);
         expect(c.couvertes.length, `offre ${o.id}, exigences couvertes`).toBe(attendu.couvertes);
         compares += 1;
@@ -51,7 +55,7 @@ describe("la gauche de la fiche dit la même chose que son relevé", () => {
 
   it("ne laisse jamais une compétence être à la fois couverte et manquante", () => {
     for (const o of offers) {
-      const c = couverturePour(TROIS, o.id);
+      const c = couverturePour(D, TROIS, o.id);
       const doubles = c.couvertes.filter((x) => c.manquants.includes(x));
       expect(doubles, `offre ${o.id}`).toEqual([]);
       expect(c.couvertes.length + c.manquants.length).toBe(c.exigences.length);
@@ -69,8 +73,8 @@ describe("changer de profil change les deux colonnes", () => {
       const b = decompteDuBulletin(PROFIL_DEFAUT, o.id);
       if (!a || !b) continue;
 
-      const ca = couverturePour(PROFIL_VIDE, o.id).couvertes.length;
-      const cb = couverturePour(PROFIL_DEFAUT, o.id).couvertes.length;
+      const ca = couverturePour(D, PROFIL_VIDE, o.id).couvertes.length;
+      const cb = couverturePour(D, PROFIL_DEFAUT, o.id).couvertes.length;
 
       expect(a.couvertes !== b.couvertes, `offre ${o.id}`).toBe(ca !== cb);
       if (ca !== cb) bougent += 1;
@@ -82,7 +86,7 @@ describe("changer de profil change les deux colonnes", () => {
     // La vérification la plus simple, et celle qui manquait : sans compétence confirmée,
     // aucune exigence ne peut être couverte, sur aucune offre.
     for (const o of offers) {
-      expect(couverturePour(PROFIL_VIDE, o.id).couvertes, `offre ${o.id}`).toEqual([]);
+      expect(couverturePour(D, PROFIL_VIDE, o.id).couvertes, `offre ${o.id}`).toEqual([]);
     }
   });
 });

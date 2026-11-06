@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { critereLabel, enLettres, meta, nbSignalFormation, offers, sourceLabel } from "@/lib/offers";
+import { critereLabel, enLettres, nbSignalFormation, sourceLabel } from "@/lib/offers";
+import { chargerDonnees } from "@/lib/donnees";
 import { estConstant } from "@/lib/groupes";
 import { chiffresMethode, type GroupeMethode } from "@/lib/methode";
 
@@ -53,13 +54,16 @@ function BlocGroupe({ titre, intro, g }: { titre: string; intro: string; g: Grou
   );
 }
 
-export default function Page() {
+export default async function Page() {
+  // Les offres et leur `meta` viennent de la source choisie par `OFFERS_SOURCE`.
+  const d = await chargerDonnees();
+  const { meta, offers } = d;
   const sources = Object.entries(meta.sources).sort((a, b) => b[1] - a[1]);
   const nbFormation = nbSignalFormation(offers);
   // Les chiffres de la note se déduisent du moteur et de l'export, ils ne sont pas écrits en
   // dur : une phrase figée devient fausse sans que personne ne le voie. `lib/methode.test.ts`
   // épingle ce que la page cite et que le moteur garde en constantes privées.
-  const m = chiffresMethode();
+  const m = chiffresMethode(d);
   const nbAjustements = m.toi.ajustements.length + m.annonce.ajustements.length;
   const diversite = m.constants.find((c) => c.critere === "diversité");
   const dossier = m.constants.find((c) => c.critere === "dossier");

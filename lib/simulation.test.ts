@@ -143,7 +143,7 @@ describe("l'effet d'ensemble", () => {
   });
 
   it("la collecte est assez grosse pour qu'un comptage ait un sens", () => {
-    expect(volumeSuffisant()).toBe(true);
+    expect(volumeSuffisant(offers.length)).toBe(true);
   });
 });
 

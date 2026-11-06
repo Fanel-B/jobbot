@@ -18,12 +18,16 @@ import {
   tranchePour,
 } from "./classement";
 import { PROFIL_DEFAUT, PROFIL_VIDE, classementPour, type Profil } from "./profil";
+import { donneesFichier } from "./offers";
+
+/** Les données de référence : le fichier, comme avant le mode base. */
+const D = donneesFichier();
 
 const PAUVRE: Profil = { ...PROFIL_VIDE, competences: ["SQL"] };
 
 describe("le partage entre notable et incalculable", () => {
   it("ne retient que les offres citant au moins une technologie", () => {
-    const classement = classementPour(PROFIL_DEFAUT);
+    const classement = classementPour(D, PROFIL_DEFAUT);
     for (const o of offers) {
       const r = classement.get(o.id);
       expect(estNotable(r)).toBe((r?.exigences.length ?? 0) > 0);
@@ -31,7 +35,7 @@ describe("le partage entre notable et incalculable", () => {
   });
 
   it("ne perd aucune offre en les séparant", () => {
-    const { notables, incalculables } = separerNotables(PROFIL_DEFAUT, [...offers]);
+    const { notables, incalculables } = separerNotables(D, PROFIL_DEFAUT, [...offers]);
     expect(notables.length + incalculables.length).toBe(offers.length);
   });
 
@@ -39,34 +43,34 @@ describe("le partage entre notable et incalculable", () => {
     // Le caractère calculable tient à ce que dit l'annonce, jamais à ce que sait le lecteur.
     // Si ça devenait faux, deux personnes verraient des listes de tailles différentes sans
     // qu'aucune ne puisse comprendre pourquoi.
-    const a = separerNotables(PROFIL_VIDE, [...offers]).incalculables.map((o) => o.id);
-    const b = separerNotables(PROFIL_DEFAUT, [...offers]).incalculables.map((o) => o.id);
+    const a = separerNotables(D, PROFIL_VIDE, [...offers]).incalculables.map((o) => o.id);
+    const b = separerNotables(D, PROFIL_DEFAUT, [...offers]).incalculables.map((o) => o.id);
     expect(a).toEqual(b);
   });
 
   it("en trouve une part importante, ce qui justifie le bloc à part", () => {
-    const { incalculables } = separerNotables(PROFIL_DEFAUT, [...offers]);
+    const { incalculables } = separerNotables(D, PROFIL_DEFAUT, [...offers]);
     expect(incalculables.length).toBeGreaterThan(50);
   });
 });
 
 describe("les rangs", () => {
   it("n'attribue de rang qu'aux offres notables", () => {
-    const table = rangsPour(PROFIL_DEFAUT);
-    const { notables, incalculables } = separerNotables(PROFIL_DEFAUT, [...offers]);
+    const table = rangsPour(D, PROFIL_DEFAUT);
+    const { notables, incalculables } = separerNotables(D, PROFIL_DEFAUT, [...offers]);
     expect(table.size).toBe(notables.length);
-    for (const o of incalculables) expect(rangDe(PROFIL_DEFAUT, o.id)).toBeNull();
+    for (const o of incalculables) expect(rangDe(D, PROFIL_DEFAUT, o.id)).toBeNull();
   });
 
   it("numérote de 1 à N sans trou ni doublon", () => {
-    const rangs = [...rangsPour(PROFIL_DEFAUT).values()].map((r) => r.rang).sort((a, b) => a - b);
+    const rangs = [...rangsPour(D, PROFIL_DEFAUT).values()].map((r) => r.rang).sort((a, b) => a - b);
     expect(rangs[0]).toBe(1);
     expect(rangs[rangs.length - 1]).toBe(rangs.length);
     expect(new Set(rangs).size).toBe(rangs.length);
   });
 
   it("annonce le même dénominateur partout", () => {
-    const sur = new Set([...rangsPour(PROFIL_DEFAUT).values()].map((r) => r.sur));
+    const sur = new Set([...rangsPour(D, PROFIL_DEFAUT).values()].map((r) => r.sur));
     expect(sur.size).toBe(1);
   });
 
@@ -74,14 +78,14 @@ describe("les rangs", () => {
     // La règle exacte, et c'est elle qui fait la valeur du rang : une meilleure correspondance
     // passe toujours devant, quelle que soit la qualité de l'annonce. Classer sur le total
     // referait le défaut qu'on répare, puisque le total est aux sept dixièmes l'annonce.
-    const classement = classementPour(PROFIL_DEFAUT);
-    const ordre = [...rangsPour(PROFIL_DEFAUT).entries()].sort((a, b) => a[1].rang - b[1].rang);
+    const classement = classementPour(D, PROFIL_DEFAUT);
+    const ordre = [...rangsPour(D, PROFIL_DEFAUT).entries()].sort((a, b) => a[1].rang - b[1].rang);
 
     for (let i = 1; i < ordre.length; i++) {
       const [idA] = ordre[i - 1];
       const [idB] = ordre[i];
-      const a = correspondancePour(PROFIL_DEFAUT, idA)!;
-      const b = correspondancePour(PROFIL_DEFAUT, idB)!;
+      const a = correspondancePour(D, PROFIL_DEFAUT, idA)!;
+      const b = correspondancePour(D, PROFIL_DEFAUT, idB)!;
       expect(a, `${idA} devant ${idB}`).toBeGreaterThanOrEqual(b);
       if (a === b) {
         // À correspondance égale, l'annonce la mieux notée passe devant.
@@ -95,8 +99,8 @@ describe("les rangs", () => {
   it("ne classe pas sur le total, et la différence se voit", () => {
     // Garde-fou : si quelqu'un remettait un tri sur le total, ce test tomberait. Il existe
     // parce que les deux ordres se ressemblent assez pour qu'on ne voie pas la substitution.
-    const classement = classementPour(PROFIL_DEFAUT);
-    const parRang = [...rangsPour(PROFIL_DEFAUT).entries()]
+    const classement = classementPour(D, PROFIL_DEFAUT);
+    const parRang = [...rangsPour(D, PROFIL_DEFAUT).entries()]
       .sort((a, b) => a[1].rang - b[1].rang)
       .map(([id]) => id);
     const parTotal = [...parRang].sort(
@@ -108,14 +112,14 @@ describe("les rangs", () => {
   it("reste stable d'un appel à l'autre", () => {
     // Deux offres à égalité de total doivent garder le même ordre, sinon la même offre change
     // de rang entre deux visites alors que rien n'a bougé.
-    const a = [...rangsPour(PAUVRE).entries()].map(([id, r]) => `${id}:${r.rang}`);
-    const b = [...rangsPour(PAUVRE).entries()].map(([id, r]) => `${id}:${r.rang}`);
+    const a = [...rangsPour(D, PAUVRE).entries()].map(([id, r]) => `${id}:${r.rang}`);
+    const b = [...rangsPour(D, PAUVRE).entries()].map(([id, r]) => `${id}:${r.rang}`);
     expect(a).toEqual(b);
   });
 
   it("suit le profil : enrichir son profil change les places", () => {
-    const vide = rangsPour(PROFIL_VIDE);
-    const riche = rangsPour(PROFIL_DEFAUT);
+    const vide = rangsPour(D, PROFIL_VIDE);
+    const riche = rangsPour(D, PROFIL_DEFAUT);
     const bouge = [...riche.entries()].filter(([id, r]) => vide.get(id)?.rang !== r.rang);
     expect(bouge.length).toBeGreaterThan(0);
   });

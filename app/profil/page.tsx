@@ -2,7 +2,8 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ZONE_LABEL, offers, type Zone } from "@/lib/offers";
+import { ZONE_LABEL, type Zone } from "@/lib/offers";
+import { chargerDonnees } from "@/lib/donnees";
 import { FAMILLES, competencesRangees } from "@/lib/competences";
 import { EtatDuProfil } from "@/components/EtatDuProfil";
 import {
@@ -58,7 +59,7 @@ function Case({
 
 async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre?: string; reinitialise?: string }> }) {
   const p = await searchParams;
-  const profil = await lireProfil();
+  const [profil, d] = await Promise.all([lireProfil(), chargerDonnees()]);
   // `auth()` tire un aléa pour sa session, que le pré-rendu ne peut pas figer : sans cette ligne,
   // Next signale « unstable value crypto.getRandomValues() while prerendering » et la page sort
   // du pré-rendu partiel. `connection()` arrête le pré-rendu ici, la suite a lieu à la requête.
@@ -68,7 +69,7 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
   const vierge = estVide(profil);
 
   // Ce que le profil change concrètement, dit en chiffres plutôt qu'en promesse.
-  const classement = classementPour(profil);
+  const classement = classementPour(d, profil);
   const notes = [...classement.values()].map((r) => r.total);
   const moyenne = notes.length ? Math.round(notes.reduce((a, b) => a + b, 0) / notes.length) : 0;
   const auDessusDe65 = notes.filter((n) => n >= 65).length;
@@ -87,7 +88,7 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
 
       {p.enregistre ? (
         <p className="mt-6 rounded-card border border-good/30 bg-good-soft px-4 py-3 text-sm text-good">
-          Profil enregistré. Les {offers.length} offres viennent d&apos;être renotées.
+          Profil enregistré. Les {d.offers.length} offres viennent d&apos;être renotées.
         </p>
       ) : null}
       {p.reinitialise ? (
@@ -101,21 +102,21 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
           {vierge ? (
             <>
               Rien de coché pour l&apos;instant, donc aucune offre n&apos;est notée. Coche ce que tu
-              sais faire : les <span className="num">{offers.length}</span> offres se classent dès
+              sais faire : les <span className="num">{d.offers.length}</span> offres se classent dès
               l&apos;enregistrement.
             </>
           ) : (
             <>
               Avec ce profil : note moyenne{" "}
               <strong className="num font-medium text-ink">{moyenne}</strong> sur les{" "}
-              <span className="num">{offers.length}</span> offres, dont{" "}
+              <span className="num">{d.offers.length}</span> offres, dont{" "}
               <strong className="num font-medium text-ink">{auDessusDe65}</strong> au-dessus de 65.
             </>
           )}
         </p>
       </div>
 
-      <EtatDuProfil profil={profil} vierge={vierge} />
+      <EtatDuProfil donnees={d} profil={profil} vierge={vierge} />
 
       <form action={enregistrerProfil} className="mt-10 space-y-10">
         <section>
