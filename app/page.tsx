@@ -42,7 +42,7 @@ export default async function Home() {
         <div className="regle bloc mx-auto max-w-[78rem] overflow-hidden border border-line">
           <div className="cascade grid gap-12 px-6 py-16 sm:px-12 sm:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16 lg:py-20">
             <div>
-              <p className="label">Stages et alternances · Toulouse et Île-de-France</p>
+              <p className="label">Stages · Toulouse et Île-de-France</p>
               <h1 className="titre-geant mt-5 max-w-[11ch]">
                 Les offres qui te correspondent <em className="italique-accent">vraiment</em>.
               </h1>

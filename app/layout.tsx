@@ -9,7 +9,7 @@ import { AgeCollecte } from "@/components/AgeCollecte";
 export const metadata: Metadata = {
   title: "JobBot, les offres qui te correspondent vraiment",
   description:
-    "Alternance et stage en France : les offres publiées par les entreprises et les sources officielles, avec une note expliquée critère par critère.",
+    "Stages en France : les offres publiées par les entreprises et les sources officielles, avec une note expliquée critère par critère.",
 };
 
 export default async function RootLayout({
@@ -87,7 +87,7 @@ export default async function RootLayout({
             <div>
               <p className="font-medium text-ink">JobBot</p>
               <p className="mt-2 leading-relaxed">
-                Recherche d&apos;alternance et de stage. Les offres sont collectées une fois, le
+                Recherche de stage. Les offres sont collectées une fois, le
                 classement est calculé pour chaque profil.
               </p>
             </div>

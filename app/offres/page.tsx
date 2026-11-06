@@ -214,12 +214,18 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
               {comptes.stage}
             </span>
           </Filtre>
-          <Filtre actif={p.type === "alternance"} href={lien({ ...p, type: "alternance" })}>
-            Alternance
-            <span className={`num ${p.type === "alternance" ? "text-paper/60" : "text-muted"}`}>
-              {comptes.alternance}
-            </span>
-          </Filtre>
+          {/* Comme « Autre » : le filtre n'existe que si la collecte contient de l'alternance.
+              Le périmètre est le stage seul jusqu'en janvier 2027 (CONTRATS_COPIES du collecteur) :
+              un filtre à zéro en permanence ferait croire à une panne. Il reste affiché quand il
+              est déjà choisi, par un lien partagé, pour que l'écran vide s'explique. */}
+          {comptesCollecte.alternance > 0 || p.type === "alternance" ? (
+            <Filtre actif={p.type === "alternance"} href={lien({ ...p, type: "alternance" })}>
+              Alternance
+              <span className={`num ${p.type === "alternance" ? "text-paper/60" : "text-muted"}`}>
+                {comptes.alternance}
+              </span>
+            </Filtre>
+          ) : null}
           {/* « Autre » n'apparaît que s'il y a vraiment un type renseigné hors stage et
               alternance : un filtre vide en permanence serait du bruit. */}
           {comptes.autre > 0 ? (
