@@ -21,6 +21,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { ZONE_LABEL } from "./offers";
 import { NIVEAU_LABEL, RECHERCHE_LABEL, encoderProfil, type Profil } from "./profil";
+import { donneesFichier } from "./offers";
+
+/** Les données de référence : le fichier, comme avant le mode base. */
+const D = donneesFichier();
 
 // Un profil dont chaque réglage serait reconnaissable à l'écran s'il y apparaissait.
 const PROFIL_TEMOIN: Profil = {
@@ -72,8 +76,8 @@ describe("l'en-tête du relevé", () => {
     // compétences mais opposé en réglages.
     const autres: Profil = { ...PROFIL_TEMOIN, zones: ["toulouse"], niveau: "bac+3", recherche: ["stage"] };
     const { classementPour } = await import("./profil");
-    const a = classementPour(PROFIL_TEMOIN).get(913)?.total;
-    const b = classementPour(autres).get(913)?.total;
+    const a = classementPour(D, PROFIL_TEMOIN).get(913)?.total;
+    const b = classementPour(D, autres).get(913)?.total;
     expect(a).toBeDefined();
     expect(a).toBe(b);
   });

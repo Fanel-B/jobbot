@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { offers } from "@/lib/offers";
+import type { Donnees } from "@/lib/offers";
 import { competencesSimulablesPour, effetGlobalPour, type Profil } from "@/lib/profil";
 import { effetDeGroupe, estNotable, rangsPour } from "@/lib/classement";
 import { classementPour } from "@/lib/profil";
@@ -21,11 +21,19 @@ import { classementPour } from "@/lib/profil";
  *
  * Tout vient de calculs qui existaient déjà. Rien n'est estimé.
  */
-export function EtatDuProfil({ profil, vierge }: { profil: Profil; vierge: boolean }) {
+export function EtatDuProfil({
+  donnees: d,
+  profil,
+  vierge,
+}: {
+  donnees: Donnees;
+  profil: Profil;
+  vierge: boolean;
+}) {
   // Les lacunes, classées par ce qu'elles rapporteraient vraiment. Une techno citée partout
   // mais déjà couverte par le profil ne sert à rien : c'est l'effet qui compte, pas la mode.
-  const lacunes = competencesSimulablesPour(profil, 6)
-    .map((c) => ({ competence: c, effet: effetGlobalPour(profil, c) }))
+  const lacunes = competencesSimulablesPour(d, profil, 6)
+    .map((c) => ({ competence: c, effet: effetGlobalPour(d, profil, c) }))
     .filter((l) => l.effet.montent > 0)
     .sort((a, b) => b.effet.montent - a.effet.montent)
     .slice(0, 5);
@@ -34,9 +42,9 @@ export function EtatDuProfil({ profil, vierge }: { profil: Profil; vierge: boole
     // Ce que les cinq premières feraient ensemble, mesuré d'un bloc : additionner leurs effets
     // séparés compterait deux fois les offres que plusieurs d'entre elles concernent.
     const formes = lacunes.flatMap((l) => l.competence.formes);
-    const ensemble = effetDeGroupe(profil, formes);
+    const ensemble = effetDeGroupe(d, profil, formes);
     const exemples = ensemble.meilleures
-      .map((m) => offers.find((o) => o.id === m.id))
+      .map((m) => d.offers.find((o) => o.id === m.id))
       .filter((o): o is NonNullable<typeof o> => Boolean(o));
 
     return (
@@ -97,9 +105,9 @@ export function EtatDuProfil({ profil, vierge }: { profil: Profil; vierge: boole
     );
   }
 
-  const classement = classementPour(profil);
+  const classement = classementPour(d, profil);
   const notables = [...classement.values()].filter((r) => estNotable(r)).length;
-  const rangs = rangsPour(profil);
+  const rangs = rangsPour(d, profil);
   const dansLePremierQuart = [...rangs.values()].filter((r) => r.rang <= r.sur / 4).length;
 
   return (

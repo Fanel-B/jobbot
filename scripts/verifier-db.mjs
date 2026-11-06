@@ -1,7 +1,7 @@
 /**
  * `npm run verifier-db` : la base Neon est-elle joignable, et le schéma appliqué ?
  *
- * Lecture seule — aucune écriture, aucune migration. Affiche les six tables attendues, celles qui
+ * Lecture seule : aucune écriture, aucune migration. Affiche les tables attendues (`TABLES_ATTENDUES`), celles qui
  * manquent, et le nombre d'offres. Rien d'autre ne peut être conclu sans se connecter, donc cette
  * commande est le premier contrôle à passer après avoir posé `DATABASE_URL`.
  *

@@ -21,13 +21,23 @@ import {
   dateCourte,
   estNonRenseigne,
   fraicheur,
-  offers,
   parId,
+  referenceDe,
   signalFormationCitable,
   sourceLabel,
 } from "@/lib/offers";
+import { chargerDonnees } from "@/lib/donnees";
 
-export function generateStaticParams() {
+/**
+ * Les fiches pré-rendues au build : celles de la collecte présente à ce moment-là.
+ *
+ * Avec `cacheComponents`, `dynamicParams` n'existe plus : une offre arrivée après le build (mode
+ * base) est rendue à sa première visite, puis gardée comme les autres. `chargerDonnees()` la
+ * connaît déjà si son cache a été rafraîchi ; sinon la fiche répond 404 jusqu'au rafraîchissement
+ * suivant, au plus quinze minutes plus tard.
+ */
+export async function generateStaticParams() {
+  const { offers } = await chargerDonnees();
   return offers.map((o) => ({ id: String(o.id) }));
 }
 
@@ -37,7 +47,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const offre = parId(id);
+  const offre = parId((await chargerDonnees()).offers, id);
   if (!offre) return { title: "Offre introuvable - JobBot" };
   return {
     title: `${offre.title ?? "Offre"} - ${offre.company ?? "JobBot"}`,
@@ -70,8 +80,10 @@ export default async function Page({
   searchParams: Promise<{ simule?: string }>;
 }) {
   const { id } = await params;
-  const offre = parId(id);
+  const d = await chargerDonnees();
+  const offre = parId(d.offers, id);
   if (!offre) notFound();
+  const reference = referenceDe(d.meta);
 
   const cvRecommande = estNonRenseigne(offre)
     ? "À définir après lecture de l'annonce d'origine"
@@ -103,7 +115,7 @@ export default async function Page({
             <SourceChip source={offre.source} />
             <ZoneChip zone={offre.location_zone} sansLieu={!offre.location?.trim()} />
             {signalFormationCitable(offre) ? <TrainingChip /> : null}
-            <FreshnessChip offre={offre} />
+            <FreshnessChip offre={offre} reference={reference} />
             {offre.miage_mentioned ? <InfoChip>MIAGE mentionné</InfoChip> : null}
           </div>
 
@@ -173,7 +185,7 @@ export default async function Page({
               </div>
               <div>
                 <dt className="text-xs text-muted">Vue pour la dernière fois</dt>
-                <dd className="mt-1 text-sm">{fraicheur(offre)}</dd>
+                <dd className="mt-1 text-sm">{fraicheur(offre, reference)}</dd>
               </div>
             </dl>
           </section>
@@ -183,10 +195,10 @@ export default async function Page({
               compétences de Fanel : il annonçait donc à tout le monde « déjà dans ton profil »
               pendant que le relevé, en face, comptait zéro. Une seule source désormais, la
               même que le relevé, et dans une frontière <Suspense> puisqu'elle lit un cookie. */}
-          {annonceAgee(offre) !== null ? (
+          {annonceAgee(offre, reference) !== null ? (
             <p className="mt-6 rounded-card border border-warn/30 bg-warn-soft px-4 py-3 text-sm text-warn">
               Cette annonce a été publiée il y a{" "}
-              <span className="num font-medium">{annonceAgee(offre)}</span> jours. Elle reste
+              <span className="num font-medium">{annonceAgee(offre, reference)}</span> jours. Elle reste
               notée comme les autres, l&apos;âge ne retire aucun point, mais vérifie sur le site
               de l&apos;employeur qu&apos;elle est encore ouverte avant de préparer un dossier.
             </p>

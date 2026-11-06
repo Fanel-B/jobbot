@@ -18,14 +18,14 @@
  * Elles sortent donc du classement principal, en le disant, et restent affichées. C'est le motif
  * que le site applique déjà aux contrats non renseignés.
  */
-import { familleLacune, offers, type Offer } from "./offers";
+import { familleLacune, type Donnees, type Offer } from "./offers";
 import { enDeuxGroupes } from "./groupes";
 import { SEUIL_BONNE_PISTE } from "./simulation";
 import {
   classementPour,
+  cleClassement,
   competencesSimulablesPour,
   effetGlobalPour,
-  encoderProfil,
   manquantsPour,
   type Profil,
 } from "./profil";
@@ -61,12 +61,13 @@ export function estNotable(r: Resultat | undefined): boolean {
  * devant une annonce vieille et bavarde : c'est une vraie information, elle a sa place, mais
  * après la correspondance et jamais à sa place.
  */
-export function correspondancePour(profil: Profil, id: number): number | null {
-  const r = classementPour(profil).get(id);
+export function correspondancePour(d: Donnees, profil: Profil, id: number): number | null {
+  const r = classementPour(d, profil).get(id);
   if (!estNotable(r)) return null;
   return enDeuxGroupes(r!.breakdown).toi.points;
 }
 
+/** Indexé comme `classementPour` : version des données, puis profil (voir `cleClassement`). */
 const cacheRangs = new Map<string, Map<number, Rang>>();
 
 /**
@@ -76,13 +77,13 @@ const cacheRangs = new Map<string, Map<number, Rang>>();
  * point. Demander leur rang rend `null`, ce qui oblige l'appelant à traiter le cas au lieu de
  * l'ignorer.
  */
-export function rangsPour(profil: Profil): Map<number, Rang> {
-  const cle = encoderProfil(profil);
+export function rangsPour(d: Donnees, profil: Profil): Map<number, Rang> {
+  const cle = cleClassement(d, profil);
   const connu = cacheRangs.get(cle);
   if (connu) return connu;
 
-  const classement = classementPour(profil);
-  const notables = offers
+  const classement = classementPour(d, profil);
+  const notables = d.offers
     .map((o) => classement.get(o.id))
     .filter((r): r is Resultat => estNotable(r))
     // Correspondance d'abord, qualité de l'annonce ensuite, identifiant en dernier recours.
@@ -102,8 +103,8 @@ export function rangsPour(profil: Profil): Map<number, Rang> {
 }
 
 /** Le rang d'une offre, ou `null` si elle n'est pas notable. */
-export function rangDe(profil: Profil, id: number): Rang | null {
-  return rangsPour(profil).get(id) ?? null;
+export function rangDe(d: Donnees, profil: Profil, id: number): Rang | null {
+  return rangsPour(d, profil).get(id) ?? null;
 }
 
 /**
@@ -112,10 +113,11 @@ export function rangDe(profil: Profil, id: number): Rang | null {
  * L'ordre d'entrée est conservé dans chaque liste, pour que l'appelant reste maître du tri.
  */
 export function separerNotables(
+  d: Donnees,
   profil: Profil,
   liste: Offer[],
 ): { notables: Offer[]; incalculables: Offer[] } {
-  const classement = classementPour(profil);
+  const classement = classementPour(d, profil);
   const notables: Offer[] = [];
   const incalculables: Offer[] = [];
   for (const o of liste) {
@@ -172,19 +174,19 @@ export type Observation = {
   levier: { label: string; montent: number; franchissent: number } | null;
 };
 
-export function observationPour(profil: Profil, id: number): Observation | null {
-  const manquants = manquantsPour(profil, id);
+export function observationPour(d: Donnees, profil: Profil, id: number): Observation | null {
+  const manquants = manquantsPour(d, profil, id);
   if (manquants.length === 0) return null;
 
   // Le levier se choisit sur l'ensemble de la collecte, pas sur cette seule offre : apprendre
   // une techno pour une annonce est un mauvais calcul, l'apprendre pour vingt en est un bon.
-  const candidates = competencesSimulablesPour(profil, 12);
+  const candidates = competencesSimulablesPour(d, profil, 12);
   const familles = new Set(manquants.map((m) => familleLacune(m)));
   const utile = candidates.filter((c) => familles.has(c.label));
 
   let levier: Observation["levier"] = null;
   for (const c of utile) {
-    const e = effetGlobalPour(profil, c);
+    const e = effetGlobalPour(d, profil, c);
     if (e.montent === 0) continue;
     if (!levier || e.montent > levier.montent) {
       levier = { label: c.label, montent: e.montent, franchissent: e.franchissent };
@@ -218,12 +220,13 @@ export type EffetGroupe = {
 };
 
 export function effetDeGroupe(
+  d: Donnees,
   profil: Profil,
   formes: readonly string[],
   seuil = SEUIL_BONNE_PISTE,
 ): EffetGroupe {
-  const avant = classementPour(profil);
-  const apres = classementPour(profil, formes);
+  const avant = classementPour(d, profil);
+  const apres = classementPour(d, profil, formes);
 
   let montent = 0;
   let franchissent = 0;

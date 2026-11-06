@@ -1,10 +1,13 @@
 /**
- * Lecture des offres réelles exportées par le pipeline Hermes.
+ * Les offres : leurs types, leurs libellés, et leur mise en forme commune.
  *
- * Le site ne parle jamais à la base : il lit `data/offers.json`, produit par
- * `export_site.py`. Le fichier contient déjà le score **expliqué** et les
- * compétences couvertes / manquantes, calculés côté Python par le moteur qui
- * tourne en production.
+ * Elles arrivent de deux endroits, choisis par `lib/donnees.ts` : `data/offers.json`, produit par
+ * `export_site.py` (le défaut), ou la table `offers` de Neon, remplie par le collecteur. Les deux
+ * passent par `normaliserExport`, pour que le reste du site ne sache pas d'où elles viennent.
+ *
+ * Les constantes `offers` et `meta` de ce module sont **le fichier**, et seulement lui : la
+ * référence des tests et des oracles. Les pages n'y touchent pas, elles passent par
+ * `chargerDonnees()` (le test `lib/donnees-consommateurs.test.ts` y veille).
  */
 import raw from "@/data/offers.json";
 import { classer, maintenantDeLExport, ordreDuPipeline } from "./scoring";
@@ -76,7 +79,12 @@ export type OffreNotee = Offer & { couverture: Couverture };
 
 export type Zone = "toulouse" | "idf" | "remote" | "autre";
 
-export type Meta = {
+/** D'où viennent les offres affichées. */
+export type SourceOffres = "file" | "db";
+
+/** Ce que l'export écrit dans `meta`, et ce que le mode base reconstitue à l'identique. */
+export type MetaExport = {
+  /** L'heure de la collecte : l'export du fichier, ou la dernière copie réussie en base. */
   generated_at: string;
   count: number;
   sources: Record<string, number>;
@@ -86,33 +94,91 @@ export type Meta = {
   note: string;
 };
 
-type Payload = { meta: Meta; offers: Offer[] };
+export type Meta = MetaExport & {
+  /** Ce que le site lit réellement. « file » aussi quand il s'est rabattu sur le fichier. */
+  source: SourceOffres;
+  /**
+   * Pourquoi le site lit le fichier alors qu'on lui demandait la base (base vide, injoignable…),
+   * ou `null`. Le dire plutôt que le taire : sinon le site afficherait de vieilles offres en
+   * laissant croire qu'elles sortent de la dernière copie.
+   */
+  repli: string | null;
+};
 
-const data = raw as unknown as Payload;
+/** Ce que le site affiche, d'une seule source et d'une seule collecte. */
+export type Donnees = {
+  offers: Offer[];
+  meta: Meta;
+  /**
+   * Change à chaque collecte. Les caches de classement par profil s'indexent dessus : sans elle,
+   * ils resserviraient l'ancien classement après une copie.
+   */
+  version: string;
+};
 
-export const meta: Meta = data.meta;
+/** Une offre telle que l'export l'écrit (ou que la base la reconstitue), avant mise en forme. */
+export type OffreExportee = Omit<Offer, "skills_pipeline"> & {
+  skills_optional?: string[] | null;
+  skills?: Skills | null;
+};
+
+export type ExportBrut = { meta: MetaExport; offers: OffreExportee[] };
 
 /**
- * La note affichée est recalculée par `lib/scoring.ts`, à l'heure du calcul du pipeline. Ce portage
- * est vérifié contre l'oracle (`npm run verifier-scoring` : zéro désaccord sur la note, les points et
- * les libellés) — c'est ce qui permettra plus tard de recalculer pour un autre profil.
+ * La mise en forme commune aux deux sources.
+ *
+ * La note affichée est recalculée par `lib/scoring.ts`, à l'heure de la collecte. Ce portage est
+ * vérifié contre l'oracle (`npm run verifier-scoring` : zéro désaccord sur la note, les points et
+ * les libellés), et c'est ce qui permet de noter des offres venues de la base, qui n'en a pas.
  */
-const recalcul = new Map(
-  classer(ordreDuPipeline(data.offers), maintenantDeLExport(data.meta.generated_at)).map((r) => [r.id, r]),
-);
+export function normaliserExport(
+  brut: ExportBrut,
+  source: SourceOffres,
+  repli: string | null = null,
+): Donnees {
+  const recalcul = new Map(
+    classer(ordreDuPipeline(brut.offers), maintenantDeLExport(brut.meta.generated_at)).map((r) => [
+      r.id,
+      r,
+    ]),
+  );
 
-export const offers: Offer[] = data.offers.map((o) => {
-  // Le champ `skills` de l'export est renommé dès l'entrée. Il porte la couverture calculée
-  // avec les compétences de Fanel, et sous son nom court il se relisait comme « les
-  // compétences de cette offre ». Le nom long le rend impossible à confondre, et le type
-  // `Offer` n'expose plus rien d'affichable : l'affichage passe par `OffreNotee`.
-  const { skills, ...reste } = o as typeof o & { skills: Skills | null };
-  const brut = { ...reste, skills_pipeline: skills ?? null } as Offer;
+  const offres = brut.offers.map((o) => {
+    // Le champ `skills` de l'export est renommé dès l'entrée. Il porte la couverture calculée
+    // avec les compétences de Fanel, et sous son nom court il se relisait comme « les
+    // compétences de cette offre ». Le nom long le rend impossible à confondre, et le type
+    // `Offer` n'expose plus rien d'affichable : l'affichage passe par `OffreNotee`.
+    const { skills, ...reste } = o;
+    const mise = { ...reste, skills_pipeline: skills ?? null } as Offer;
 
-  const r = recalcul.get(o.id);
-  if (!r) return brut;
-  return { ...brut, score: r.total, score_breakdown: r.breakdown, score_reasons: r.raisons };
-});
+    const r = recalcul.get(o.id);
+    if (!r) return mise;
+    return { ...mise, score: r.total, score_breakdown: r.breakdown, score_reasons: r.raisons };
+  });
+
+  const meta: Meta = { ...brut.meta, source, repli };
+  return {
+    offers: offres,
+    meta,
+    version: `${source}:${meta.generated_at}:${offres.length}`,
+  };
+}
+
+const FICHIER = normaliserExport(raw as unknown as ExportBrut, "file");
+
+/**
+ * Le contenu de `data/offers.json`. Avec un motif de repli, il dit pourquoi le site le lit alors
+ * que la base était demandée ; la version change aussi, pour ne pas mêler les caches des deux.
+ */
+export function donneesFichier(repli: string | null = null): Donnees {
+  if (repli === null) return FICHIER;
+  return { ...FICHIER, meta: { ...FICHIER.meta, repli }, version: `${FICHIER.version}:repli` };
+}
+
+/** Le fichier seul. Pour les tests et les oracles : les pages passent par `chargerDonnees()`. */
+export const meta: Meta = FICHIER.meta;
+/** Le fichier seul. Pour les tests et les oracles : les pages passent par `chargerDonnees()`. */
+export const offers: Offer[] = FICHIER.offers;
 
 /* ---------------------------------------------------------------- libellés */
 
@@ -190,9 +256,9 @@ export type StructureBulletin = {
  * prérequis métier, dates, bloqueurs administratifs — et la phrase est devenue fausse sans que
  * personne ne s'en aperçoive. La décrire à partir de l'export empêche que ça recommence.
  */
-export const structureBulletin: StructureBulletin = (() => {
+export function structureDe(offres: Offer[]): StructureBulletin {
   const vus = new Map<string, number>();
-  for (const o of data.offers) {
+  for (const o of offres) {
     for (const b of o.score_breakdown ?? []) {
       if (!vus.has(b.critere)) vus.set(b.critere, b.max);
     }
@@ -203,7 +269,10 @@ export const structureBulletin: StructureBulletin = (() => {
     ajustements: [...vus.entries()].filter(([, max]) => max === 0).map(([nom]) => nom),
     total: notes.reduce((s, [, max]) => s + max, 0),
   };
-})();
+}
+
+/** La structure du bulletin du fichier. Pour les tests : les pages appellent `structureDe`. */
+export const structureBulletin: StructureBulletin = structureDe(offers);
 
 /** « neuf », « quatorze »… pour écrire un nombre en toutes lettres dans une phrase. */
 export function enLettres(n: number): string {
@@ -256,7 +325,12 @@ export function joursDepuis(iso: string | null, reference: Date): number | null 
  * ce qui reste vrai quel que soit le moment où la page est ouverte — et c'est
  * pré-rendable, donc la page ne dépend pas de l'horloge du visiteur.
  */
-export const referenceCollecte = new Date(meta.generated_at);
+export function referenceDe(m: Pick<Meta, "generated_at">): Date {
+  return new Date(m.generated_at);
+}
+
+/** La référence du fichier. Pour les tests : les pages passent `referenceDe(donnees.meta)`. */
+export const referenceCollecte = referenceDe(meta);
 
 /** Âge de l'offre, en clair. On ne devine jamais : sans date, on le dit. */
 export function fraicheur(o: Offer, reference: Date = referenceCollecte): string {
@@ -443,19 +517,13 @@ export function nbSignalFormation(offres: Offer[]): number {
 
 /* ------------------------------------------------------------- recherche */
 
-export function parId(id: string): Offer | undefined {
-  return offers.find((o) => String(o.id) === id);
+export function parId(offres: Offer[], id: string): Offer | undefined {
+  return offres.find((o) => String(o.id) === id);
 }
 
 /** Offres utilisables par défaut : type de contrat connu (les autres ont leur bloc). */
 export const offresAvecContrat = offers.filter((o) => o.contract_known);
 export const offresSansContrat = offers.filter((o) => !o.contract_known);
-
-export function top(n: number): Offer[] {
-  return [...offresAvecContrat]
-    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
-    .slice(0, n);
-}
 
 /* --------------------------------------------------- lacunes du profil */
 

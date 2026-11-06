@@ -65,3 +65,6 @@ jobbot-*.png
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Cache Python des tests du collecteur
+__pycache__/

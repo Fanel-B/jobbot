@@ -2,6 +2,7 @@ import Link from "next/link";
 import { critereLabel } from "@/lib/offers";
 import { lireSimulation } from "@/lib/simulation";
 import { effetPour, estVide, lireProfil, manquantsPour } from "@/lib/profil";
+import { chargerDonnees } from "@/lib/donnees";
 
 type Params = { simule?: string };
 
@@ -32,7 +33,8 @@ export async function Simulant({
   // comme autant de lacunes, ce qui est vrai au sens strict et décourageant pour rien.
   if (estVide(profil)) return null;
 
-  const manquants = manquantsPour(profil, offreId);
+  const d = await chargerDonnees();
+  const manquants = manquantsPour(d, profil, offreId);
 
   if (manquants.length === 0) {
     return (
@@ -53,7 +55,7 @@ export async function Simulant({
     .map((a) => demandees.get(a.toLowerCase()))
     .filter((a): a is string => a !== undefined);
 
-  const effet = actives.length ? effetPour(profil, offreId, actives) : null;
+  const effet = actives.length ? effetPour(d, profil, offreId, actives) : null;
   const coherence = effet?.lignesQuiBougent.find((l) => l.critere === "cohérence");
   const autres = effet?.lignesQuiBougent.filter((l) => l.critere !== "cohérence") ?? [];
 

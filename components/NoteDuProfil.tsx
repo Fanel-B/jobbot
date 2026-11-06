@@ -3,6 +3,7 @@ import { Bulletin } from "@/components/Bulletin";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { classementPour, estVide, lireProfil } from "@/lib/profil";
 import { observationPour, rangDe, rangEnLettres, tranchePour } from "@/lib/classement";
+import { chargerDonnees } from "@/lib/donnees";
 
 /**
  * La note de cette offre **pour le profil en cours**, avec son bulletin.
@@ -39,9 +40,10 @@ export async function NoteDuProfil({ offreId }: { offreId: number }) {
     );
   }
 
-  const resultat = classementPour(profil).get(offreId);
-  const place = rangDe(profil, offreId);
-  const observation = observationPour(profil, offreId);
+  const d = await chargerDonnees();
+  const resultat = classementPour(d, profil).get(offreId);
+  const place = rangDe(d, profil, offreId);
+  const observation = observationPour(d, profil, offreId);
 
   return (
     <>

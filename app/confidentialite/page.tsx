@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { meta } from "@/lib/offers";
+import { chargerDonnees } from "@/lib/donnees";
 
 export const metadata: Metadata = {
   title: "Données et mentions légales - JobBot",
@@ -19,7 +19,8 @@ export const metadata: Metadata = {
  * À reprendre le jour où les comptes arrivent : il y aura alors un hébergement de données chez
  * un tiers, et cette page devra le dire.
  */
-export default function Page() {
+export default async function Page() {
+  const { meta } = await chargerDonnees();
   const collecte = new Date(meta.generated_at).toLocaleDateString("fr-FR");
 
   return (

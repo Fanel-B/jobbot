@@ -22,9 +22,13 @@ import {
   groupeDe,
 } from "./groupes";
 import { PROFIL_DEFAUT, classementPour } from "./profil";
+import { donneesFichier } from "./offers";
+
+/** Les données de référence : le fichier, comme avant le mode base. */
+const D = donneesFichier();
 
 const bulletins = offers
-  .map((o) => classementPour(PROFIL_DEFAUT).get(o.id)?.breakdown)
+  .map((o) => classementPour(D, PROFIL_DEFAUT).get(o.id)?.breakdown)
   .filter((b): b is NonNullable<typeof b> => Boolean(b && b.length));
 
 describe("la partition des critères", () => {
@@ -74,7 +78,7 @@ describe("l'addition tient sur les 290 offres", () => {
     // La garantie qui compte : le chiffre affiché reste celui du moteur Python, celui que
     // `npm run verifier-scoring` compare. Regrouper n'est pas recalculer.
     for (const o of offers) {
-      const r = classementPour(PROFIL_DEFAUT).get(o.id);
+      const r = classementPour(D, PROFIL_DEFAUT).get(o.id);
       if (!r?.breakdown?.length) continue;
       expect(enDeuxGroupes(r.breakdown).total, String(o.id)).toBe(r.total);
     }

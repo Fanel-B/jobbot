@@ -3,17 +3,21 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { Compte, CompteSquelette } from "@/components/Compte";
 import "./globals.css";
-import { meta } from "@/lib/offers";
+import { chargerDonnees } from "@/lib/donnees";
+import { AgeCollecte } from "@/components/AgeCollecte";
 
 export const metadata: Metadata = {
   title: "JobBot, les offres qui te correspondent vraiment",
   description:
-    "Alternance et stage en France : les offres publiées par les entreprises et les sources officielles, avec une note expliquée critère par critère.",
+    "Stages en France : les offres publiées par les entreprises et les sources officielles, avec une note expliquée critère par critère.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // La date de la collecte chargée : l'export du fichier, ou la dernière copie en base.
+  // C'est une donnée, pas l'horloge : elle se pré-rend. L'âge, lui, attend la requête.
+  const { meta } = await chargerDonnees();
   const collecte = new Date(meta.generated_at);
 
   return (
@@ -83,7 +87,7 @@ export default function RootLayout({
             <div>
               <p className="font-medium text-ink">JobBot</p>
               <p className="mt-2 leading-relaxed">
-                Recherche d&apos;alternance et de stage. Les offres sont collectées une fois, le
+                Recherche de stage. Les offres sont collectées une fois, le
                 classement est calculé pour chaque profil.
               </p>
             </div>
@@ -109,6 +113,14 @@ export default function RootLayout({
                 <li className="num">
                   Dernière collecte : {collecte.toLocaleString("fr-FR")}
                 </li>
+                <Suspense fallback={null}>
+                  <AgeCollecte generatedAt={meta.generated_at} />
+                </Suspense>
+                {meta.repli ? (
+                  // Le mode base était demandé, mais le site lit le fichier : le dire, sinon la
+                  // date ci-dessus passerait pour celle de la dernière copie.
+                  <li>Offres lues dans le fichier de secours ({meta.repli}).</li>
+                ) : null}
               </ul>
             </div>
             <div>

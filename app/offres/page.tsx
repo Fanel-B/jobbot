@@ -4,6 +4,7 @@ import { OfferRow } from "@/components/OfferCard";
 import {
   compterFamilles,
   filtrerParContrat,
+  referenceDe,
   sourceLabel,
   ZONE_LABEL,
   type Offer,
@@ -11,6 +12,7 @@ import {
 } from "@/lib/offers";
 import { estVide, lireProfil, offresPour } from "@/lib/profil";
 import { rangsPour, separerNotables } from "@/lib/classement";
+import { chargerDonnees } from "@/lib/donnees";
 
 type Params = {
   zone?: string;
@@ -104,13 +106,14 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
 
   // Le classement est celui du profil en cours, recalculé à la lecture — jamais stocké.
   // C'est la règle du cahier de route : deux personnes voient la même offre, pas la même note.
-  const profil = await lireProfil();
+  const [profil, d] = await Promise.all([lireProfil(), chargerDonnees()]);
   const sansNote = estVide(profil);
-  const notees = offresPour(profil);
+  const notees = offresPour(d, profil);
+  const reference = referenceDe(d.meta);
   const offresAvecContrat = notees.filter((o) => o.contract_known);
   const offresSansContrat = notees.filter((o) => !o.contract_known);
   const toutes = [...offresAvecContrat, ...offresSansContrat];
-  const rangs = sansNote ? null : rangsPour(profil);
+  const rangs = sansNote ? null : rangsPour(d, profil);
   const liste = filtrer(toutes, p, sansNote, rangs);
 
   // Les annonces qui ne citent aucune technologie ne sont pas mal notées, elles sont
@@ -118,7 +121,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
   // qu'on n'a pas pu mesurer. Elles descendent dans leur propre bloc, et restent affichees.
   const { notables, incalculables } = sansNote
     ? { notables: liste, incalculables: [] as typeof liste }
-    : separerNotables(profil, liste);
+    : separerNotables(d, profil, liste);
   const vues = notables.slice(0, 120);
 
   const sources = [...new Set(offresAvecContrat.map((o) => o.source))].sort();
@@ -211,12 +214,18 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
               {comptes.stage}
             </span>
           </Filtre>
-          <Filtre actif={p.type === "alternance"} href={lien({ ...p, type: "alternance" })}>
-            Alternance
-            <span className={`num ${p.type === "alternance" ? "text-paper/60" : "text-muted"}`}>
-              {comptes.alternance}
-            </span>
-          </Filtre>
+          {/* Comme « Autre » : le filtre n'existe que si la collecte contient de l'alternance.
+              Le périmètre est le stage seul jusqu'en janvier 2027 (CONTRATS_COPIES du collecteur) :
+              un filtre à zéro en permanence ferait croire à une panne. Il reste affiché quand il
+              est déjà choisi, par un lien partagé, pour que l'écran vide s'explique. */}
+          {comptesCollecte.alternance > 0 || p.type === "alternance" ? (
+            <Filtre actif={p.type === "alternance"} href={lien({ ...p, type: "alternance" })}>
+              Alternance
+              <span className={`num ${p.type === "alternance" ? "text-paper/60" : "text-muted"}`}>
+                {comptes.alternance}
+              </span>
+            </Filtre>
+          ) : null}
           {/* « Autre » n'apparaît que s'il y a vraiment un type renseigné hors stage et
               alternance : un filtre vide en permanence serait du bruit. */}
           {comptes.autre > 0 ? (
@@ -342,6 +351,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
         <div className="mt-6 card overflow-hidden">
           {vues.map((o, i) => (
             <OfferRow
+              reference={reference}
               key={o.id}
               offre={o}
               rang={i + 1}
@@ -376,7 +386,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
           </p>
           <div className="card mt-5 overflow-hidden">
             {incalculables.slice(0, 40).map((o) => (
-              <OfferRow key={o.id} offre={o} sansNote />
+              <OfferRow key={o.id} offre={o} sansNote reference={reference} />
             ))}
           </div>
           {incalculables.length > 40 ? (
