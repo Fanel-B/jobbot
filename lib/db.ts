@@ -42,7 +42,13 @@ export function base(): Pool {
     );
   }
 
-  pool = new Pool({ connectionString: sslExplicite(url), ssl: { rejectUnauthorized: true } });
+  pool = new Pool({
+    connectionString: sslExplicite(url),
+    ssl: { rejectUnauthorized: true },
+    // Sans délai, `pg` attend une base injoignable indéfiniment, et la page avec lui. Dix
+    // secondes, puis une erreur : `lib/donnees.ts` se rabat alors sur le fichier.
+    connectionTimeoutMillis: 10_000,
+  });
 
   // Sur Vercel, laisse la plateforme vider le pool quand la fonction se suspend. Ailleurs —
   // en local, sur le VPS — le module n'existe pas ou ne sert à rien : on continue sans.
