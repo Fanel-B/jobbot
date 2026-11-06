@@ -6,17 +6,15 @@ import {
   SectionsProfil,
   SectionsProfilSquelette,
 } from "@/components/AccueilProfil";
-import {
-  ageJours,
-  meta,
-  nbSignalFormation,
-  offers,
-  offresAvecContrat,
-  offresSansContrat,
-  sourceLabel,
-} from "@/lib/offers";
+import { ageJours, nbSignalFormation, referenceDe, sourceLabel } from "@/lib/offers";
+import { chargerDonnees } from "@/lib/donnees";
 
-export default function Home() {
+export default async function Home() {
+  // Les offres et leur `meta` viennent de la source choisie par `OFFERS_SOURCE`.
+  const { offers, meta } = await chargerDonnees();
+  const reference = referenceDe(meta);
+  const offresAvecContrat = offers.filter((o) => o.contract_known);
+  const offresSansContrat = offers.filter((o) => !o.contract_known);
   // Le signal n'est compté que s'il peut citer son extrait : un drapeau sans citation
   // n'est pas une offre signalée, c'est une donnée incomplète.
   const nbFormation = nbSignalFormation([...offresAvecContrat, ...offresSansContrat]);
@@ -30,7 +28,7 @@ export default function Home() {
   // Le restreindre aux offres classées donnait 86 à côté d'un « 230 en base » : deux
   // dénominateurs dans la même phrase, donc un chiffre qui ne veut rien dire.
   const vues7j = offers.filter((o) => {
-    const j = ageJours(o);
+    const j = ageJours(o, reference);
     return j !== null && j <= 7;
   }).length;
 
