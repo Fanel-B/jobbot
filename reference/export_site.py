@@ -25,7 +25,7 @@ import json
 import re
 import sqlite3
 import sys
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parent
@@ -33,29 +33,27 @@ sys.path.insert(0, str(SKILL_DIR))
 
 import db  # noqa: E402
 import eligibility  # noqa: E402
+import faits  # noqa: E402  (zones : une seule déclaration, lue ici comme ailleurs)
 import priorites  # noqa: E402
 
 DESCRIPTION_MAX = 4000
 EXTRAIT_LARGEUR = 110                      # caractères montrés autour du motif « formation imposée »
 SANS_CONTRAT_MAX = 40                      # offres sans type de contrat affichées (bloc « à vérifier »)
 
-# Zones géographiques reconnues (le site filtre là-dessus ; le calcul est fait ici, une seule fois).
-ZONE_TOULOUSE = re.compile(
-    r"toulouse|blagnac|colomiers|lab[eè]ge|balma|haute[- ]garonne|muret|castanet|l'union|fenouillet|"
-    r"cornebarrieu|aucamville|beauzelle|cugnaux|tournefeuille|portet[- ]sur[- ]garonne|\b31\s*-|\b31\d{3}\b",
-    re.I)
-ZONE_IDF = re.compile(
-    r"paris|île[- ]de[- ]france|ile[- ]de[- ]france|nanterre|boulogne|saint[- ]denis|cr[eé]teil|"
-    r"montrouge|issy|saclay|v[eé]lizy|guyancourt|marne[- ]la[- ]vall[eé]e|\b7[5-9]\d{3}\b|\b9[1-5]\d{3}\b",
-    re.I)
-ZONE_REMOTE = re.compile(r"t[eé]l[eé]travail|remote|à distance|a distance|home ?office", re.I)
-
-
+# Zone géographique d'une offre. Le calcul n'est **pas** refait ici : `eligibility.zone_de_texte`
+# décide de la zone certaine (commune, département, nom ambigu confirmé), à partir de `faits.ZONES`.
+# Le site affiche donc toujours la zone sur laquelle l'offre a été jugée. Une seconde règle, même
+# proche, finirait par diverger (mesure du 06/11/2026 : « Montpellier, Occitanie » était classé en
+# zone toulousaine par une liste de régions, et « Rive Gauche » en Occitanie à cause du mot « auch »).
 def zone_de(location: str | None) -> str:
-    for motif, nom in ((ZONE_TOULOUSE, "toulouse"), (ZONE_IDF, "idf"), (ZONE_REMOTE, "remote")):
-        if motif.search(location or ""):
-            return nom
-    return "autre"
+    """Zone d'une offre, ou « autre » : **la** règle, celle de l'éligibilité.
+
+    `eligibility.zone_de_lieu` décide (communes non ambiguës et départements, noms ambigus
+    confirmés,Île-de-France quand seule la région est nommée, télétravail), et le classement s'en
+    sert aussi. Deux règles parallèles finiraient par diverger, comme « Montpellier, Occitanie »
+    classé toulousain et « Rive Gauche » classé en Occitanie (mesures du 06/11/2026).
+    """
+    return eligibility.zone_de_lieu(location)
 
 
 def extrait_formation(offre: dict, motif: str) -> str | None:
@@ -117,6 +115,34 @@ def est_offre_du_site(offre: dict) -> bool:
     return "stage" in types or "alternance" in types or "apprentissage" in types
 
 
+def note_date(offre: dict) -> str | None:
+    """Note affichée quand la date de début n'est **pas exploitable** (option b du 06/11/2026).
+
+    Une seule condition, celle de l'éligibilité : le parseur du pipeline (`eligibility.parse_date`)
+    ne rend pas une date. Elle couvre les deux cas, et c'est le même code qui tranche côté statut et
+    côté note : la date **absente** (champ vide) et la date **illisible** (« asap », « à convenir »).
+    Un texte qui se lit (« novembre 2027 » vaut le 1er novembre 2027) n'est donc pas signalé, à
+    l'inverse d'un test rapide sur la forme ISO qui l'aurait affiché à tort.
+
+    Deux textes, celui de la date absente et celui de la date illisible, avec la citation du champ
+    quand il y en a un. La date de fin est lue dans la constante du profil (`faits.STAGE`), jamais
+    recopiée : si Fanel décale sa fin de stage, la note suit sans que le site soit touché.
+
+    Le site recalcule cette note : la table `offers` n'a pas de colonne pour la recevoir. Cette
+    fonction est la **spécification** de ce qu'il doit afficher, et le contrôle qui l'accompagne
+    vérifie l'équivalence avec les raisons d'éligibilité sur toute la base.
+    """
+    debut = (offre.get("start_date") or "").strip()
+    if isinstance(eligibility.parse_date(debut), date):
+        return None
+    fin = faits.STAGE["fin_max_long"]
+    if not debut:
+        return ("Date de début non annoncée. À confirmer auprès du recruteur : le stage doit se "
+                f"terminer au plus tard le {fin}.")
+    return (f"Date de début illisible (« {debut} »). À confirmer auprès du recruteur : le stage "
+            f"doit se terminer au plus tard le {fin}.")
+
+
 def ligne(offre: dict, score: dict | None) -> dict:
     motif = eligibility.partner_school_match(offre) if offre.get("description") else None
     types = contrats(offre)
@@ -134,6 +160,9 @@ def ligne(offre: dict, score: dict | None) -> dict:
         "contract_kinds": types or None,
         "duration": offre.get("duration") or None,
         "start_date": offre.get("start_date") or None,
+        # Note de date (option b du 06/11/2026) : le site l'affiche telle quelle. Elle vaut `None`
+        # quand la date est exploitable, et n'a aucun effet sur le statut de l'offre.
+        "note_date": note_date(offre),
         "education_required": offre.get("education_required") or None,
         "description": (offre.get("description") or "")[:DESCRIPTION_MAX] or None,
         "skills_required": json.loads(offre.get("skills_required") or "[]"),

@@ -10,6 +10,11 @@ TypeScript** ma logique de notation, et pouvoir **vérifier** que la copie est f
   dans mon pipeline ; une correction faite ici serait un mensonge sur ce qui tourne réellement. Quand
   mon moteur change, je resynchronise ces copies — et je le vérifie fichier par fichier.
 - Je ne l'importe pas depuis `app/` ou `lib/` : c'est du Python, il ne s'exécute pas dans Next.js.
+- **Une exception, voulue (6 novembre 2026) : `tools/collecteur_postgres.py` importe
+  `eligibility.zone_de_lieu` depuis ce dossier.** La zone d'une offre n'a ainsi qu'une règle, celle
+  du moteur, au lieu d'une copie de plus à garder synchronisée. Conséquence : ces fichiers doivent
+  rester *exécutables* (voir `faits.py` plus bas), et chaque resynchronisation se vérifie avec la
+  commande de `DEPLOIEMENT.md`, section « Après une resynchronisation de `reference/` ».
 - Mes contrôles du pipeline (**403**) vivent avec le moteur, pas ici.
 
 ## Ce que contient chaque fichier
@@ -20,6 +25,20 @@ TypeScript** ma logique de notation, et pouvoir **vérifier** que la copie est f
 | `priorites.py` | **mon bulletin** : les neuf critères de la note affichée sur le site, la diversité, le dédoublonnage, le coût de dépôt |
 | `eligibility.py` | l'éligibilité (durée, dates, niveau, contrat), les zones géographiques, la détection « formation imposée » |
 | `export_site.py` | l'export qui produit `data/offers.json` — donc **la définition exacte du format que mon site lit** |
+| `faits.py` | **les faits déclarés une seule fois** : les zones (communes, départements, régions, noms ambigus, points), les paliers de fin de stage, le référentiel de compétences. `eligibility.py` et `scoring.py` l'importent. |
+
+### État de la resynchronisation
+
+| Fichier | État |
+|---|---|
+| `eligibility.py`, `scoring.py`, `export_site.py` | resynchronisés le 7 novembre 2026 d'après le diff d'étape B du 6 novembre (version de 17:50), appliqué sans décalage. Chantier zone : Toulouse, Occitanie, Île-de-France, télétravail, noms ambigus, note de date. |
+| `faits.py` | **absent.** Le diff d'étape B n'en contient qu'un extrait (les hunks commencent à la ligne 98) : le reconstituer serait inventer. Il faut le fichier complet du pipeline. Tant qu'il manque, ces copies ne s'exécutent pas seules. |
+| `priorites.py` | inchangé : le bulletin affiché ne lit pas la zone. |
+
+Deux défauts connus du diff d'étape B sont transmis à l'auteur du pipeline et **ne sont pas corrigés
+ici** (ce dossier est une copie, pas un atelier) : `note_date` plante sur une date impossible
+(`ValueError` de `date(...)`, par exemple « 2026-13-01 »), et `meta.zones` de l'export ne compte pas
+l'Occitanie. Les copies seront resynchronisées quand le diff final arrivera.
 
 ## Les neuf critères, et pourquoi j'en parle ici
 
