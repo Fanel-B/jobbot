@@ -49,7 +49,7 @@ def zone_de(location: str | None) -> str:
     """Zone d'une offre, ou « autre » : **la** règle, celle de l'éligibilité.
 
     `eligibility.zone_de_lieu` décide (communes non ambiguës et départements, noms ambigus
-    confirmés,Île-de-France quand seule la région est nommée, télétravail), et le classement s'en
+    confirmés, Île-de-France quand seule la région est nommée, télétravail), et le classement s'en
     sert aussi. Deux règles parallèles finiraient par diverger, comme « Montpellier, Occitanie »
     classé toulousain et « Rive Gauche » classé en Occitanie (mesures du 06/11/2026).
     """
@@ -254,10 +254,13 @@ def main() -> int:
             "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "count": len(lignes),
             "sources": sources,
+            # Toutes les zones déclarées dans `faits.ZONES`, plus « autre ». Écrit en dur, ce
+            # dictionnaire avait oublié l'Occitanie : le site ne voyait pas ce compteur (défaut
+            # relevé par l'audit du 06/11/2026). L'ordre suit `faits.ZONES_ORDRE`.
             "zones": {z: sum(1 for l in lignes if l["location_zone"] == z)
-                      for z in ("toulouse", "idf", "remote", "autre")},
+                      for z in (*faits.ZONES_ORDRE, "autre")},
             "sans_contrat_renseigne": sum(1 for l in lignes if not l["contract_known"]),
-            "score_profile": "Fanel — L3 MIAGE, Toulouse, alternance + stage",
+            "score_profile": "Fanel, L3 MIAGE, Toulouse, alternance + stage",
             "note": "Aucune donnée inventée : un champ absent sort à null.",
         },
         "offers": lignes,

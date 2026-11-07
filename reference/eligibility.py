@@ -155,11 +155,25 @@ MONTHS_FR = {
 ASAP_TERMS = ("asap", "des que possible", "immediat", "immediatement", "au plus vite")
 
 
+def _date_si_possible(annee: int, mois: int, jour: int = 1) -> date | None:
+    """La date demandée, ou None si elle n'existe pas (« 2026-13-01 », « 31/02/2027 »).
+
+    `date(...)` lève ValueError sur une date impossible. Ici une date impossible est une date
+    **illisible** : elle vaut None, donc la note de date dit « à confirmer », au lieu de faire
+    échouer la passe entière (défaut relevé par l'audit du 06/11/2026).
+    """
+    try:
+        return date(annee, mois, jour)
+    except ValueError:
+        return None
+
+
 def parse_date(value) -> date | str | None:
-    """date -> date ; 'ASAP' -> 'asap' ; illisible -> None.
+    """date -> date ; 'ASAP' -> 'asap' ; illisible ou impossible -> None.
 
     Formats : ISO (2026-09-01), JJ/MM/AAAA, MM/AAAA, 'septembre 2026', '1er mars 2027'.
-    Un mois sans jour est ramené au 1er du mois.
+    Un mois sans jour est ramené au 1er du mois. Une date qui n'existe pas au calendrier
+    (« 31 février ») est traitée comme illisible, jamais comme une erreur.
     """
     if value is None:
         return None
@@ -171,15 +185,15 @@ def parse_date(value) -> date | str | None:
     if any(t in s for t in ASAP_TERMS):
         return "asap"
     if m := re.search(r"(\d{4})-(\d{1,2})(?:-(\d{1,2}))?", s):
-        return date(int(m[1]), int(m[2]), int(m[3] or 1))
+        return _date_si_possible(int(m[1]), int(m[2]), int(m[3] or 1))
     if m := re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})", s):
-        return date(int(m[3]), int(m[2]), int(m[1]))
+        return _date_si_possible(int(m[3]), int(m[2]), int(m[1]))
     if m := re.search(r"\b(\d{1,2})/(\d{4})\b", s):
-        return date(int(m[2]), int(m[1]), 1)
+        return _date_si_possible(int(m[2]), int(m[1]))
     if m := re.search(r"(?:(\d{1,2})(?:er)?\s+)?([a-z]+)\.?\s+(\d{4})", s):
         month = MONTHS_FR.get(m[2])
         if month:
-            return date(int(m[3]), month, int(m[1] or 1))
+            return _date_si_possible(int(m[3]), month, int(m[1] or 1))
     return None
 
 
