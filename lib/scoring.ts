@@ -6,8 +6,10 @@
  * `reference/priorites.py` ; `npm run verifier-scoring` compare ce calcul à `data/offers.json`
  * offre par offre, critère par critère.
  *
- * Ce module n'importe rien : il tourne tel quel dans Next.js et sous Node (script de vérification).
+ * Il n'importe que `./dates.ts`, pur lui aussi : l'extension est écrite parce que Node exécute ce
+ * fichier tel quel (scripts de vérification) et ne la devine pas. Next.js l'accepte aussi.
  */
+import { parseDate } from "./dates.ts";
 
 /** Ce dont le calcul a besoin — un sous-ensemble des champs de `data/offers.json`. */
 export type OffreAScorer = {
@@ -449,36 +451,32 @@ export function maintenantDeLExport(generatedAt: string, fuseauHeures = FUSEAU_P
  */
 const FIN_TARDIVE_MALUS = -8.0;
 const PALIERS_FIN = { compatible: "2027-07-31", negociation: "2027-08-31", raccourcir: "2027-10-31" };
+
+/**
+ * Le dernier jour où un stage peut finir sans rien négocier : la fenêtre « compatible » ci-dessus.
+ * Le site l'écrit à deux endroits (la page méthode, et la ligne « Début » d'une fiche dont la date
+ * est inexploitable) et les lit ici, jamais recopiée : si la date de fin de Fanel bouge, le moteur,
+ * la méthode et les fiches bougent ensemble. Format ISO ; `dateLongue` (lib/dates.ts) l'écrit en clair.
+ */
+export const FIN_DE_STAGE_LA_PLUS_TARDIVE = PALIERS_FIN.compatible;
 const PALIER_FIN_COMPATIBLE = "compatible";
 const PALIER_FIN_NEGOCIATION = "negociation";
 const PALIER_FIN_RACCOURCIR = "raccourcir";
 const PALIER_FIN_HORS_PORTEE = "hors_portee";
-
-const MOIS_FR: Record<string, number> = {
-  janvier: 1, fevrier: 2, mars: 3, avril: 4, mai: 5, juin: 6, juillet: 7, aout: 8,
-  septembre: 9, octobre: 10, novembre: 11, decembre: 12,
-};
 
 /** `_norm` de Python : minuscules, accents retirés, espaces normalisés. */
 function sansAccents(txt: string): string {
   return txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 }
 
-/** `parse_date` : ISO, JJ/MM/AAAA, MM/AAAA, « septembre 2026 », « 1er mars 2027 ». */
+/**
+ * `parse_date`, réduit à ce que `fin_de_stage` utilise : une vraie date, ou rien. « asap » et les
+ * dates impossibles ne donnent pas de fin calculable. Le lecteur lui-même est `lib/dates.ts`, qui
+ * connaît les mois abrégés et anglais comme Python : l'ancien, privé, les ignorait.
+ */
 function parseDateFr(value: string | null | undefined): Date | null {
-  const s = sansAccents(String(value ?? ""));
-  if (!s) return null;
-  let m = /(\d{4})-(\d{1,2})(?:-(\d{1,2}))?/.exec(s);
-  if (m) return new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3] ?? 1)));
-  m = /(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(s);
-  if (m) return new Date(Date.UTC(Number(m[3]), Number(m[2]) - 1, Number(m[1])));
-  m = /\b(\d{1,2})\/(\d{4})\b/.exec(s);
-  if (m) return new Date(Date.UTC(Number(m[2]), Number(m[1]) - 1, 1));
-  m = /(\d{1,2})(?:er)?\s+([a-z]+)\.?\s+(\d{4})/.exec(s);
-  if (m && MOIS_FR[m[2]]) return new Date(Date.UTC(Number(m[3]), MOIS_FR[m[2]] - 1, Number(m[1])));
-  m = /(?:^|\s)([a-z]+)\.?\s+(\d{4})/.exec(s);
-  if (m && MOIS_FR[m[1]]) return new Date(Date.UTC(Number(m[2]), MOIS_FR[m[1]] - 1, 1));
-  return null;
+  const lue = parseDate(value);
+  return lue instanceof Date ? lue : null;
 }
 
 const UNITES_MOIS: Record<string, number> = {

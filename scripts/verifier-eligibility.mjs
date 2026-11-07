@@ -8,6 +8,10 @@
  *   · `contract_kinds` et `contract_known` — oracle : `contrats()` + `bool(contract_type)`, même fichier
  *   · le signal d'école partenaire — oracle : `partner_school_match()`, reference/eligibility.py,
  *     appelé par `export_site.ligne` **uniquement si l'offre a une description**
+ *   · « la date de début n'est pas exploitable » — oracle : `note_date`, reference/export_site.py.
+ *     Le site n'a besoin que du booléen (`dateDebutNonExploitable`, lib/dates.ts) : le texte de
+ *     l'avertissement est celui du site. L'export doit donc porter `note_date` sur chaque offre ;
+ *     un fichier plus ancien est un échec, pas une comparaison sautée en silence.
  *
  * `eligibility.zone_status()` n'est volontairement pas porté : il rend des *statuts* (éligible,
  * incertain, rejeté) et se rabat sur le titre quand le lieu est vide. Ce n'est pas ce que l'export
@@ -21,12 +25,15 @@
  */
 import { readFileSync } from "node:fs";
 import { contratsDe, contratConnu, signalEcole, zoneDe, zonesReconnues } from "../lib/eligibilite.ts";
+import { dateDebutNonExploitable } from "../lib/dates.ts";
 
-const { meta, offers } = JSON.parse(
-  readFileSync(new URL("../data/offers.json", import.meta.url), "utf8"),
-);
+// `--fichier=chemin` : vérifier un autre export (le candidat du pipeline, avant de le committer).
+const argFichier = process.argv.find((a) => a.startsWith("--fichier="));
+const fichier = argFichier ? argFichier.slice("--fichier=".length) : new URL("../data/offers.json", import.meta.url);
+const { meta, offers } = JSON.parse(readFileSync(fichier, "utf8"));
 
 const desaccords = [];
+let sansNoteDate = 0;
 const memeChose = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 for (const o of offers) {
@@ -50,6 +57,19 @@ for (const o of offers) {
   const connu = contratConnu(o.contract_type);
   if (connu !== o.contract_known) {
     desaccords.push({ id: o.id, quoi: "contract_known", attendu: o.contract_known, calcule: connu });
+  }
+
+  // `note_date` vaut null quand la date est exploitable, un texte sinon.
+  if (!("note_date" in o)) {
+    sansNoteDate += 1;
+  } else if (dateDebutNonExploitable(o.start_date) !== (o.note_date !== null)) {
+    desaccords.push({
+      id: o.id,
+      quoi: "date de début non exploitable",
+      attendu: o.note_date !== null,
+      calcule: dateDebutNonExploitable(o.start_date),
+      note: `start_date = ${JSON.stringify(o.start_date)}`,
+    });
   }
 
   // `export_site.ligne` : `partner_school_match(offre) if offre.get("description") else None`.
@@ -86,7 +106,7 @@ const couverture = [
   ["annonce déclenchant le signal d'école", flags],
 ];
 
-console.log(`Oracle : data/offers.json (généré le ${meta.generated_at})`);
+console.log(`Oracle : ${argFichier ? fichier : "data/offers.json"} (généré le ${meta.generated_at})`);
 console.log(`Offres comparées : ${offers.length}`);
 console.log(`Désaccords : ${desaccords.length}`);
 for (const d of desaccords.slice(0, 40)) {
@@ -96,6 +116,10 @@ for (const d of desaccords.slice(0, 40)) {
   );
 }
 if (desaccords.length > 40) console.log(`  … et ${desaccords.length - 40} autres`);
+if (sansNoteDate > 0) {
+  console.log(`  ✗ ${sansNoteDate} offre(s) sans le champ note_date : data/offers.json date d'avant le chantier`);
+  console.log("    zone. Régénérer l'export avec le pipeline à jour (export_site.py) avant de vérifier.");
+}
 
 console.log("");
 console.log("Ce que ces offres mettent à l'épreuve :");
@@ -121,4 +145,4 @@ if (flags === 0) {
   console.log("  pas que le signal fonctionne.");
 }
 
-process.exit(desaccords.length === 0 ? 0 : 1);
+process.exit(desaccords.length === 0 && sansNoteDate === 0 ? 0 : 1);

@@ -19,7 +19,10 @@ import { FUSEAU_PIPELINE_HEURES, classer, maintenantDeLExport, ordreDuPipeline }
 const argFuseau = process.argv.find((a) => a.startsWith("--fuseau="));
 const fuseauHeures = argFuseau ? Number(argFuseau.slice("--fuseau=".length)) : FUSEAU_PIPELINE_HEURES;
 
-const { meta, offers } = JSON.parse(readFileSync(new URL("../data/offers.json", import.meta.url), "utf8"));
+// `--fichier=chemin` : vérifier un autre export (le candidat du pipeline, avant de le committer).
+const argFichier = process.argv.find((a) => a.startsWith("--fichier="));
+const fichier = argFichier ? argFichier.slice("--fichier=".length) : new URL("../data/offers.json", import.meta.url);
+const { meta, offers } = JSON.parse(readFileSync(fichier, "utf8"));
 const maintenant = maintenantDeLExport(meta.generated_at, fuseauHeures);
 
 const calcules = new Map(classer(ordreDuPipeline(offers), maintenant).map((r) => [r.id, r]));
@@ -56,7 +59,7 @@ for (const o of offers) {
   }
 }
 
-console.log(`Oracle : data/offers.json (généré le ${meta.generated_at}) · heure du calcul : UTC${fuseauHeures >= 0 ? "+" : ""}${fuseauHeures}`);
+console.log(`Oracle : ${argFichier ? fichier : "data/offers.json"} (généré le ${meta.generated_at}) · heure du calcul : UTC${fuseauHeures >= 0 ? "+" : ""}${fuseauHeures}`);
 console.log(`Offres comparées : ${offers.length}`);
 console.log(`Désaccords : ${desaccords.length}`);
 for (const d of desaccords) {
