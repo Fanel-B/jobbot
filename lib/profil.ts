@@ -21,7 +21,7 @@ import {
   ordreDuPipeline,
   type Resultat,
 } from "./scoring";
-import { familleLacune, type Couverture, type Donnees, type OffreNotee, type Zone } from "./offers";
+import { ZONES, familleLacune, type Couverture, type Donnees, type OffreNotee, type Zone } from "./offers";
 import { SEUIL_BONNE_PISTE } from "./simulation";
 import type { Competence, EffetGlobal, EffetOffre, LigneQuiBouge } from "./simulation";
 
@@ -74,7 +74,6 @@ export const PROFIL_DEFAUT: Profil = {
 
 const NIVEAUX: NiveauEtudes[] = ["bac+3", "bac+4", "bac+5"];
 const RECHERCHES: TypeRecherche[] = ["stage", "alternance"];
-const ZONES: Zone[] = ["toulouse", "idf", "remote", "autre"];
 
 export const NIVEAU_LABEL: Record<NiveauEtudes, string> = {
   "bac+3": "Bac+3, L3 ou Licence",
@@ -112,7 +111,7 @@ export function decoderProfil(brut: string | undefined): Profil {
       ? o.c.filter((x): x is string => typeof x === "string" && noms.has(x))
       : PROFIL_VIDE.competences;
     const zones = Array.isArray(o.z)
-      ? o.z.filter((x): x is Zone => typeof x === "string" && ZONES.includes(x as Zone))
+      ? o.z.filter((x): x is Zone => typeof x === "string" && (ZONES as readonly string[]).includes(x))
       : PROFIL_VIDE.zones;
     const recherche = Array.isArray(o.r)
       ? o.r.filter((x): x is TypeRecherche => typeof x === "string" && RECHERCHES.includes(x as TypeRecherche))

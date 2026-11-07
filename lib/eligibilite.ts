@@ -18,7 +18,15 @@
  * ce que l'export écrit dans `location_zone`. Le porter donnerait des désaccords garantis.
  */
 
-export type Zone = "toulouse" | "idf" | "remote" | "autre";
+/**
+ * Les zones que le site connaît, dans l'ordre où il les présente. Une seule liste : le filtre de la
+ * liste d'offres, le formulaire de profil, le décodeur du cookie et la lecture de la base la
+ * partagent, et les contraintes CHECK de `db/schema.sql` doivent citer exactement les mêmes valeurs
+ * (`lib/zones-sql.test.ts` le vérifie). « occitanie » s'y ajoute le 6 novembre 2026, avec le
+ * chantier zone ; « autre » veut dire « aucune zone reconnue ».
+ */
+export const ZONES = ["toulouse", "occitanie", "idf", "remote", "autre"] as const;
+export type Zone = (typeof ZONES)[number];
 
 /* ------------------------------------------------------------------- zones */
 

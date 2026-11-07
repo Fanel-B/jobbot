@@ -11,6 +11,8 @@
  */
 import { contratsDe, signalEcoleExporte } from "./eligibilite";
 import { meta as metaFichier } from "./offers";
+import { ZONES } from "./eligibilite";
+import { compterZones } from "./offers";
 import type { ExportBrut, MetaExport, OffreExportee, Zone } from "./offers";
 
 /** Une ligne de la requête `REQUETE_OFFRES`, telle que `pg` la rend. */
@@ -74,8 +76,6 @@ const { score_profile: SCORE_PROFILE, note: NOTE } = metaFichier;
 /** Largeur de l'extrait cité autour du signal d'école (`EXTRAIT_LARGEUR` de l'export). */
 const EXTRAIT_LARGEUR = 110;
 
-const ZONES: Zone[] = ["toulouse", "idf", "remote", "autre"];
-
 function liste(v: unknown): string[] {
   return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
 }
@@ -116,7 +116,7 @@ export function ligneVersExport(l: LigneBase): OffreExportee {
     title: l.title,
     company: l.company,
     location: l.location,
-    location_zone: (ZONES.includes(l.location_zone as Zone) ? l.location_zone : "autre") as Zone,
+    location_zone: ((ZONES as readonly string[]).includes(l.location_zone) ? l.location_zone : "autre") as Zone,
     contract_type: l.contract_type,
     contract_known: l.contract_known,
     contract_kinds: types.length ? types : null,
@@ -144,9 +144,7 @@ export function ligneVersExport(l: LigneBase): OffreExportee {
 export function metaDepuis(offres: OffreExportee[], termineeA: string): MetaExport {
   const sources: Record<string, number> = {};
   for (const o of offres) sources[o.source] = (sources[o.source] ?? 0) + 1;
-  const zones = Object.fromEntries(
-    ZONES.map((z) => [z, offres.filter((o) => o.location_zone === z).length]),
-  ) as Record<Zone, number>;
+  const zones = compterZones(offres);
   return {
     generated_at: termineeA,
     count: offres.length,

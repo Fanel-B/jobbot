@@ -7,6 +7,7 @@ import {
   referenceDe,
   sourceLabel,
   ZONE_LABEL,
+  ZONES,
   type Offer,
   type Zone,
 } from "@/lib/offers";
@@ -22,8 +23,6 @@ type Params = {
   min?: string;
 };
 
-const ZONES: Zone[] = ["toulouse", "idf", "remote", "autre"];
-
 function filtrer(
   offres: Offer[],
   p: Params,
@@ -32,7 +31,7 @@ function filtrer(
 ): Offer[] {
   let out = offres;
 
-  if (p.zone && ZONES.includes(p.zone as Zone)) {
+  if (p.zone && (ZONES as readonly string[]).includes(p.zone)) {
     out = out.filter((o) => o.location_zone === p.zone);
   }
 
