@@ -8,7 +8,7 @@
  *   · `contract_kinds` et `contract_known` — oracle : `contrats()` + `bool(contract_type)`, même fichier
  *   · le signal d'école partenaire — oracle : `partner_school_match()`, reference/eligibility.py,
  *     appelé par `export_site.ligne` **uniquement si l'offre a une description**
- *   · « la date de début n'est pas exploitable » — oracle : `note_date`, reference/export_site.py.
+ *   · « la date de début n'est pas exploitable » : oracle `note_date`, reference/export_site.py.
  *     Le site n'a besoin que du booléen (`dateDebutNonExploitable`, lib/dates.ts) : le texte de
  *     l'avertissement est celui du site. L'export doit donc porter `note_date` sur chaque offre ;
  *     un fichier plus ancien est un échec, pas une comparaison sautée en silence.
