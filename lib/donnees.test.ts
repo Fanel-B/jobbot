@@ -91,9 +91,11 @@ describe("le mode base, sur le fichier mis en table", () => {
     for (const [i, o] of d.offers.entries()) {
       const f = offresFichier[i];
       // `skills_pipeline` est la couverture figée de l'export, que la base n'a pas (et que le
-      // site n'affiche jamais). Tout le reste doit être identique, champ par champ.
-      const { skills_pipeline: _a, ...attendu } = f;
-      const { skills_pipeline: _b, ...obtenu } = o;
+      // site n'affiche jamais). `note_date` est l'oracle de la date de début (le site recalcule le
+      // même fait avec `dateDebutNonExploitable`, vérifié par `npm run verifier-eligibility`) : la
+      // base ne le stocke pas non plus. Tout le reste doit être identique, champ par champ.
+      const { skills_pipeline: _a, note_date: _n, ...attendu } = f as typeof f & { note_date?: unknown };
+      const { skills_pipeline: _b, note_date: _m, ...obtenu } = o as typeof o & { note_date?: unknown };
       expect(obtenu, `offre #${o.id}`).toEqual(attendu);
     }
   });

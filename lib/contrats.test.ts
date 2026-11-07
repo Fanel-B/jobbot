@@ -50,20 +50,25 @@ describe("normaliserContrat", () => {
   });
 });
 
+/** Les offres dont l'alerte a deviné le contrat : « stage (d'après l'alerte) ». Il y en a toujours quelques-unes. */
+const sontDeLAlerte = (o: { contract_kinds: string[] | null }) =>
+  (o.contract_kinds ?? []).some((k) => k.includes("(d'après l'alerte)"));
+
 describe("familleContrat", () => {
-  it("classe les deux offres qui échappaient à tous les filtres", () => {
-    for (const id of [480, 428]) {
-      const o = offers.find((x) => x.id === id);
-      expect(o, `offre #${id} absente de data/offers.json`).toBeDefined();
-      expect(o!.contract_kinds).toEqual(["stage (d'après l'alerte)"]);
-      expect(familleContrat(o!)).toBe("stage");
+  it("classe les offres qui échappaient à tous les filtres", () => {
+    // Deux offres, #480 et #428, servaient de cas ; elles ont quitté l'export du 7 novembre 2026.
+    // On prend toutes celles du fichier, pour ne plus dépendre d'identifiants qui disparaissent.
+    const concernees = offers.filter(sontDeLAlerte);
+    expect(concernees.length).toBeGreaterThanOrEqual(2);
+    for (const o of concernees) {
+      expect(o.contract_kinds, `offre #${o.id}`).toEqual(["stage (d'après l'alerte)"]);
+      expect(familleContrat(o), `offre #${o.id}`).toBe("stage");
     }
   });
 
-  it("rend ces deux offres de nouveau accessibles par le filtre « stage »", () => {
-    const ids = filtrerParContrat(offers, "stage").map((o) => o.id);
-    expect(ids).toContain(480);
-    expect(ids).toContain(428);
+  it("rend ces offres de nouveau accessibles par le filtre « stage »", () => {
+    const ids = new Set(filtrerParContrat(offers, "stage").map((o) => o.id));
+    for (const o of offers.filter(sontDeLAlerte)) expect(ids.has(o.id), `offre #${o.id}`).toBe(true);
   });
 
   it("garde « non renseigné » distinct : une annonce sans contrat n'est jamais un stage", () => {

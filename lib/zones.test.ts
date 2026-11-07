@@ -116,13 +116,16 @@ describe("les compteurs par zone", () => {
       ...d.offers.slice(3),
     ];
     const zones = compterZones(offres);
-    expect(zones.occitanie).toBe(3);
+    // Les trois forcées, plus celles que le fichier compte déjà en Occitanie.
+    const deja = d.offers.slice(3).filter((o) => o.location_zone === "occitanie").length;
+    expect(zones.occitanie).toBe(3 + deja);
     expect(Object.values(zones).reduce((a, b) => a + b, 0)).toBe(offres.length);
   });
 
-  it("le fichier actuel ne contient aucune offre d'Occitanie, et meta le dit à zéro", () => {
+  it("le fichier actuel : meta.zones dit combien d'offres d'Occitanie, et la somme redonne la collecte", () => {
     const d = donneesFichier();
-    expect(d.meta.zones.occitanie).toBe(0);
+    const reelles = d.offers.filter((o) => o.location_zone === "occitanie").length;
+    expect(d.meta.zones.occitanie).toBe(reelles);
     expect(Object.values(d.meta.zones).reduce((a, b) => a + b, 0)).toBe(d.offers.length);
   });
 });
