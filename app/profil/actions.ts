@@ -15,9 +15,8 @@ import {
   type Profil,
   type TypeRecherche,
 } from "@/lib/profil";
-import type { Zone } from "@/lib/offers";
+import { ZONES, type Zone } from "@/lib/offers";
 
-const ZONES: Zone[] = ["toulouse", "idf", "remote", "autre"];
 const NIVEAUX: NiveauEtudes[] = ["bac+3", "bac+4", "bac+5"];
 const RECHERCHES: TypeRecherche[] = ["stage", "alternance"];
 
@@ -37,7 +36,7 @@ export async function enregistrerProfil(donnees: FormData) {
   const niveauBrut = String(donnees.get("niveau") ?? "");
   const profil: Profil = {
     competences: donnees.getAll("competence").map(String).filter((n) => noms.has(n)),
-    zones: donnees.getAll("zone").map(String).filter((z): z is Zone => ZONES.includes(z as Zone)),
+    zones: donnees.getAll("zone").map(String).filter((z): z is Zone => (ZONES as readonly string[]).includes(z)),
     niveau: NIVEAUX.includes(niveauBrut as NiveauEtudes)
       ? (niveauBrut as NiveauEtudes)
       : PROFIL_DEFAUT.niveau,

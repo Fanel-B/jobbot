@@ -77,7 +77,16 @@ export type Couverture = {
 /** Une offre renotée pour un profil précis. Seul ce type porte une couverture affichable. */
 export type OffreNotee = Offer & { couverture: Couverture };
 
-export type Zone = "toulouse" | "idf" | "remote" | "autre";
+import { ZONES, type Zone } from "./eligibilite";
+
+export { ZONES, type Zone };
+
+/** Combien d'offres par zone. Toutes les zones sont présentes, à zéro si besoin. */
+export function compterZones(offres: { location_zone: Zone }[]): Record<Zone, number> {
+  return Object.fromEntries(
+    ZONES.map((z) => [z, offres.filter((o) => o.location_zone === z).length]),
+  ) as Record<Zone, number>;
+}
 
 /** D'où viennent les offres affichées. */
 export type SourceOffres = "file" | "db";
@@ -156,7 +165,9 @@ export function normaliserExport(
     return { ...mise, score: r.total, score_breakdown: r.breakdown, score_reasons: r.raisons };
   });
 
-  const meta: Meta = { ...brut.meta, source, repli };
+  // Les compteurs par zone sont recomptés sur les offres lues : l'export du pipeline ne comptait que
+  // quatre zones, et une offre d'Occitanie n'apparaissait alors dans aucun compteur.
+  const meta: Meta = { ...brut.meta, zones: compterZones(offres), source, repli };
   return {
     offers: offres,
     meta,
@@ -197,6 +208,7 @@ export const SOURCE_LABEL: Record<string, string> = {
 
 export const ZONE_LABEL: Record<Zone, string> = {
   toulouse: "Toulouse et alentours",
+  occitanie: "Occitanie",
   idf: "Île-de-France",
   remote: "À distance",
   autre: "Ailleurs en France",

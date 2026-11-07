@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { critereLabel, enLettres, nbSignalFormation, sourceLabel } from "@/lib/offers";
 import { chargerDonnees } from "@/lib/donnees";
+import { dateLongue } from "@/lib/dates";
+import { FIN_DE_STAGE_LA_PLUS_TARDIVE } from "@/lib/scoring";
 import { estConstant } from "@/lib/groupes";
 import { chiffresMethode, type GroupeMethode } from "@/lib/methode";
 
@@ -201,9 +203,15 @@ export default async function Page() {
         <p className="mt-3 text-sm leading-relaxed text-muted">
           Les autres lignes du groupe « toi » comparent l&apos;annonce à une situation fixe, celle de
           Fanel, l&apos;auteur du site : un niveau Bac+3, disponible à partir du 29 mars 2027, avec
-          un stage à finir avant la rentrée de Master de septembre 2027 (une fin au 31 juillet 2027
-          au plus tard est jugée compatible). Le niveau, la zone et le type de recherche que tu
+          un stage à finir avant la rentrée de Master de septembre 2027 (une fin au{" "}
+          {dateLongue(FIN_DE_STAGE_LA_PLUS_TARDIVE)} au plus tard est jugée compatible). Le niveau, la zone et le type de recherche que tu
           règles sur la page profil ne changent donc pas la note pour l&apos;instant.
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-muted">
+          Beaucoup d&apos;annonces ne donnent pas de date de début, ou une date qu&apos;on ne sait
+          pas lire (« à convenir », « dès que possible »). La fiche écrit alors « à confirmer » sur
+          la ligne « Début », et rappelle que le stage doit finir au plus tard le{" "}
+          {dateLongue(FIN_DE_STAGE_LA_PLUS_TARDIVE)}. C&apos;est un rappel : il ne retire aucun point.
         </p>
 
         <h3 className="mt-10 font-display text-2xl font-light leading-tight text-ink">

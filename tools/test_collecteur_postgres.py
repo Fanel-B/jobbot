@@ -2,6 +2,9 @@
 
     python3 -m unittest discover -s tools -v
 
+Un sixième point, du chantier zone (novembre 2026) : la zone d'une offre vient de la règle du moteur
+(`reference/eligibility.zone_de_lieu`), et non d'une copie de regex.
+
 Ils vérifient les cinq points de la migration T6 :
   1. `pipeline_id` reprend le numéro du pipeline, et le schéma le déclare unique ;
   2. la description est coupée à 4 000 caractères, comme l'export JSON ;
@@ -27,6 +30,7 @@ RACINE = ICI.parent
 sys.path.insert(0, str(ICI))
 
 import collecteur_postgres as c  # noqa: E402
+import comparer_zones  # noqa: E402
 
 COLONNES_SQLITE = (
     "id", "status", "canonical_url", "source", "title", "company", "location", "contract_type",
@@ -291,6 +295,86 @@ class Perimetre(unittest.TestCase):
     def test_plafond_global_de_400(self):
         lignes = preparer_depuis([offre(i, "Stage") for i in range(1, 451)])
         self.assertEqual(len(lignes), 400)
+
+
+# ------------------------------------------------------------------ 6. zone
+
+# Les cas de lieux du diff d'étape B (test_pipeline.py du pipeline) : la règle se lit dans
+# `reference/`, ces cas disent ce qu'elle doit rendre. « autre » veut dire « aucune zone reconnue ».
+CAS_DE_LIEUX = (
+    ("Saint-Denis", "autre", "nom ambigu seul"),
+    ("Saint Denis", "autre", "variante avec une espace"),
+    ("Saint Ouen", "autre", "variante avec une espace"),
+    ("93 - Saint-Denis", "idf", "confirmé par le département"),
+    ("Saint-Denis 93200", "idf", "confirmé par le code postal"),
+    ("Saint Denis 93200", "idf", "code postal, variante avec une espace"),
+    ("Saint-Denis, Île-de-France", "idf", "confirmé par la région nommée"),
+    ("Saint-Denis, La Réunion", "autre", "l'homonyme que la règle doit écarter"),
+    ("Vitry-sur-Seine", "idf", "nom complet d'une commune d'Île-de-France"),
+    ("Montigny-lès-Metz", "autre", "homonyme hors zone, non confirmé"),
+    ("Toulouse", "toulouse", "commune de la zone toulousaine"),
+    ("Toulouse (télétravail)", "toulouse", "la ville tranche, pas le mode de travail"),
+    ("Montpellier, Occitanie", "occitanie", "la ville tranche, pas la région"),
+    ("12 - Rodez", "occitanie", "département d'Occitanie"),
+    ("Occitanie", "autre", "région seule : rien de certain"),
+    ("Paris", "idf", "Paris"),
+    ("Île-de-France", "idf", "la région seule vaut l'Île-de-France"),
+    ("Télétravail", "remote", "mode de travail"),
+    ("Rive Gauche", "autre", "« auch » n'est pas dans « Rive Gauche »"),
+    ("Albigny", "autre", "« albi » n'est pas dans « Albigny »"),
+    ("Lyon", "autre", "hors zone"),
+    (None, "autre", "lieu absent"),
+    ("", "autre", "lieu vide"),
+)
+
+
+class ZoneDuCollecteur(unittest.TestCase):
+    def test_cas_de_lieux_du_diff(self):
+        for lieu, attendu, pourquoi in CAS_DE_LIEUX:
+            with self.subTest(lieu=lieu, pourquoi=pourquoi):
+                self.assertEqual(c.zone_de(lieu), attendu)
+
+    def test_la_zone_decide_de_la_colonne_ecrite(self):
+        lignes = preparer_depuis([offre(1, "Stage", location="Montpellier, Occitanie"),
+                                  offre(2, "Stage", location="Saint-Denis, La Réunion")])
+        zones = {l["pipeline_id"]: l["location_zone"] for l in lignes}
+        self.assertEqual(zones, {1: "occitanie", 2: "autre"})
+
+    def test_aucune_copie_de_regex_dans_le_collecteur(self):
+        source = (ICI / "collecteur_postgres.py").read_text(encoding="utf-8")
+        for nom in ("ZONE_TOULOUSE", "ZONE_IDF", "ZONE_REMOTE"):
+            self.assertNotIn(nom, source)
+        self.assertIn("eligibility.zone_de_lieu", source)
+
+    def test_la_regle_manquante_est_dite_et_non_devinee(self):
+        import os
+        ancien = os.environ.get("JOBBOT_REFERENCE")
+        avec_regle = c._regle_de_zone
+        try:
+            with tempfile.TemporaryDirectory() as vide:
+                os.environ["JOBBOT_REFERENCE"] = vide
+                c._regle_de_zone = None
+                with self.assertRaisesRegex(RuntimeError, "faits.py est absent"):
+                    c.zone_de("Toulouse")
+        finally:
+            c._regle_de_zone = avec_regle
+            if ancien is None:
+                os.environ.pop("JOBBOT_REFERENCE", None)
+            else:
+                os.environ["JOBBOT_REFERENCE"] = ancien
+
+    def test_la_comparaison_au_fichier_voit_un_desaccord(self):
+        offres = [{"location": "Toulouse", "location_zone": "toulouse"},
+                  {"location": "Montpellier", "location_zone": "toulouse"}]   # ancienne règle
+        desaccords, zones = comparer_zones.comparer(offres)
+        self.assertEqual(sum(desaccords.values()), 1)
+        self.assertEqual(list(desaccords), [("Montpellier", "toulouse", "occitanie")])
+        self.assertEqual(zones["occitanie"], 1)
+
+    def test_la_comparaison_est_a_zero_sur_un_export_coherent(self):
+        offres = [{"location": lieu, "location_zone": attendu} for lieu, attendu, _ in CAS_DE_LIEUX]
+        desaccords, _ = comparer_zones.comparer(offres)
+        self.assertEqual(sum(desaccords.values()), 0)
 
 
 if __name__ == "__main__":

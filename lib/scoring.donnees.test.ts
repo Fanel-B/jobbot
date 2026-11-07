@@ -130,20 +130,29 @@ describe("informations manquantes dans les offres réelles", () => {
     expect(apres.total).toBe(avant.total);
   });
 
-  it("offre #973 (type de contrat non renseigné) : bulletin du Python, ligne à ligne", () => {
-    const o = parId(973);
-    expect(o.contract_known).toBe(false);
-    expect(resultat(973).raisons).toEqual(o.score_reasons);
-    expect(resultat(973).total).toBe(o.score);
+  it("offres sans type de contrat : bulletin du Python, ligne à ligne", () => {
+    // L'offre #973, citée ici jusqu'au 6 novembre 2026, a quitté l'export du 7 novembre : on prend
+    // toutes les offres sans contrat du fichier, pas une seule dont l'identifiant peut disparaître.
+    const sansContrat = offers.filter((o) => !o.contract_known);
+    expect(sansContrat.length).toBeGreaterThan(10);
+    for (const o of sansContrat) {
+      expect(resultat(o.id).raisons, `offre #${o.id}`).toEqual(o.score_reasons);
+      expect(resultat(o.id).total, `offre #${o.id}`).toBe(o.score);
+    }
   });
 
-  it("effacer le lieu et la description d'une offre sans contrat ne change pas son bulletin (ils ne sont pas notés)", () => {
+  it("effacer le lieu d'une offre sans contrat ne change pas son bulletin (le lieu n'est pas noté)", () => {
     // Le cas d'origine (#716 : ni contrat, ni lieu, ni description) a quitté l'export le 25/10/2026 :
     // sans lieu, aucune zone n'est calculable, donc l'offre n'est pas publiée. On vérifie la même
-    // propriété — lieu et description ne sont pas notés — en les effaçant en mémoire.
-    const o = parId(973);
-    const ampute = { ...o, location: null, location_zone: null, description: null };
-    expect(classer([ampute], MAINTENANT)[0].raisons).toEqual(classer([o], MAINTENANT)[0].raisons);
+    // propriété en effaçant le lieu en mémoire, sur toutes les offres sans contrat du fichier.
+    // La description, elle, est lue par « cohérence » (6 des 40 offres changent de bulletin quand on
+    // l'efface) : l'ancien test ne l'affirmait vrai que pour #973, par hasard de ses données.
+    for (const o of offers.filter((x) => !x.contract_known)) {
+      const ampute = { ...o, location: null, location_zone: null };
+      expect(classer([ampute], MAINTENANT)[0].raisons, `offre #${o.id}`).toEqual(
+        classer([o], MAINTENANT)[0].raisons,
+      );
+    }
   });
 });
 
@@ -162,8 +171,12 @@ describe("référence : les 11 offres relues à la main", () => {
     expect(lot.filter((id) => !resultats.has(id))).toEqual([]);
   });
 
-  it("#897 finit premier des 11 offres", () => {
-    const classement = [...resultats.values()]
+  it("#897 finit premier des 11 offres, à la date de la relecture", () => {
+    // La relecture date du 25 octobre 2026 : on classe à l'heure de l'export d'alors. Au 7 novembre,
+    // #897 (publiée le 19 octobre) a perdu ses 5 points de fraîcheur (« il y a 19 j ») et #836 la
+    // dépasse de un point, 67 contre 66. C'est le calendrier qui a changé, pas le moteur.
+    const LE_25_OCTOBRE = maintenantDeLExport("2026-10-25T17:41:17+00:00");
+    const classement = classer(ordreDuPipeline(offers), LE_25_OCTOBRE)
       .filter((r) => lot.includes(r.id))
       .sort((a, b) => b.total - a.total || a.id - b.id);
     expect(classement[0].id).toBe(897);

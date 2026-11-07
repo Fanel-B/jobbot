@@ -67,16 +67,10 @@ COLONNES_LUES = (
     "skills_optional", "published_at", "first_seen_at", "last_seen_at", "miage_mentioned",
 )
 
-# Zones géographiques : copie conforme de `reference/export_site.py` (à garder synchronisée).
-ZONE_TOULOUSE = re.compile(
-    r"toulouse|blagnac|colomiers|lab[eè]ge|balma|haute[- ]garonne|muret|castanet|l'union|fenouillet|"
-    r"cornebarrieu|aucamville|beauzelle|cugnaux|tournefeuille|portet[- ]sur[- ]garonne|\b31\s*-|\b31\d{3}\b",
-    re.I)
-ZONE_IDF = re.compile(
-    r"paris|île[- ]de[- ]france|ile[- ]de[- ]france|nanterre|boulogne|saint[- ]denis|cr[eé]teil|"
-    r"montrouge|issy|saclay|v[eé]lizy|guyancourt|marne[- ]la[- ]vall[eé]e|\b7[5-9]\d{3}\b|\b9[1-5]\d{3}\b",
-    re.I)
-ZONE_REMOTE = re.compile(r"t[eé]l[eé]travail|remote|à distance|a distance|home ?office", re.I)
+# La zone d'une offre n'est PAS calculée ici : elle l'est par `eligibility.zone_de_lieu`, lue dans
+# `reference/` (voir `zone_de` plus bas). Les trois regex qui s'y trouvaient étaient une copie de
+# l'ancien `export_site.py`, et une copie de plus à garder synchronisée.
+REFERENCE_PAR_DEFAUT = Path(__file__).resolve().parent.parent / "reference"
 
 # Colonnes écrites dans `offers`, dans l'ordre de la requête.
 COLONNES_PG = (
@@ -128,11 +122,35 @@ RETURNING (xmax = 0) AS inseree
 
 # ---------------------------------------------------------------- transformation
 
+_regle_de_zone = None
+
+
+def _charger_regle_de_zone():
+    """`eligibility.zone_de_lieu`, la règle du moteur, lue dans `reference/` (ou `JOBBOT_REFERENCE`).
+
+    `eligibility.py` importe `faits.py` : si ce dernier manque, la règle ne peut pas tourner, et le
+    dire vaut mieux qu'une zone devinée. La variable d'environnement sert aux essais sur une copie
+    du dossier ; en production, le dossier du dépôt fait foi.
+    """
+    dossier = Path(os.environ.get("JOBBOT_REFERENCE") or REFERENCE_PAR_DEFAUT)
+    if not (dossier / "faits.py").is_file():
+        raise RuntimeError(
+            f"{dossier / 'faits.py'} est absent : la règle de zone de reference/eligibility.py ne "
+            "peut pas s'exécuter sans lui. Il vient du pipeline (voir reference/README.md).")
+    sys.path.insert(0, str(dossier))
+    try:
+        import eligibility               # noqa: PLC0415  (import tardif : --help ne doit pas en dépendre)
+    finally:
+        sys.path.remove(str(dossier))
+    return eligibility.zone_de_lieu
+
+
 def zone_de(location: str | None) -> str:
-    for motif, nom in ((ZONE_TOULOUSE, "toulouse"), (ZONE_IDF, "idf"), (ZONE_REMOTE, "remote")):
-        if motif.search(location or ""):
-            return nom
-    return "autre"
+    """Zone d'un lieu : la règle de `reference/eligibility.py`, celle de l'export du site."""
+    global _regle_de_zone
+    if _regle_de_zone is None:
+        _regle_de_zone = _charger_regle_de_zone()
+    return _regle_de_zone(location)
 
 
 # ---------------------------------------------------------------- sélection

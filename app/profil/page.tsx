@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ZONE_LABEL, type Zone } from "@/lib/offers";
+import { ZONE_LABEL, ZONES } from "@/lib/offers";
 import { chargerDonnees } from "@/lib/donnees";
 import { FAMILLES, competencesRangees } from "@/lib/competences";
 import { EtatDuProfil } from "@/components/EtatDuProfil";
@@ -24,7 +24,6 @@ export const metadata: Metadata = {
     "Les compétences que tu confirmes, ta zone et ton niveau : c'est à partir d'eux que chaque offre est notée.",
 };
 
-const ZONES: Zone[] = ["toulouse", "idf", "remote", "autre"];
 const NIVEAUX: NiveauEtudes[] = ["bac+3", "bac+4", "bac+5"];
 const RECHERCHES: TypeRecherche[] = ["stage", "alternance"];
 

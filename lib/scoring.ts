@@ -6,8 +6,14 @@
  * `reference/priorites.py` ; `npm run verifier-scoring` compare ce calcul à `data/offers.json`
  * offre par offre, critère par critère.
  *
- * Ce module n'importe rien : il tourne tel quel dans Next.js et sous Node (script de vérification).
+ * Il n'importe que `./dates.ts`, `./eligibilite.ts` et `./zones.generees.ts`, purs eux aussi
+ * (la zone du lieu vient de la même règle que le statut, pas d'une seconde liste) : l'extension
+ * est écrite parce que Node exécute ce
+ * fichier tel quel (scripts de vérification) et ne la devine pas. Next.js l'accepte aussi.
  */
+import { parseDate } from "./dates.ts";
+import { zoneDe } from "./eligibilite.ts";
+import { POINTS_LIEU_AUTRE, ZONES_FAITS } from "./zones.generees.ts";
 
 /** Ce dont le calcul a besoin — un sous-ensemble des champs de `data/offers.json`. */
 export type OffreAScorer = {
@@ -449,36 +455,32 @@ export function maintenantDeLExport(generatedAt: string, fuseauHeures = FUSEAU_P
  */
 const FIN_TARDIVE_MALUS = -8.0;
 const PALIERS_FIN = { compatible: "2027-07-31", negociation: "2027-08-31", raccourcir: "2027-10-31" };
+
+/**
+ * Le dernier jour où un stage peut finir sans rien négocier : la fenêtre « compatible » ci-dessus.
+ * Le site l'écrit à deux endroits (la page méthode, et la ligne « Début » d'une fiche dont la date
+ * est inexploitable) et les lit ici, jamais recopiée : si la date de fin de Fanel bouge, le moteur,
+ * la méthode et les fiches bougent ensemble. Format ISO ; `dateLongue` (lib/dates.ts) l'écrit en clair.
+ */
+export const FIN_DE_STAGE_LA_PLUS_TARDIVE = PALIERS_FIN.compatible;
 const PALIER_FIN_COMPATIBLE = "compatible";
 const PALIER_FIN_NEGOCIATION = "negociation";
 const PALIER_FIN_RACCOURCIR = "raccourcir";
 const PALIER_FIN_HORS_PORTEE = "hors_portee";
-
-const MOIS_FR: Record<string, number> = {
-  janvier: 1, fevrier: 2, mars: 3, avril: 4, mai: 5, juin: 6, juillet: 7, aout: 8,
-  septembre: 9, octobre: 10, novembre: 11, decembre: 12,
-};
 
 /** `_norm` de Python : minuscules, accents retirés, espaces normalisés. */
 function sansAccents(txt: string): string {
   return txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 }
 
-/** `parse_date` : ISO, JJ/MM/AAAA, MM/AAAA, « septembre 2026 », « 1er mars 2027 ». */
+/**
+ * `parse_date`, réduit à ce que `fin_de_stage` utilise : une vraie date, ou rien. « asap » et les
+ * dates impossibles ne donnent pas de fin calculable. Le lecteur lui-même est `lib/dates.ts`, qui
+ * connaît les mois abrégés et anglais comme Python : l'ancien, privé, les ignorait.
+ */
 function parseDateFr(value: string | null | undefined): Date | null {
-  const s = sansAccents(String(value ?? ""));
-  if (!s) return null;
-  let m = /(\d{4})-(\d{1,2})(?:-(\d{1,2}))?/.exec(s);
-  if (m) return new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3] ?? 1)));
-  m = /(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(s);
-  if (m) return new Date(Date.UTC(Number(m[3]), Number(m[2]) - 1, Number(m[1])));
-  m = /\b(\d{1,2})\/(\d{4})\b/.exec(s);
-  if (m) return new Date(Date.UTC(Number(m[2]), Number(m[1]) - 1, 1));
-  m = /(\d{1,2})(?:er)?\s+([a-z]+)\.?\s+(\d{4})/.exec(s);
-  if (m && MOIS_FR[m[2]]) return new Date(Date.UTC(Number(m[3]), MOIS_FR[m[2]] - 1, Number(m[1])));
-  m = /(?:^|\s)([a-z]+)\.?\s+(\d{4})/.exec(s);
-  if (m && MOIS_FR[m[1]]) return new Date(Date.UTC(Number(m[2]), MOIS_FR[m[1]] - 1, 1));
-  return null;
+  const lue = parseDate(value);
+  return lue instanceof Date ? lue : null;
 }
 
 const UNITES_MOIS: Record<string, number> = {
@@ -825,26 +827,11 @@ const TECH_NEUTRAL_SCORE = 20.0;
 const REQUIRED_WEIGHT_SCORE = 0.8;
 const OPTIONAL_WEIGHT_SCORE = 0.2;
 
-const LIEUX: [string[], number][] = [
-  [["toulouse", "haute-garonne", "blagnac", "labege", "colomiers"], 15],
-  [["paris", "ile-de-france", "idf", "la defense",
-    "suresnes", "boulogne", "nanterre", "courbevoie", "puteaux", "levallois", "neuilly",
-    "issy-les-moulineaux", "issy les moulineaux", "rueil", "colombes", "asnieres",
-    "clichy", "montrouge", "malakoff", "clamart", "meudon", "sevres", "chatillon",
-    "gennevilliers", "saint-cloud", "saint cloud",
-    "saint-denis", "saint denis", "montreuil", "aubervilliers", "pantin", "bobigny",
-    "noisy-le-grand", "noisy le grand", "bagnolet", "saint-ouen", "saint ouen",
-    "vincennes", "creteil", "ivry", "vitry", "villejuif", "fontenay-sous-bois",
-    "charenton", "saint-mande", "saint-maur", "maisons-alfort", "arcueil", "rungis",
-    "cergy", "argenteuil", "pontoise", "sarcelles", "massy", "palaiseau", "saclay",
-    "evry", "orsay", "versailles", "saint-quentin-en-yvelines", "guyancourt",
-    "velizy", "saint-germain-en-laye", "marne-la-vallee", "melun", "meaux",
-    "champs-sur-marne", "serris"], 13],
-  [["remote", "teletravail", "full remote", "a distance", "distanciel"], 10],
-];
-const LIEU_DEFAUT = 3, IDF_SCORE = 13, TOULOUSE_SCORE = 15;
-const IDF_DEPT_RE_SCORE = /(?:^|\D)(?:75|77|78|91|92|93|94|95)(?:\s*-\s|\d{3}\b)/;
-const HAUTE_GARONNE_RE_SCORE = /(?:^|\D)31(?:\s*-\s|\d{3}\b)/;
+// Les points d'un lieu viennent de `faits.ZONES` (lib/zones.generees.ts, produit depuis
+// `reference/faits.py`), et la zone elle-même est calculée par la règle du moteur : `zoneDe` porte
+// `eligibility.zone_de_lieu`. Une seule règle pour le statut, l'affichage et les points. Les
+// sous-chaînes d'avant donnaient 13 points à « Rive Gauche » (« auch ») ou à « Albigny » (« albi »),
+// et 15 à une offre de La Réunion nommée « Saint-Denis » (relevé du 6 novembre 2026).
 
 const CONTRATS: [string[], number][] = [
   [["alternance", "apprentissage", "apprenti", "contrat pro", "professionnalisation", "work-study"], 10],
@@ -1036,14 +1023,8 @@ function scoreEducation(o: OffreAEvaluer): number {
 }
 
 function scoreLieu(o: OffreAEvaluer): number {
-  const loc = norm(o.location);
-  let best = LIEU_DEFAUT;
-  for (const [termes, pts] of LIEUX) {
-    if (termes.some((t) => loc.includes(t))) best = Math.max(best, pts);
-  }
-  if (IDF_DEPT_RE_SCORE.test(loc)) best = Math.max(best, IDF_SCORE);
-  if (HAUTE_GARONNE_RE_SCORE.test(loc)) best = Math.max(best, TOULOUSE_SCORE);
-  return best;
+  const zone = zoneDe(o.location);
+  return zone === "autre" ? POINTS_LIEU_AUTRE : ZONES_FAITS[zone].points;
 }
 
 function scoreContrat(o: OffreAEvaluer): number {

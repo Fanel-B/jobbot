@@ -1,0 +1,177 @@
+{
+ "note": "Résultats du vrai parse_date de la copie d'étape B, pour le test du portage TypeScript.",
+ "python": "3.14.4",
+ "cas": 34,
+ "attendu": [
+  {
+   "entree": "2026-09-01",
+   "sortie": "2026-09-01",
+   "type": "date"
+  },
+  {
+   "entree": "2027-03-29",
+   "sortie": "2027-03-29",
+   "type": "date"
+  },
+  {
+   "entree": "2027-02-30",
+   "sortie": null,
+   "type": "illisible"
+  },
+  {
+   "entree": "2026-13-01",
+   "sortie": null,
+   "type": "illisible"
+  },
+  {
+   "entree": "2026-9-1",
+   "sortie": "2026-09-01",
+   "type": "date"
+  },
+  {
+   "entree": "29/03/2027",
+   "sortie": "2027-03-29",
+   "type": "date"
+  },
+  {
+   "entree": "31/02/2027",
+   "sortie": null,
+   "type": "illisible"
+  },
+  {
+   "entree": "01/09/2026",
+   "sortie": "2026-09-01",
+   "type": "date"
+  },
+  {
+   "entree": "5/1/2027",
+   "sortie": "2027-01-05",
+   "type": "date"
+  },
+  {
+   "entree": "09/2026",
+   "sortie": "2026-09-01",
+   "type": "date"
+  },
+  {
+   "entree": "03/2027",
+   "sortie": "2027-03-01",
+   "type": "date"
+  },
+  {
+   "entree": "13/2027",
+   "sortie": null,
+   "type": "illisible"
+  },
+  {
+   "entree": "septembre 2026",
+   "sortie": "2026-09-01",
+   "type": "date"
+  },
+  {
+   "entree": "mars 2027",
+   "sortie": "2027-03-01",
+   "type": "date"
+  },
+  {
+   "entree": "novembre 2027",
+   "sortie": "2027-11-01",
+   "type": "date"
+  },
+  {
+   "entree": "début novembre 2027",
+   "sortie": "2027-11-01",
+   "type": "date"
+  },
+  {
+   "entree": "sept. 2027",
+   "sortie": "2027-09-01",
+   "type": "date"
+  },
+  {
+   "entree": "janv. 2027",
+   "sortie": "2027-01-01",
+   "type": "date"
+  },
+  {
+   "entree": "déc. 2026",
+   "sortie": "2026-12-01",
+   "type": "date"
+  },
+  {
+   "entree": "1er mars 2027",
+   "sortie": "2027-03-01",
+   "type": "date"
+  },
+  {
+   "entree": "5 janvier 2027",
+   "sortie": "2027-01-05",
+   "type": "date"
+  },
+  {
+   "entree": "March 2027",
+   "sortie": "2027-03-01",
+   "type": "date"
+  },
+  {
+   "entree": "September 2026",
+   "sortie": "2026-09-01",
+   "type": "date"
+  },
+  {
+   "entree": "as soon as possible",
+   "sortie": null,
+   "type": "illisible"
+  },
+  {
+   "entree": "asap",
+   "sortie": "asap",
+   "type": "asap"
+  },
+  {
+   "entree": "dès que possible",
+   "sortie": "asap",
+   "type": "asap"
+  },
+  {
+   "entree": "dès que possible, mars 2027",
+   "sortie": "asap",
+   "type": "asap"
+  },
+  {
+   "entree": "immédiatement",
+   "sortie": "asap",
+   "type": "asap"
+  },
+  {
+   "entree": "à définir",
+   "sortie": null,
+   "type": "illisible"
+  },
+  {
+   "entree": "",
+   "sortie": null,
+   "type": "illisible"
+  },
+  {
+   "entree": null,
+   "sortie": null,
+   "type": "illisible"
+  },
+  {
+   "entree": "bientôt",
+   "sortie": null,
+   "type": "illisible"
+  },
+  {
+   "entree": "2026",
+   "sortie": null,
+   "type": "illisible"
+  },
+  {
+   "entree": "Stage de 6 mois à partir de septembre 2026",
+   "sortie": "2026-09-01",
+   "type": "date"
+  }
+ ]
+}

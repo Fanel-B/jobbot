@@ -28,6 +28,8 @@ import json
 import re
 import unicodedata
 
+import faits  # noqa: E402  (zones : une seule déclaration, lue ici comme ailleurs)
+import eligibility  # noqa: E402  (zone du lieu : la même règle que le statut et l'export)
 from eligibility import PALIER_FIN_RACCOURCIR, est_stage, fin_de_stage
 from faits import COMPETENCES_CONFIRMEES
 
@@ -181,33 +183,22 @@ TECH_HORS_PROFIL = (
     ("Snowflake", r"(?<![a-z0-9])snowflake(?![a-z0-9])"),
 )
 
-LOCATION_POINTS = [
-    (("toulouse", "haute-garonne", "blagnac", "labege", "colomiers"), 15),
-    (("paris", "ile-de-france", "idf", "la defense",
-      # 92
-      "suresnes", "boulogne", "nanterre", "courbevoie", "puteaux", "levallois", "neuilly",
-      "issy-les-moulineaux", "issy les moulineaux", "rueil", "colombes", "asnieres",
-      "clichy", "montrouge", "malakoff", "clamart", "meudon", "sevres", "chatillon",
-      "gennevilliers", "saint-cloud", "saint cloud",
-      # 93
-      "saint-denis", "saint denis", "montreuil", "aubervilliers", "pantin", "bobigny",
-      "noisy-le-grand", "noisy le grand", "bagnolet", "saint-ouen", "saint ouen",
-      # 94
-      "vincennes", "creteil", "ivry", "vitry", "villejuif", "fontenay-sous-bois",
-      "charenton", "saint-mande", "saint-maur", "maisons-alfort", "arcueil", "rungis",
-      # 95 / 91 / 78 / 77
-      "cergy", "argenteuil", "pontoise", "sarcelles", "massy", "palaiseau", "saclay",
-      "evry", "orsay", "versailles", "saint-quentin-en-yvelines", "guyancourt",
-      "velizy", "saint-germain-en-laye", "marne-la-vallee", "melun", "meaux",
-      "champs-sur-marne", "serris"), 13),
-    (("remote", "teletravail", "full remote", "a distance", "distanciel"), 10),
-]
+# Points et lieux par zone : tout est lu dans `faits.ZONES` (décision du 06/11/2026). Aucune liste
+# de communes n'est recopiée : ajouter une ville à une zone dans `faits.py` suffit à la faire
+# reconnaître ici **et** dans l'éligibilité, ce qui supprime la paire de listes qui divergeait.
+# Les lieux qui étaient reconnus ici à 13 points ont été versés dans `faits.ZONES["idf"]` : les
+# oublier aurait fait baisser la note d'offres déjà classées.
+# Les points d'un lieu sont lus dans `faits.ZONES`, et **la zone elle-même** est calculée par la
+# même fonction que celle qui décide du statut et de l'affichage : `eligibility.zone_de_lieu`.
+# Une seule règle pour les trois usages. Les sous-chaînes d'avant donnaient 13 points à une offre
+# dont le lieu contenait « auch » (« Rive Gauche ») ou « albi » (« Albigny »), et 15 points à une
+# offre de La Réunion nommée « Saint-Denis » (relevé du 06/11/2026).
+ZONE_POINTS = {nom: faits.ZONES[nom]["points"] for nom in faits.ZONES_ORDRE}
 LOCATION_DEFAULT = 3
-IDF_SCORE = 13
-TOULOUSE_SCORE = 15
-# Département d'Île-de-France : "92 - Suresnes" (France Travail) ou code postal "92150" (LBA)
-IDF_DEPT_RE = re.compile(r"(?:^|\D)(?:75|77|78|91|92|93|94|95)(?:\s*-\s|\d{3}\b)")
-HAUTE_GARONNE_RE = re.compile(r"(?:^|\D)31(?:\s*-\s|\d{3}\b)")
+TOULOUSE_SCORE = ZONE_POINTS["toulouse"]
+IDF_SCORE = ZONE_POINTS["idf"]
+OCCITANIE_SCORE = ZONE_POINTS["occitanie"]
+REMOTE_SCORE = ZONE_POINTS["remote"]
 
 CONTRACT_POINTS = [
     (("alternance", "apprentissage", "apprenti", "contrat pro", "professionnalisation", "work-study"), 10),
@@ -525,16 +516,14 @@ def fin_score(offer: dict) -> tuple[float, str]:
 
 
 def location_score(offer: dict) -> float:
-    loc = _norm(offer.get("location"))
-    best = LOCATION_DEFAULT
-    for terms, pts in LOCATION_POINTS:
-        if any(t in loc for t in terms):
-            best = max(best, pts)
-    if IDF_DEPT_RE.search(loc):
-        best = max(best, IDF_SCORE)
-    if HAUTE_GARONNE_RE.search(loc):
-        best = max(best, TOULOUSE_SCORE)
-    return float(best)
+    """Points du lieu, lus dans `faits.ZONES` : la zone reconnue donne ses points.
+
+    L'ordre de `faits.ZONES_ORDRE` décide, du plus précis au plus large : « Toulouse
+    (télétravail) » est toulousaine, pas distancielle. Une offre qui n'évoque aucune zone garde le
+    minimum (`LOCATION_DEFAULT`) : le lieu informe le classement, il ne décide pas de l'éligibilité.
+    """
+    zone = eligibility.zone_de_lieu(offer.get("location"))
+    return float(ZONE_POINTS[zone] if zone != "autre" else LOCATION_DEFAULT)
 
 
 def contract_score(offer: dict) -> float:
