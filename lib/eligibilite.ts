@@ -7,7 +7,8 @@
  * la base ne contiendra que les champs bruts de l'annonce, et c'est lui qui devra les dériver.
  *
  * Les oracles, ligne par ligne :
- *   · `zoneDe`      ← `zone_de()`        et `ZONE_TOULOUSE/IDF/REMOTE`, reference/export_site.py
+ *   · `zoneDe`      ← `zone_de_lieu()` et ses aides (`_zone_du_texte`...), reference/eligibility.py ;
+ *                     `export_site.zone_de()` l'appelle pour écrire `location_zone`
  *   · `contratsDe`  ← `contrats()`       , même fichier
  *   · `signalEcole` ← `partner_school_match()` et `PARTNER_SCHOOL_PATTERNS`, reference/eligibility.py
  *
@@ -17,6 +18,9 @@
  * (éligible / incertain / rejeté) et se rabat sur le titre quand le lieu est vide — ce n'est pas
  * ce que l'export écrit dans `location_zone`. Le porter donnerait des désaccords garantis.
  */
+
+// Les listes de communes, de départements et de régions : générées depuis `reference/faits.py`.
+import { ZONES_ELIGIBLES, ZONES_FAITS, ZONES_ORDRE } from "./zones.generees.ts";
 
 /**
  * Les zones que le site connaît, dans l'ordre où il les présente. Une seule liste : le filtre de la
@@ -31,53 +35,124 @@ export type Zone = (typeof ZONES)[number];
 /* ------------------------------------------------------------------- zones */
 
 /**
- * Les trois motifs de `export_site.py`, dans leur ordre d'évaluation — qui est une priorité, pas
- * un ensemble : une annonce « Toulouse, télétravail partiel » est toulousaine, pas distancielle.
+ * Portage de la règle de zone du pipeline : `zone_de_lieu` et ses aides, `reference/eligibility.py`.
+ * Les listes (communes, départements, régions, noms ambigus) ne sont pas écrites ici : elles viennent
+ * de `lib/zones.generees.ts`, produit par `tools/generer_zones.py` depuis `reference/faits.py`.
  *
- * Python les compile avec `re.I` et les applique avec `re.search` (n'importe où dans le texte,
- * pas seulement au début). Le drapeau `i` et `RegExp.test` font la même chose ici.
+ * La règle, dans l'ordre (décision de Fanel du 06/11/2026) :
+ *   1. le lieu est normalisé (sans accents, en minuscules) ;
+ *   2. pour chaque zone dans l'ordre toulouse, occitanie, idf : une commune non ambiguë ou un
+ *      département (« 31 - Blagnac », « 93200 ») la désigne ;
+ *   3. puis, dans le même ordre, un nom ambigu (« Saint-Denis », « Vitry »...) ne la désigne que
+ *      **confirmé** par un département ou par le nom propre de la région (« Paris », « Île-de-France ») ;
+ *   4. sinon « Île-de-France » seule vaut l'Île-de-France ;
+ *   5. sinon un mot de télétravail vaut « remote » ;
+ *   6. sinon « autre ».
+ * L'ordre est une priorité : « Toulouse, télétravail partiel » est toulousaine.
  *
- * Les accents sont conservés tels quels : contrairement au signal d'école, `zone_de` travaille sur
- * le texte brut, sans normalisation. « Labège » doit donc matcher par `lab[eè]ge`, et c'est le
- * motif qui porte les deux graphies.
+ * Les motifs. Python écrit `\bterme\b`, avec le tiret remplacé par `[-\s]?` (« haute-garonne »
+ * reconnaît « haute garonne »). Le `\b` de Python suit Unicode, celui de JavaScript est ASCII : d'où
+ * les assertions `(?<![\p{L}\p{N}_])` et `(?![\p{L}\p{N}_])` avec le drapeau `u`. Même chose pour `\d`
+ * (`\p{Nd}`). Ni l'un ni l'autre ne se voit sur du texte normalisé, mais « identique » vaut mieux que
+ * « équivalent sur les données d'aujourd'hui ».
  */
-const ZONE_TOULOUSE =
-  /toulouse|blagnac|colomiers|lab[eè]ge|balma|haute[- ]garonne|muret|castanet|l'union|fenouillet|cornebarrieu|aucamville|beauzelle|cugnaux|tournefeuille|portet[- ]sur[- ]garonne|\b31\s*-|\b31\d{3}\b/i;
+const LETTRE = "[\\p{L}\\p{N}_]";
 
-const ZONE_IDF =
-  /paris|île[- ]de[- ]france|ile[- ]de[- ]france|nanterre|boulogne|saint[- ]denis|cr[eé]teil|montrouge|issy|saclay|v[eé]lizy|guyancourt|marne[- ]la[- ]vall[eé]e|\b7[5-9]\d{3}\b|\b9[1-5]\d{3}\b/i;
+/** `_motif_zone` : une commune ou une région, mot entier, tiret et espace équivalents. */
+function motifZone(terme: string): RegExp {
+  const corps = normaliser(terme)
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    .replace(/-/g, "[-\\s]?");
+  return new RegExp(`(?<!${LETTRE})${corps}(?!${LETTRE})`, "u");
+}
 
-const ZONE_REMOTE = /t[eé]l[eé]travail|remote|à distance|a distance|home ?office/i;
+/** `_motif_departement` : « 31 - Commune » (France Travail) ou « 31000 » (code postal). */
+function motifDepartement(code: string): RegExp {
+  return new RegExp(`(?:^|\\P{Nd})${code}(?:\\s*-\\s|\\p{Nd}{3}(?!${LETTRE}))`, "u");
+}
 
-const ZONES_ORDONNEES: [RegExp, Zone][] = [
-  [ZONE_TOULOUSE, "toulouse"],
-  [ZONE_IDF, "idf"],
-  [ZONE_REMOTE, "remote"],
-];
+/** `_cle_zone` : pour comparer deux noms de commune, le tiret et l'espace sont la même chose. */
+function cleZone(terme: string): string {
+  return normaliser(terme).replace(/-/g, " ").split(/\s+/).filter(Boolean).join(" ");
+}
+
+type MotifsDeZone = {
+  surs: RegExp[]; // communes non ambiguës, puis départements (`_motifs`)
+  ambigus: RegExp[]; // noms qui existent ailleurs en France (`_motifs_ambigus`)
+  departements: RegExp[]; // confirmation par département (`_confirme_la_zone`)
+  regionPropre: RegExp[]; // confirmation par le nom de la région
+};
+
+const MOTIFS: Record<string, MotifsDeZone> = Object.fromEntries(
+  ZONES_ORDRE.map((nom) => {
+    const zone = ZONES_FAITS[nom];
+    const ambigus = new Set(zone.ambigus.map(cleZone));
+    const departements = zone.departements.map(motifDepartement);
+    return [
+      nom,
+      {
+        surs: [...zone.villes.filter((v) => !ambigus.has(cleZone(v))).map(motifZone), ...departements],
+        ambigus: zone.ambigus.map(motifZone),
+        departements,
+        regionPropre: zone.region_propre.map(motifZone),
+      },
+    ];
+  }),
+);
+
+/** `REMOTE_PATTERNS` : les mots de télétravail sont les « villes » de la zone remote. */
+const MOTIFS_REMOTE = ZONES_FAITS.remote.villes.map(motifZone);
+
+const toutes = (motifs: RegExp[], texte: string) => motifs.some((m) => m.test(texte));
+
+/** `_confirme_la_zone` : un département ou le nom propre de la région confirme un nom ambigu. */
+function confirmeLaZone(texte: string, nom: string): boolean {
+  return toutes(MOTIFS[nom].departements, texte) || toutes(MOTIFS[nom].regionPropre, texte);
+}
+
+/** `_zone_du_texte` : la zone reconnue dans un texte déjà normalisé, ou `null`. Le plus précis d'abord. */
+function zoneDuTexte(texte: string): Zone | null {
+  for (const nom of ZONES_ELIGIBLES) {
+    if (toutes(MOTIFS[nom].surs, texte)) return nom as Zone;
+  }
+  for (const nom of ZONES_ELIGIBLES) {
+    if (toutes(MOTIFS[nom].ambigus, texte) && confirmeLaZone(texte, nom)) return nom as Zone;
+  }
+  return null;
+}
 
 /**
- * La zone d'une annonce, d'après son seul champ `location`.
+ * La zone d'une annonce, d'après son seul champ `location` : `zone_de_lieu` de `eligibility.py`,
+ * la règle qui décide aussi du statut, de l'export et des points du lieu.
  *
- * Un lieu absent donne « autre », pas une erreur : `location or ""` côté Python, et 19 offres de
- * l'export sont dans ce cas. Deviner la ville depuis le titre serait inventer une donnée.
+ * Un lieu absent donne « autre », pas une erreur : `_norm(None)` vaut la chaîne vide côté Python, et
+ * 19 offres de l'export sont dans ce cas. Deviner la ville depuis le titre serait inventer une donnée.
  */
 export function zoneDe(location: string | null | undefined): Zone {
-  const texte = location ?? "";
-  for (const [motif, nom] of ZONES_ORDONNEES) {
-    if (motif.test(texte)) return nom;
-  }
+  const texte = normaliser(location);
+  const zone = zoneDuTexte(texte);
+  if (zone) return zone;
+  if (toutes(MOTIFS.idf.regionPropre, texte)) return "idf";
+  if (toutes(MOTIFS_REMOTE, texte)) return "remote";
   return "autre";
 }
 
 /**
- * Toutes les zones dont le motif correspond, pas seulement celle qui l'emporte.
- *
- * Sert au vérificateur : savoir si une offre met l'ordre de priorité à l'épreuve demande de
- * compter les correspondances, pas de lire le résultat — qui est unique par construction.
+ * Toutes les zones que le texte désigne, pas seulement celle qui l'emporte (même ordre que
+ * `zoneDe`). Sert au vérificateur : savoir si une offre met l'ordre de priorité à l'épreuve demande
+ * de compter les correspondances, pas de lire le résultat, qui est unique par construction.
  */
 export function zonesReconnues(location: string | null | undefined): Zone[] {
-  const texte = location ?? "";
-  return ZONES_ORDONNEES.filter(([motif]) => motif.test(texte)).map(([, nom]) => nom);
+  const texte = normaliser(location);
+  const trouvees: Zone[] = [];
+  for (const nom of ZONES_ORDRE) {
+    const sure = toutes(MOTIFS[nom].surs, texte);
+    const confirmee = toutes(MOTIFS[nom].ambigus, texte) && confirmeLaZone(texte, nom);
+    const region = nom === "idf" && toutes(MOTIFS.idf.regionPropre, texte);
+    const teletravail = nom === "remote" && toutes(MOTIFS_REMOTE, texte);
+    if (sure || confirmee || region || teletravail) trouvees.push(nom as Zone);
+  }
+  return trouvees;
 }
 
 /* --------------------------------------------------------------- contrats */

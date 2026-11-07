@@ -24,7 +24,7 @@
  * alors que le portage sera réellement mis à l'épreuve.
  */
 import { readFileSync } from "node:fs";
-import { contratsDe, contratConnu, signalEcole, zoneDe, zonesReconnues } from "../lib/eligibilite.ts";
+import { ZONES, contratsDe, contratConnu, signalEcole, zoneDe, zonesReconnues } from "../lib/eligibilite.ts";
 import { dateDebutNonExploitable } from "../lib/dates.ts";
 
 // `--fichier=chemin` : vérifier un autre export (le candidat du pipeline, avant de le committer).
@@ -102,6 +102,7 @@ const couverture = [
   ["type de contrat contenant « , »", offers.filter((o) => (o.contract_type ?? "").includes(",")).length],
   ["lieu correspondant à deux zones", offers.filter((o) => zonesReconnues(o.location).length > 1).length],
   ["lieu absent (→ « autre »)", offers.filter((o) => !(o.location ?? "").trim()).length],
+  ...ZONES.map((z) => [`lieu rangé en « ${z} »`, offers.filter((o) => zoneDe(o.location) === z).length]),
   ["lieu contenant un code postal", offers.filter((o) => /\d{5}/.test(o.location ?? "")).length],
   ["annonce déclenchant le signal d'école", flags],
 ];
@@ -137,7 +138,8 @@ console.log(
 console.log(
   "  découpage sur « / » et la normalisation des accents passeraient donc même s'ils étaient faux —",
 );
-console.log("  vérifié en mutant le portage. Ces règles sont épinglées par lib/eligibilite.test.ts.");
+console.log("  vérifié en mutant le portage. Ces règles sont épinglées par lib/eligibilite.test.ts, et la règle");
+console.log("  de zone (noms ambigus, départements, Occitanie) par lib/zones-regle.test.ts, qui la compare au moteur.");
 if (flags === 0) {
   console.log(
     "  Le signal d'école n'étant levé nulle part, cette partie établit l'absence de faux positifs,",
