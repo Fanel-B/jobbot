@@ -191,6 +191,58 @@ passage se fait **à blanc** (`--dry-run`), qui ne se connecte à rien. Le colle
 le relancer ne crée pas de doublon. **[à vérifier sur le VPS]** que l'environnement et le fichier
 existent toujours, et que `psql` est installé.
 
+### 5.4 Après une resynchronisation de `reference/`
+
+Le collecteur n'a plus sa propre règle de zone : il exécute `eligibility.zone_de_lieu` lu dans
+`reference/` (`tools/collecteur_postgres.py`, fonction `zone_de`). La base et le fichier d'export
+ne disent donc la même chose que si `reference/` est à jour. **Après chaque resynchronisation de
+`reference/`, et avant de copier**, comparer sur tous les lieux d'un export la zone du collecteur
+à la `location_zone` du fichier, et exiger zéro désaccord :
+
+```bash
+cd ~/jobbot-v2
+python3 tools/comparer_zones.py data/offers.json         # [dépôt] exige : Désaccords : 0
+python3 tools/comparer_zones.py /chemin/vers/export.json # un autre export, par exemple le candidat
+npm run verifier-eligibility -- --fichier=data/offers.json   # [dépôt] la zone du site, aussi à 0
+python3 -m unittest discover -s tools                    # [dépôt] les cas de lieux du collecteur
+```
+
+Codes de sortie de `comparer_zones.py` : **0** aucun désaccord, **1** au moins un (la liste est
+affichée, groupée par lieu), **2** la règle ne peut pas s'exécuter (typiquement `reference/faits.py`
+absent). Un désaccord veut dire que la base et le fichier afficheraient deux zones pour la même
+offre : ne pas copier avant de l'avoir expliqué.
+
+### 5.5 Mettre en service le chantier zone : l'ordre
+
+Chaque étape attend un accord explicite ; rien n'est appliqué avant. Dans l'ordre :
+
+1. **Fusion de la pull request du chantier** (Vercel redéploie). Le site connaît alors l'Occitanie,
+   mais lit toujours son fichier : rien ne change à l'écran tant que `data/offers.json` n'a pas été
+   régénéré.
+2. **Migration T7 sur Neon**, avant que le collecteur n'écrive la nouvelle zone. Elle remplace les
+   contraintes `offers_location_zone_check` et `profiles_zones_check`, rejouable sans effet :
+
+   ```bash
+   cd ~/jobbot-v2
+   ( set -a; . ~/.hermes/.env; set +a; psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migration-t7-zones.sql )
+   ```
+
+   Sans elle, la première offre d'Occitanie ferait annuler toute la copie. **[à vérifier sur le
+   VPS]** que `psql` est installé.
+3. **Tirer le dépôt** sur le VPS (section 4), pour que le collecteur et `reference/` soient à jour.
+4. **Déployer le Python du pipeline**, puis réévaluer les offres rejetées pour la zone. La
+   réévaluation a une simulation par défaut ; elle écrit une copie datée de la base avant d'écrire :
+
+   ```bash
+   cd ~/.hermes/skills/job-search
+   python3 reevaluer_statuts.py --dry-run          # [diff d'étape B] montre ce qui changerait
+   python3 reevaluer_statuts.py --apply            # [diff d'étape B] copie datée, puis écrit
+   ```
+
+   Ces commandes viennent de l'en-tête de `reevaluer_statuts.py` dans le diff d'étape B, hors de
+   ce dépôt. **[à vérifier sur le VPS]** une fois le Python déployé.
+5. **Exporter, puis comparer** (section 5.4), puis **copier** vers Neon (section 5.3).
+
 ---
 
 ## 6. Mettre à jour le site en ligne sur Vercel
