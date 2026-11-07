@@ -205,7 +205,12 @@ python3 tools/comparer_zones.py data/offers.json         # [dépôt] exige : Dé
 python3 tools/comparer_zones.py /chemin/vers/export.json # un autre export, par exemple le candidat
 npm run verifier-eligibility -- --fichier=data/offers.json   # [dépôt] la zone du site, aussi à 0
 python3 -m unittest discover -s tools                    # [dépôt] les cas de lieux du collecteur
+python3 tools/generer_zones.py --verifier                # [dépôt] lib/zones.generees.ts suit faits.py
 ```
+
+Si `faits.py` a changé, `python3 tools/generer_zones.py` réécrit `lib/zones.generees.ts` : le
+committer avec la resynchronisation. Les listes de communes, de départements et les points du site
+viennent de là, jamais d'une copie à la main.
 
 Codes de sortie de `comparer_zones.py` : **0** aucun désaccord, **1** au moins un (la liste est
 affichée, groupée par lieu), **2** la règle ne peut pas s'exécuter (typiquement `reference/faits.py`
@@ -217,8 +222,8 @@ offre : ne pas copier avant de l'avoir expliqué.
 Chaque étape attend un accord explicite ; rien n'est appliqué avant. Dans l'ordre :
 
 1. **Fusion de la pull request du chantier** (Vercel redéploie). Le site connaît alors l'Occitanie,
-   mais lit toujours son fichier : rien ne change à l'écran tant que `data/offers.json` n'a pas été
-   régénéré.
+   et il lit toujours son fichier. La pull request embarque l'export du 7 novembre 2026 comme
+   `data/offers.json` (369 offres, une en Occitanie) : fusionner la publie.
 2. **Migration T7 sur Neon**, avant que le collecteur n'écrive la nouvelle zone. Elle remplace les
    contraintes `offers_location_zone_check` et `profiles_zones_check`, rejouable sans effet :
 

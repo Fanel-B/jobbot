@@ -31,14 +31,17 @@ TypeScript** ma logique de notation, et pouvoir **vérifier** que la copie est f
 
 | Fichier | État |
 |---|---|
-| `eligibility.py`, `scoring.py`, `export_site.py` | resynchronisés le 7 novembre 2026 d'après le diff d'étape B du 6 novembre (version de 17:50), appliqué sans décalage. Chantier zone : Toulouse, Occitanie, Île-de-France, télétravail, noms ambigus, note de date. |
-| `faits.py` | **absent.** Le diff d'étape B n'en contient qu'un extrait (les hunks commencent à la ligne 98) : le reconstituer serait inventer. Il faut le fichier complet du pipeline. Tant qu'il manque, ces copies ne s'exécutent pas seules. |
+| `eligibility.py`, `scoring.py`, `export_site.py` | resynchronisés le 7 novembre 2026 d'après le diff final d'étape B (md5 `36a0fb304e828536fd2df82d7aada220`), appliqué sans décalage. Chantier zone : Toulouse, Occitanie, Île-de-France, télétravail, noms ambigus, note de date. |
+| `faits.py` | présent, tel que le pipeline le livre (344 lignes, md5 `3bf6eacf262faaf27afd3eb95d0f07a7`). Ces copies s'exécutent donc seules. |
 | `priorites.py` | inchangé : le bulletin affiché ne lit pas la zone. |
 
-Deux défauts connus du diff d'étape B sont transmis à l'auteur du pipeline et **ne sont pas corrigés
-ici** (ce dossier est une copie, pas un atelier) : `note_date` plante sur une date impossible
-(`ValueError` de `date(...)`, par exemple « 2026-13-01 »), et `meta.zones` de l'export ne compte pas
-l'Occitanie. Les copies seront resynchronisées quand le diff final arrivera.
+Les deux défauts du diff précédent sont corrigés dans le diff final : une date impossible
+(« 2026-13-01 ») vaut `None` au lieu de faire planter `note_date`, et `meta.zones` de l'export compte
+l'Occitanie. L'export du 7 novembre 2026 le montre (`occitanie: 1`).
+
+**Les listes de zones du site ne sont pas recopiées de ces fichiers.** `lib/zones.generees.ts` est
+produit par `python3 tools/generer_zones.py` depuis `faits.py`, et deux tests échouent s'il diverge :
+après une resynchronisation de `faits.py`, relancer ce script et committer le résultat.
 
 ## Les neuf critères, et pourquoi j'en parle ici
 
@@ -69,7 +72,9 @@ détail, accents compris :
 npm run verifier-scoring     # exige 0 désaccord
 ```
 
-Aujourd'hui : **290 offres comparées, 0 désaccord**. Un portage « à peu près » rendrait ma promesse
+Au 7 novembre 2026 : **369 offres comparées, 0 désaccord**. Cette commande ne compare que la note
+publiée (`classer`) ; les points du lieu de `scoreOffre` sont comparés au moteur par
+`lib/zones-regle.test.ts`. Un portage « à peu près » rendrait ma promesse
 fausse — une note est la somme exacte de ses lignes, ou elle n'est pas.
 
 ## Ce que ce portage me débloque
