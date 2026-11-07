@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS offers (
 
     CONSTRAINT offers_canonical_url_key UNIQUE (canonical_url),
     CONSTRAINT offers_location_zone_check
-        CHECK (location_zone IN ('toulouse', 'idf', 'remote', 'autre')),
+        CHECK (location_zone IN ('toulouse', 'occitanie', 'idf', 'remote', 'autre')),
     -- « Contrat renseigné » doit dire la vérité sur `contract_type` (règle n° 3 du BRIEFING).
     CONSTRAINT offers_contract_known_check
         CHECK (contract_known = (contract_type IS NOT NULL)),
@@ -197,9 +197,36 @@ CREATE TABLE IF NOT EXISTS profiles (
     updated_at      timestamptz NOT NULL DEFAULT now(),
 
     CONSTRAINT profiles_zones_check
-        CHECK (zones <@ ARRAY['toulouse', 'idf', 'remote', 'autre']::text[]),
+        CHECK (zones <@ ARRAY['toulouse', 'occitanie', 'idf', 'remote', 'autre']::text[]),
     CONSTRAINT profiles_skills_check CHECK (jsonb_typeof(skills) = 'array')
 );
+
+-- --------------------------------------- évolutions des contraintes de zone (T7, novembre 2026)
+
+-- `CREATE TABLE IF NOT EXISTS` ne corrige pas une contrainte d'une table déjà créée : celles de
+-- `offers.location_zone` et de `profiles.zones` ne connaissaient pas « occitanie ». Même contenu que
+-- `db/migration-t7-zones.sql`, qui existe seul pour être appliqué à la base en service. La
+-- contrainte n'est remplacée que si elle ne cite pas encore « occitanie » : rejouable sans effet.
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint
+                    WHERE conrelid = 'offers'::regclass
+                      AND conname = 'offers_location_zone_check'
+                      AND pg_get_constraintdef(oid) LIKE '%occitanie%') THEN
+        ALTER TABLE offers DROP CONSTRAINT IF EXISTS offers_location_zone_check;
+        ALTER TABLE offers ADD CONSTRAINT offers_location_zone_check
+            CHECK (location_zone IN ('toulouse', 'occitanie', 'idf', 'remote', 'autre'));
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint
+                    WHERE conrelid = 'profiles'::regclass
+                      AND conname = 'profiles_zones_check'
+                      AND pg_get_constraintdef(oid) LIKE '%occitanie%') THEN
+        ALTER TABLE profiles DROP CONSTRAINT IF EXISTS profiles_zones_check;
+        ALTER TABLE profiles ADD CONSTRAINT profiles_zones_check
+            CHECK (zones <@ ARRAY['toulouse', 'occitanie', 'idf', 'remote', 'autre']::text[]);
+    END IF;
+END $$;
 
 -- Les CV déposés. Les compétences proposées par l'IA restent séparées des compétences confirmées :
 -- une compétence jamais confirmée ne compte jamais.
