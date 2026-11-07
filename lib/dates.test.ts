@@ -3,17 +3,25 @@
  *
  * La table (`lib/dates.table.json`) est calculée par `tools/table_dates.py` avec le code de
  * `reference/eligibility.py` : chaque valeur attendue vient de Python, pas de ce que le TypeScript
- * devrait rendre. Quand le pipeline fournira sa propre table, elle remplace celle-ci sans toucher
- * au test.
+ * devrait rendre. Le pipeline a aussi calculé sa propre table (`lib/dates.hermes.json`, 34 cas, avec
+ * son `parse_date`) : elle est vérifiée à part, et les deux tables doivent dire la même chose.
+ *
+ * Depuis le diff final du 7 novembre 2026, une date impossible (« 2026-13-01 », « 31/02/2027 ») vaut
+ * `None` côté Python : il n'y a plus de cas « ValueError ».
  */
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { dateDebutNonExploitable, dateLongue, parseDate } from "./dates";
 
 type Ligne = { entree: string | null; attendu: string | null };
+type LigneDuPipeline = { entree: string | null; sortie: string | null; type: "date" | "asap" | "illisible" };
 const { table } = JSON.parse(
   readFileSync(new URL("./dates.table.json", import.meta.url), "utf8"),
 ) as { table: Ligne[] };
+
+const { attendu: tablePipeline } = JSON.parse(
+  readFileSync(new URL("./dates.hermes.json", import.meta.url), "utf8"),
+) as { attendu: LigneDuPipeline[] };
 
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
@@ -21,18 +29,50 @@ describe("parseDate suit parse_date de Python, chaîne par chaîne", () => {
   it("la table est assez large pour dire quelque chose", () => {
     expect(table.length).toBeGreaterThan(100);
     const genres = new Set(table.map((l) => (l.attendu === null ? "null" : /^\d/.test(l.attendu) ? "date" : l.attendu)));
-    expect(genres).toEqual(new Set(["date", "asap", "null", "ValueError"]));
+    expect(genres).toEqual(new Set(["date", "asap", "null"]));
+  });
+
+  it("aucune entrée ne vaut ValueError : une date impossible est illisible", () => {
+    expect(table.filter((l) => l.attendu === "ValueError")).toEqual([]);
+    for (const e of ["2026-13-01", "2027-02-30", "31/02/2027", "13/2027"]) {
+      expect(table.find((l) => l.entree === e)?.attendu, e).toBeNull();
+    }
   });
 
   for (const { entree, attendu } of table) {
     it(`${JSON.stringify(entree)} -> ${attendu}`, () => {
       const lue = parseDate(entree);
       if (attendu === "asap") expect(lue).toBe("asap");
-      else if (attendu === null || attendu === "ValueError") expect(lue).toBeNull();
+      else if (attendu === null) expect(lue).toBeNull();
       else {
         expect(lue).toBeInstanceOf(Date);
         expect(iso(lue as Date)).toBe(attendu);
       }
+    });
+  }
+});
+
+describe("la table calculée par le pipeline lui-même", () => {
+  it("elle compte 34 cas et couvre dates, asap, illisible et impossible", () => {
+    expect(tablePipeline).toHaveLength(34);
+    expect(new Set(tablePipeline.map((l) => l.type))).toEqual(new Set(["date", "asap", "illisible"]));
+  });
+
+  it("« as soon as possible » reste illisible (null), en toutes lettres anglaises", () => {
+    const cas = tablePipeline.find((l) => l.entree === "as soon as possible");
+    expect(cas).toMatchObject({ sortie: null, type: "illisible" });
+    expect(parseDate("as soon as possible")).toBeNull();
+    expect(dateDebutNonExploitable("as soon as possible")).toBe(true);
+  });
+
+  for (const { entree, sortie, type } of tablePipeline) {
+    it(`${JSON.stringify(entree)} -> ${sortie}`, () => {
+      const lue = parseDate(entree);
+      if (type === "asap") expect(lue).toBe("asap");
+      else if (type === "illisible") expect(lue).toBeNull();
+      else expect(iso(lue as Date)).toBe(sortie);
+      // Notre table (calculée avec le même code) doit dire la même chose que celle du pipeline.
+      expect(table.find((l) => l.entree === entree)?.attendu).toBe(sortie);
     });
   }
 });

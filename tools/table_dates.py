@@ -13,9 +13,14 @@ l'import direct marchera ; l'extraction rend le même code (de `_norm` à `parse
 Valeurs attendues :
   "AAAA-MM-JJ"   une date lue
   "asap"         « dès que possible »
-  null           texte illisible
-  "ValueError"   Python lève (date impossible, comme « 2026-13-01 ») : la version publiée de
-                 `note_date` plante alors sur cette offre. Le TypeScript la refuse (null).
+  null           texte illisible, ou date impossible (« 2026-13-01 », « 31/02/2027 »)
+
+Depuis le diff final du 7 novembre 2026, `parse_date` ne lève plus `ValueError` : une date qui
+n'existe pas au calendrier vaut `None`. Si Python en lève quand même une, ce script s'arrête : une
+régression du pipeline ne doit pas se glisser dans la table.
+
+`lib/dates.hermes.json` est la table que le pipeline a calculée lui-même (34 cas). Ses entrées sont
+reprises ici, et `lib/dates.test.ts` vérifie que cette table-ci et la sienne disent la même chose.
 """
 
 from __future__ import annotations
@@ -75,20 +80,29 @@ def charger_parse_date():
 
 
 def attendu(parse_date, entree):
-    try:
-        lue = parse_date(entree)
-    except ValueError:
-        return "ValueError"
+    lue = parse_date(entree)             # ValueError : on laisse remonter (voir l'en-tête)
     if isinstance(lue, date):
         return lue.isoformat()
     return lue            # "asap" ou None
 
 
+HERMES = Path(__file__).resolve().parent.parent / "lib" / "dates.hermes.json"
+
+
+def entrees_du_pipeline() -> list:
+    """Les entrées de la table du pipeline, dans son ordre (y compris None et la chaîne vide)."""
+    return [cas["entree"] for cas in json.loads(HERMES.read_text(encoding="utf-8"))["attendu"]]
+
+
 def main() -> int:
     parse_date = charger_parse_date()
-    table = [{"entree": e, "attendu": attendu(parse_date, e)} for e in ENTREES]
-    # None (champ absent) : le seul cas où l'entrée n'est pas une chaîne.
-    table.append({"entree": None, "attendu": attendu(parse_date, None)})
+    # Entrées du pipeline d'abord, puis les miennes ; chacune une seule fois, None compris.
+    vues, entrees = set(), []
+    for e in [*entrees_du_pipeline(), *ENTREES, None]:
+        if e not in vues:
+            vues.add(e)
+            entrees.append(e)
+    table = [{"entree": e, "attendu": attendu(parse_date, e)} for e in entrees]
     json.dump({"source": "reference/eligibility.py, parse_date", "table": table},
               sys.stdout, ensure_ascii=False, indent=1)
     sys.stdout.write("\n")
