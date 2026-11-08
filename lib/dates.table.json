@@ -1,0 +1,501 @@
+{
+ "source": "reference/eligibility.py, parse_date",
+ "table": [
+  {
+   "entree": "2026-09-01",
+   "attendu": "2026-09-01"
+  },
+  {
+   "entree": "2027-03-29",
+   "attendu": "2027-03-29"
+  },
+  {
+   "entree": "2027-02-30",
+   "attendu": null
+  },
+  {
+   "entree": "2026-13-01",
+   "attendu": null
+  },
+  {
+   "entree": "2026-9-1",
+   "attendu": "2026-09-01"
+  },
+  {
+   "entree": "29/03/2027",
+   "attendu": "2027-03-29"
+  },
+  {
+   "entree": "31/02/2027",
+   "attendu": null
+  },
+  {
+   "entree": "01/09/2026",
+   "attendu": "2026-09-01"
+  },
+  {
+   "entree": "5/1/2027",
+   "attendu": "2027-01-05"
+  },
+  {
+   "entree": "09/2026",
+   "attendu": "2026-09-01"
+  },
+  {
+   "entree": "03/2027",
+   "attendu": "2027-03-01"
+  },
+  {
+   "entree": "13/2027",
+   "attendu": null
+  },
+  {
+   "entree": "septembre 2026",
+   "attendu": "2026-09-01"
+  },
+  {
+   "entree": "mars 2027",
+   "attendu": "2027-03-01"
+  },
+  {
+   "entree": "novembre 2027",
+   "attendu": "2027-11-01"
+  },
+  {
+   "entree": "début novembre 2027",
+   "attendu": "2027-11-01"
+  },
+  {
+   "entree": "sept. 2027",
+   "attendu": "2027-09-01"
+  },
+  {
+   "entree": "janv. 2027",
+   "attendu": "2027-01-01"
+  },
+  {
+   "entree": "déc. 2026",
+   "attendu": "2026-12-01"
+  },
+  {
+   "entree": "1er mars 2027",
+   "attendu": "2027-03-01"
+  },
+  {
+   "entree": "5 janvier 2027",
+   "attendu": "2027-01-05"
+  },
+  {
+   "entree": "March 2027",
+   "attendu": "2027-03-01"
+  },
+  {
+   "entree": "September 2026",
+   "attendu": "2026-09-01"
+  },
+  {
+   "entree": "as soon as possible",
+   "attendu": null
+  },
+  {
+   "entree": "asap",
+   "attendu": "asap"
+  },
+  {
+   "entree": "dès que possible",
+   "attendu": "asap"
+  },
+  {
+   "entree": "dès que possible, mars 2027",
+   "attendu": "asap"
+  },
+  {
+   "entree": "immédiatement",
+   "attendu": "asap"
+  },
+  {
+   "entree": "à définir",
+   "attendu": null
+  },
+  {
+   "entree": "",
+   "attendu": null
+  },
+  {
+   "entree": null,
+   "attendu": null
+  },
+  {
+   "entree": "bientôt",
+   "attendu": null
+  },
+  {
+   "entree": "2026",
+   "attendu": null
+  },
+  {
+   "entree": "Stage de 6 mois à partir de septembre 2026",
+   "attendu": "2026-09-01"
+  },
+  {
+   "entree": "2027-03",
+   "attendu": "2027-03-01"
+  },
+  {
+   "entree": "2027-3-5",
+   "attendu": "2027-03-05"
+  },
+  {
+   "entree": "2027-03-29T09:00:00",
+   "attendu": "2027-03-29"
+  },
+  {
+   "entree": "2027-03-29 00:00:00",
+   "attendu": "2027-03-29"
+  },
+  {
+   "entree": "1/3/2027",
+   "attendu": "2027-03-01"
+  },
+  {
+   "entree": "3/2027",
+   "attendu": "2027-03-01"
+  },
+  {
+   "entree": "le 29/03/2027",
+   "attendu": "2027-03-29"
+  },
+  {
+   "entree": "à partir du 01/04/2027",
+   "attendu": "2027-04-01"
+  },
+  {
+   "entree": "Septembre 2026",
+   "attendu": "2026-09-01"
+  },
+  {
+   "entree": "SEPTEMBRE 2026",
+   "attendu": "2026-09-01"
+  },
+  {
+   "entree": "février 2028",
+   "attendu": "2028-02-01"
+  },
+  {
+   "entree": "Février 2028",
+   "attendu": "2028-02-01"
+  },
+  {
+   "entree": "août 2027",
+   "attendu": "2027-08-01"
+  },
+  {
+   "entree": "Aout 2027",
+   "attendu": "2027-08-01"
+  },
+  {
+   "entree": "décembre 2026",
+   "attendu": "2026-12-01"
+  },
+  {
+   "entree": "1er Mars 2027",
+   "attendu": "2027-03-01"
+  },
+  {
+   "entree": "15 mars 2027",
+   "attendu": "2027-03-15"
+  },
+  {
+   "entree": "5 juin 2027",
+   "attendu": "2027-06-05"
+  },
+  {
+   "entree": "fin août 2027",
+   "attendu": "2027-08-01"
+  },
+  {
+   "entree": "à partir de novembre 2027",
+   "attendu": "2027-11-01"
+  },
+  {
+   "entree": "mi-juin 2027",
+   "attendu": "2027-06-01"
+  },
+  {
+   "entree": "sept 2027",
+   "attendu": "2027-09-01"
+  },
+  {
+   "entree": "Sept. 2027",
+   "attendu": "2027-09-01"
+  },
+  {
+   "entree": "janv 2027",
+   "attendu": "2027-01-01"
+  },
+  {
+   "entree": "fev 2027",
+   "attendu": "2027-02-01"
+  },
+  {
+   "entree": "avr. 2027",
+   "attendu": "2027-04-01"
+  },
+  {
+   "entree": "juil. 2027",
+   "attendu": "2027-07-01"
+  },
+  {
+   "entree": "15 juil. 2027",
+   "attendu": "2027-07-15"
+  },
+  {
+   "entree": "oct. 2027",
+   "attendu": "2027-10-01"
+  },
+  {
+   "entree": "nov. 2027",
+   "attendu": "2027-11-01"
+  },
+  {
+   "entree": "nov 2027",
+   "attendu": "2027-11-01"
+  },
+  {
+   "entree": "dec 2026",
+   "attendu": "2026-12-01"
+  },
+  {
+   "entree": "march 2027",
+   "attendu": "2027-03-01"
+  },
+  {
+   "entree": "1 March 2027",
+   "attendu": "2027-03-01"
+  },
+  {
+   "entree": "June 2027",
+   "attendu": "2027-06-01"
+  },
+  {
+   "entree": "January 2027",
+   "attendu": "2027-01-01"
+  },
+  {
+   "entree": "December 2026",
+   "attendu": "2026-12-01"
+  },
+  {
+   "entree": "September 2027",
+   "attendu": "2027-09-01"
+  },
+  {
+   "entree": "August 2027",
+   "attendu": "2027-08-01"
+  },
+  {
+   "entree": "May 2027",
+   "attendu": null
+  },
+  {
+   "entree": "1 May 2027",
+   "attendu": null
+  },
+  {
+   "entree": "mai 2027",
+   "attendu": "2027-05-01"
+  },
+  {
+   "entree": "1er mai 2027",
+   "attendu": "2027-05-01"
+  },
+  {
+   "entree": "ASAP",
+   "attendu": "asap"
+  },
+  {
+   "entree": "As soon as possible asap",
+   "attendu": "asap"
+  },
+  {
+   "entree": "Dès que possible",
+   "attendu": "asap"
+  },
+  {
+   "entree": "immédiat",
+   "attendu": "asap"
+  },
+  {
+   "entree": "au plus vite",
+   "attendu": "asap"
+  },
+  {
+   "entree": "ASAP - mars 2027",
+   "attendu": "asap"
+  },
+  {
+   "entree": "dès que possible (avril 2027)",
+   "attendu": "asap"
+  },
+  {
+   "entree": "   ",
+   "attendu": null
+  },
+  {
+   "entree": "à convenir",
+   "attendu": null
+  },
+  {
+   "entree": "A convenir",
+   "attendu": null
+  },
+  {
+   "entree": "selon profil",
+   "attendu": null
+  },
+  {
+   "entree": "2027",
+   "attendu": null
+  },
+  {
+   "entree": "T3 2027",
+   "attendu": null
+  },
+  {
+   "entree": "été 2027",
+   "attendu": null
+  },
+  {
+   "entree": "printemps 2027",
+   "attendu": null
+  },
+  {
+   "entree": "n/a",
+   "attendu": null
+  },
+  {
+   "entree": "non précisé",
+   "attendu": null
+  },
+  {
+   "entree": "septembre",
+   "attendu": null
+  },
+  {
+   "entree": "mars",
+   "attendu": null
+  },
+  {
+   "entree": "sans objet 2027",
+   "attendu": null
+  },
+  {
+   "entree": "foo 2027",
+   "attendu": null
+  },
+  {
+   "entree": "mai. 2027",
+   "attendu": "2027-05-01"
+  },
+  {
+   "entree": "sep 2027",
+   "attendu": null
+  },
+  {
+   "entree": "mars. 2027",
+   "attendu": "2027-03-01"
+  },
+  {
+   "entree": "2027-04-31",
+   "attendu": null
+  },
+  {
+   "entree": "31/04/2027",
+   "attendu": null
+  },
+  {
+   "entree": "29/02/2027",
+   "attendu": null
+  },
+  {
+   "entree": "01/13/2027",
+   "attendu": null
+  },
+  {
+   "entree": "00/2027",
+   "attendu": null
+  },
+  {
+   "entree": "0/2027",
+   "attendu": null
+  },
+  {
+   "entree": "2027-00-10",
+   "attendu": null
+  },
+  {
+   "entree": "2027-05-00",
+   "attendu": null
+  },
+  {
+   "entree": "0000-01-01",
+   "attendu": null
+  },
+  {
+   "entree": "29 février 2027",
+   "attendu": null
+  },
+  {
+   "entree": "31 avril 2027",
+   "attendu": null
+  },
+  {
+   "entree": "0 mars 2027",
+   "attendu": null
+  },
+  {
+   "entree": "32 mars 2027",
+   "attendu": null
+  },
+  {
+   "entree": "29/02/2028",
+   "attendu": "2028-02-29"
+  },
+  {
+   "entree": "29 février 2028",
+   "attendu": "2028-02-29"
+  },
+  {
+   "entree": "2028-02-29",
+   "attendu": "2028-02-29"
+  },
+  {
+   "entree": "31/12/2027",
+   "attendu": "2027-12-31"
+  },
+  {
+   "entree": "2027-12-31",
+   "attendu": "2027-12-31"
+  },
+  {
+   "entree": "1/1/2027",
+   "attendu": "2027-01-01"
+  },
+  {
+   "entree": "0099-01-01",
+   "attendu": "0099-01-01"
+  },
+  {
+   "entree": "9999-12-31",
+   "attendu": "9999-12-31"
+  },
+  {
+   "entree": "mars 0099",
+   "attendu": "0099-03-01"
+  },
+  {
+   "entree": "1900-01-01",
+   "attendu": "1900-01-01"
+  }
+ ]
+}

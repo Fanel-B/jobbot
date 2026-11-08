@@ -155,11 +155,25 @@ MONTHS_FR = {
 ASAP_TERMS = ("asap", "des que possible", "immediat", "immediatement", "au plus vite")
 
 
+def _date_si_possible(annee: int, mois: int, jour: int = 1) -> date | None:
+    """La date demandée, ou None si elle n'existe pas (« 2026-13-01 », « 31/02/2027 »).
+
+    `date(...)` lève ValueError sur une date impossible. Ici une date impossible est une date
+    **illisible** : elle vaut None, donc la note de date dit « à confirmer », au lieu de faire
+    échouer la passe entière (défaut relevé par l'audit du 06/11/2026).
+    """
+    try:
+        return date(annee, mois, jour)
+    except ValueError:
+        return None
+
+
 def parse_date(value) -> date | str | None:
-    """date -> date ; 'ASAP' -> 'asap' ; illisible -> None.
+    """date -> date ; 'ASAP' -> 'asap' ; illisible ou impossible -> None.
 
     Formats : ISO (2026-09-01), JJ/MM/AAAA, MM/AAAA, 'septembre 2026', '1er mars 2027'.
-    Un mois sans jour est ramené au 1er du mois.
+    Un mois sans jour est ramené au 1er du mois. Une date qui n'existe pas au calendrier
+    (« 31 février ») est traitée comme illisible, jamais comme une erreur.
     """
     if value is None:
         return None
@@ -171,15 +185,15 @@ def parse_date(value) -> date | str | None:
     if any(t in s for t in ASAP_TERMS):
         return "asap"
     if m := re.search(r"(\d{4})-(\d{1,2})(?:-(\d{1,2}))?", s):
-        return date(int(m[1]), int(m[2]), int(m[3] or 1))
+        return _date_si_possible(int(m[1]), int(m[2]), int(m[3] or 1))
     if m := re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})", s):
-        return date(int(m[3]), int(m[2]), int(m[1]))
+        return _date_si_possible(int(m[3]), int(m[2]), int(m[1]))
     if m := re.search(r"\b(\d{1,2})/(\d{4})\b", s):
-        return date(int(m[2]), int(m[1]), 1)
+        return _date_si_possible(int(m[2]), int(m[1]))
     if m := re.search(r"(?:(\d{1,2})(?:er)?\s+)?([a-z]+)\.?\s+(\d{4})", s):
         month = MONTHS_FR.get(m[2])
         if month:
-            return date(int(m[3]), month, int(m[1] or 1))
+            return _date_si_possible(int(m[3]), month, int(m[1] or 1))
     return None
 
 
@@ -286,10 +300,12 @@ def partner_school_match(offer: dict) -> str | None:
     return None
 
 
-# --- Zone géographique : Toulouse et alentours -----------------------------
-# Une seule déclaration : la liste des communes vit dans `faits.ZONE`, les expressions régulières
-# sont construites ici. `faits.py` et `eligibility.py` ne peuvent donc plus se contredire
-# (règle du 22/10/2026 : la source unique se lit, elle ne se recopie pas).
+# --- Zones géographiques : Toulouse et alentours, Occitanie, Île-de-France ---
+# Une seule déclaration : les communes, les départements et les régions vivent dans `faits.ZONES`,
+# les expressions régulières sont construites ici. `faits.py` et `eligibility.py` ne peuvent donc
+# plus se contredire (règle du 22/10/2026 : la source unique se lit, elle ne se recopie pas).
+# Décision de Fanel du 06/11/2026 : zones **distinctes**, en un seul endroit, dont l'éligibilité,
+# l'export et le score dérivent tous.
 
 
 def _motif_zone(terme: str) -> str:
@@ -298,35 +314,142 @@ def _motif_zone(terme: str) -> str:
     return rf"\b{corps}\b"
 
 
-ZONE_LABEL = faits.ZONE["libelle"]
-ZONE_PATTERNS = tuple([_motif_zone(v) for v in faits.ZONE["villes"]] + [
-    # Libellés France Travail « 31 - Commune » et codes postaux 31xxx : Haute-Garonne entière.
-    r"\b31\s*-\s*[a-z]", r"\b31\d{3}\b",
-])
-REMOTE_PATTERNS = (r"\bteletravail\b", r"\bremote\b", r"\ba distance\b", r"\bhome ?office\b")
-REASON_OUT_OF_ZONE = f"hors zone {ZONE_LABEL}"
-# Régions qui *contiennent* la zone de recherche. Une annonce localisée « Occitanie » seule n'est ni
-# dans la zone (Montpellier y est aussi) ni hors zone (Toulouse y est) : la rejeter reviendrait à
-# jeter une offre toulousaine possible sur une information manquante. On la garde à vérifier.
+def _motif_departement(code: str) -> str:
+    """Département : « 31 - Commune » (France Travail) ou « 31000 » (code postal)."""
+    return rf"(?:^|\D){code}(?:\s*-\s|\d{{3}}\b)"
+
+
+def _cle_zone(terme: str) -> str:
+    """Clé de comparaison d'un nom de commune : tiret et espace, c'est la même chose.
+
+    Sans elle, la liste `ambigus` (« saint-denis ») ne reconnaissait pas la variante écrite avec une
+    espace (« saint denis »), qui restait dans les communes certaines : une offre de Saint-Denis de
+    La Réunion passait en Île-de-France certaine (relevé du 06/11/2026).
+    """
+    return " ".join(_norm(terme).replace("-", " ").split())
+
+
+def _motifs(zone: dict, departements: bool = True) -> tuple[str, ...]:
+    """Motifs qui désignent la zone **de façon certaine** : communes non ambiguës, départements.
+
+    Les régions n'y sont pas : « Occitanie » ou « Île-de-France » seules ne disent pas où est le
+    poste (Paris et Montpellier y vivent tous les deux). Elles servent à la règle « à vérifier »,
+    juste en dessous, et c'est la ville qui tranche quand elle est nommée.
+
+    Les noms **ambigus** n'y sont pas non plus : « Saint-Denis » est aussi à La Réunion.
+    `departements=False` retire les motifs de département, pour le **titre** seulement : un titre
+    comme « Stage 12 - 24 mois » désignerait sinon l'Aveyron.
+    """
+    ambigus = {_cle_zone(v) for v in zone.get("ambigus", ())}
+    motifs = [_motif_zone(v) for v in zone["villes"] if _cle_zone(v) not in ambigus]
+    if departements:
+        motifs += [_motif_departement(d) for d in zone.get("departements", ())]
+    return tuple(motifs)
+
+
+def _motifs_ambigus(zone: dict) -> tuple[str, ...]:
+    """Motifs des noms qui existent ailleurs en France : ils ne classent que **confirmés**."""
+    return tuple(_motif_zone(v) for v in zone.get("ambigus", ()))
+
+
+# Zones où l'on accepte une offre. Le télétravail n'y est pas : une offre sans ville ne dit pas si
+# elle exige une présence, elle reste « à vérifier » comme aujourd'hui. Il gagne ses points au
+# classement, pas le droit d'entrer (décision du 06/11/2026, points inchangés).
+ZONES_ELIGIBLES = ("toulouse", "occitanie", "idf")
+MOTIFS_PAR_ZONE = {nom: _motifs(faits.ZONES[nom]) for nom in ZONES_ELIGIBLES}
+MOTIFS_SANS_DEPT = {nom: _motifs(faits.ZONES[nom], departements=False) for nom in ZONES_ELIGIBLES}
+MOTIFS_AMBIGUS = {nom: _motifs_ambigus(faits.ZONES[nom]) for nom in ZONES_ELIGIBLES}
+ZONES_LIBELLES = {nom: faits.ZONES[nom]["libelle"] for nom in ZONES_ELIGIBLES}
+
+# `eligibility.ZONE_LABEL` et `ZONE_PATTERNS` restent la zone historique : des messages et des
+# contrôles les lisent, et rien n'oblige à les renommer.
+ZONE_LABEL = faits.ZONES["toulouse"]["libelle"]
+ZONE_PATTERNS = MOTIFS_PAR_ZONE["toulouse"]
+REMOTE_PATTERNS = tuple(_motif_zone(v) for v in faits.ZONES["remote"]["villes"])
+REASON_OUT_OF_ZONE = "hors zone " + " / ".join(ZONES_LIBELLES[n] for n in ZONES_ELIGIBLES)
+# Régions qui *contiennent* la zone de recherche. Une annonce localisée « Île-de-France » seule n'est
+# ni dans la zone (Paris, Versailles, Melun y sont aussi) ni hors zone : la rejeter reviendrait à
+# jeter une offre possible sur une information manquante. On la garde à vérifier.
 # La règle ne vaut que si **aucune ville** n'est nommée : « Rodez, Occitanie » ou
-# « Montpellier, Occitanie » nomment une ville précise, hors zone, et restent inéligibles.
+# « Montpellier, Occitanie » nomment une ville précise et sont jugées sur cette ville.
 # Sans cette règle, l'alerte Safran ne rend rien : ses mails ne donnent que la région (21/10/2026).
-REGIONS_QUI_CONTIENNENT_LA_ZONE = tuple(_motif_zone(r) for r in faits.ZONE["regions_englobantes"])
+REGIONS_QUI_CONTIENNENT_LA_ZONE = tuple(
+    _motif_zone(r) for nom in ZONES_ELIGIBLES for r in faits.ZONES[nom]["regions_englobantes"])
 MOTS_SANS_VILLE = re.compile(
-    r"\b(?:occitanie|france|franche|region|regions|metropole|hors|remote|fr)\b|[^a-z0-9]+")
+    r"\b(?:occitanie|ile-de-france|île-de-france|france|franche|region|regions|metropole|hors"
+    r"|remote|fr)\b|[^a-z0-9]+")
 
 
 def _reste_une_ville(loc: str) -> bool:
     """Vrai s'il reste autre chose que la région et le pays après retrait des mots génériques.
 
-    « Occitanie » -> False (lieu régional seul) · « Occitanie, France » -> False ·
+    « Occitanie » -> False (lieu régional seul) · « Île-de-France » -> False ·
     « Rodez, Occitanie » -> True (la ville est nommée, donc on sait où c'est).
     """
     return bool(re.sub(r"\s+", "", MOTS_SANS_VILLE.sub(" ", loc)).strip())
 
 
 def _in_zone(text: str) -> bool:
-    return any(re.search(p, text) for p in ZONE_PATTERNS)
+    """Vrai si le texte nomme une ville, un département ou une région d'une zone acceptée."""
+    return any(re.search(p, text) for motifs in MOTIFS_PAR_ZONE.values() for p in motifs)
+
+
+def _confirme_la_zone(text: str, nom: str, departements: bool = True) -> bool:
+    """Vrai si le texte confirme la zone **en plus** du nom ambigu qui y figure.
+
+    Deux confirmations, les mêmes pour l'éligibilité et pour l'export : un département ou un code
+    postal de la zone (« 93 », « 93200 »), ou le nom propre de la région (« Paris »,
+    « Île-de-France »). C'est ce qui distingue « Saint-Denis (93) » de « Saint-Denis, La Réunion ».
+    Sans confirmation, le lieu ne suffit pas : l'offre reste « à vérifier » au lieu d'être rangée
+    en zone certaine, et mieux vaut une question qu'une offre de La Réunion comptée francilienne.
+    """
+    zone = faits.ZONES[nom]
+    if departements and any(re.search(_motif_departement(d), text)
+                            for d in zone.get("departements", ())):
+        return True
+    return any(re.search(_motif_zone(r), text) for r in zone["region_propre"])
+
+
+def _zone_du_texte(text: str, departements: bool = True) -> str | None:
+    """Nom de la zone reconnue dans le texte, ou `None`. L'ordre décide : le plus précis d'abord.
+
+    Communes non ambiguës et départements d'abord ; puis les noms ambigus, et seulement confirmés.
+    `departements=False` sert au **titre** : « Stage 12 - 24 mois » ne désigne pas l'Aveyron, et un
+    numéro isolé dans un titre est un piège (relevé du 06/11/2026).
+    """
+    surs = MOTIFS_PAR_ZONE if departements else MOTIFS_SANS_DEPT
+    for nom in ZONES_ELIGIBLES:
+        if any(re.search(p, text) for p in surs[nom]):
+            return nom
+    for nom in ZONES_ELIGIBLES:
+        if (any(re.search(p, text) for p in MOTIFS_AMBIGUS[nom])
+                and _confirme_la_zone(text, nom, departements)):
+            return nom
+    return None
+
+
+def zone_de_lieu(texte) -> str:
+    """Zone d'un lieu, celle qu'affichent le site et le classement : une seule règle.
+
+    C'est celle de l'éligibilité, puis deux cas qui situent l'offre sans la rendre éligible :
+    « Île-de-France » seule vaut l'Île-de-France (comme avant le 06/11/2026), et le télétravail est
+    un mode de travail, pas un lieu. « autre » veut dire « aucune zone reconnue ».
+    """
+    loc = _norm(texte)
+    zone = _zone_du_texte(loc)
+    if zone:
+        return zone
+    if any(re.search(_motif_zone(r), loc) for r in faits.ZONES["idf"]["region_propre"]):
+        return "idf"
+    if any(re.search(p, loc) for p in REMOTE_PATTERNS):
+        return "remote"
+    return "autre"
+
+
+# Nom public, utilisé par l'export du site : la zone affichée doit être **exactement** celle qui a
+# décidé du statut. Deux règles qui divergeraient afficheraient une offre « Île-de-France » en
+# « hors zone », ou l'inverse.
+zone_de_texte = _zone_du_texte
 
 
 def zone_status(offer: dict) -> tuple[str, str]:
@@ -338,17 +461,20 @@ def zone_status(offer: dict) -> tuple[str, str]:
     """
     loc = _norm(offer.get("location"))
     if loc:
-        if _in_zone(loc):
-            return ELIGIBLE, f"zone OK ({ZONE_LABEL})"
+        zone = _zone_du_texte(loc)
+        if zone:
+            return ELIGIBLE, f"zone OK ({ZONES_LIBELLES[zone]})"
         if any(re.search(p, loc) for p in REMOTE_PATTERNS):
             return UNCERTAIN, f"télétravail sans zone précisée ({offer.get('location')!r})"
         if any(re.search(p, loc) for p in REGIONS_QUI_CONTIENNENT_LA_ZONE) and not _reste_une_ville(loc):
             return UNCERTAIN, (f"lieu au niveau régional seulement ({offer.get('location')!r}) : "
-                               f"{ZONE_LABEL} possible, ville à vérifier sur l'annonce")
+                               f"ville à vérifier sur l'annonce")
         return INELIGIBLE, f"{REASON_OUT_OF_ZONE} : {offer.get('location')!r}"
     title = _norm(offer.get("title"))
-    if _in_zone(title):
-        return ELIGIBLE, f"zone OK d'après le titre ({ZONE_LABEL})"
+    # Titre : jamais de département. Un numéro isolé y est un piège (« Stage 12 - 24 mois »).
+    zone = _zone_du_texte(title, departements=False)
+    if zone:
+        return ELIGIBLE, f"zone OK d'après le titre ({ZONES_LIBELLES[zone]})"
     return UNCERTAIN, f"localisation inconnue : {offer.get('location')!r}"
 
 

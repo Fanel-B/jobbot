@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Bulletin } from "@/components/Bulletin";
+import { DebutAnnonce } from "@/components/DebutAnnonce";
 import { Simulant, SimulantSquelette } from "@/components/Simulant";
 import { ExigencesDuProfil, ExigencesSquelette } from "@/components/ExigencesDuProfil";
 import { NoteDuProfil, NoteSquelette } from "@/components/NoteDuProfil";
@@ -166,7 +167,7 @@ export default async function Page({
               <div>
                 <dt className="text-xs text-muted">Début</dt>
                 <dd className="mt-1 text-sm">
-                  {offre.start_date ? offre.start_date : <NonPrecise genre="f" />}
+                  <DebutAnnonce debut={offre.start_date} />
                 </dd>
               </div>
               <div>

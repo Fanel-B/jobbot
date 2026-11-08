@@ -31,12 +31,14 @@ export function ZoneChip({ zone, sansLieu = false }: { zone: Zone; sansLieu?: bo
 
   const carte: Record<Zone, string> = {
     toulouse: "border-accent/25 bg-accent-soft text-accent-ink",
+    occitanie: "border-line bg-paper-deep text-ink-soft",
     idf: "border-line bg-paper-deep text-ink-soft",
     remote: "border-line bg-paper-deep text-ink-soft",
     autre: "border-line bg-paper-deep text-muted",
   };
   const texte: Record<Zone, string> = {
     toulouse: "Toulouse",
+    occitanie: "Occitanie",
     idf: "Île-de-France",
     remote: "À distance",
     autre: "France",
