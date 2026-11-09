@@ -54,7 +54,11 @@ SQLITE_PAR_DEFAUT = Path.home() / ".hermes" / "data" / "job-search" / "database.
 # collecte du 25 octobre dépassaient 1 500 caractères, et le moteur de note lit la description.
 DESCRIPTION_MAX = 4000
 SANS_CONTRAT_MAX = 40                     # comme l'export : offres sans contrat gardées, les plus récentes
-OFFRES_MAX = 400                          # comme l'export (option --max, 400 par défaut)
+# Plafond de la copie vers Neon : 700 (400 jusqu'au 9 novembre 2026). L'export JSON garde son `--max`
+# à 400 par défaut, `reference/export_site.py` n'est pas touché. Le plafond coupe la FIN de la liste,
+# dans l'ordre de la base, sans tri : s'il mordait, il retirerait les offres les plus récentes. Au
+# 9 novembre il ne coupe rien (399 retenues sur 400, d'après Hermes). La règle de coupe définitive reste à décider (T4).
+OFFRES_MAX = 700
 APERCU_PAR_DEFAUT = 10                    # lignes montrées par --dry-run
 
 # Colonnes indispensables dans la table SQLite : sans elles, impossible de dédoublonner, de garder
