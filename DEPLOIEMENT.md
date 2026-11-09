@@ -185,6 +185,11 @@ La migration passe par `psql` et la chaîne de `~/.hermes/.env`, comme `db/schem
 tête du fichier) et les 40 offres sans contrat les plus récentes, avec la règle de l'export. On y
 ajoutera l'alternance vers janvier 2027.
 
+**Plafond.** Le collecteur copie au plus **700** offres (`OFFRES_MAX`, 400 avant le 9 novembre 2026) ;
+l'export JSON garde `--max 400` par défaut, inchangé. Le plafond coupe la fin de la liste sans tri :
+s'il mordait, il retirerait les offres les plus récentes. Le 9 novembre, d'après Hermes, il ne coupe rien (399 offres retenues sur 400).
+Comme pour toute modification de `tools/`, il suffit de tirer le dépôt sur le VPS (section 4).
+
 Prérequis écrits dans `db/README.md` : l'environnement Python `~/.hermes/venv-jobbot-db` créé avec
 `db/requirements.txt`, et `DATABASE_URL` dans `~/.hermes/.env` avec les droits `600`. Le premier
 passage se fait **à blanc** (`--dry-run`), qui ne se connecte à rien. Le collecteur est idempotent :

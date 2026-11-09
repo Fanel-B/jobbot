@@ -290,11 +290,17 @@ class Perimetre(unittest.TestCase):
                       export)
         self.assertIn("SANS_CONTRAT_MAX = 40", export)
         self.assertIn('default=400', export)
-        self.assertEqual((c.SANS_CONTRAT_MAX, c.OFFRES_MAX), (40, 400))
+        # Le collecteur a son propre plafond (700) ; celui de l'export JSON reste 400.
+        self.assertEqual((c.SANS_CONTRAT_MAX, c.OFFRES_MAX), (40, 700))
 
-    def test_plafond_global_de_400(self):
-        lignes = preparer_depuis([offre(i, "Stage") for i in range(1, 451)])
-        self.assertEqual(len(lignes), 400)
+    def test_plafond_global_de_700(self):
+        lignes = preparer_depuis([offre(i, "Stage") for i in range(1, 751)])
+        self.assertEqual(len(lignes), 700)
+
+    def test_le_plafond_ne_coupe_rien_au_volume_actuel(self):
+        # 399 offres retenues le 9 novembre : toutes doivent passer, sans exception.
+        lignes = preparer_depuis([offre(i, "Stage") for i in range(1, 400)])
+        self.assertEqual(len(lignes), 399)
 
 
 # ------------------------------------------------------------------ 6. zone
