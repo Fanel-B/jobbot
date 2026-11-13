@@ -52,7 +52,18 @@ export default async function Page() {
             <dt className="text-[15px] font-medium">Rien d&apos;autre</dt>
             <dd className="text-sm leading-relaxed text-muted">
               Pas de nom, pas d&apos;adresse e-mail, pas de CV. Aucun traceur publicitaire, aucun
-              outil de mesure d&apos;audience, aucun partage avec un tiers.
+              partage avec un tiers.
+            </dd>
+          </div>
+
+          <div className="grid gap-x-10 gap-y-2 py-5 sm:grid-cols-[12rem_1fr]">
+            <dt className="text-[15px] font-medium">Mesure d&apos;audience</dt>
+            <dd className="text-sm leading-relaxed text-muted">
+              Le site utilise{" "}
+              <strong className="font-medium text-ink-soft">Vercel Web Analytics</strong> pour
+              compter les visites : pages vues, site d&apos;où tu arrives, pays, type
+              d&apos;appareil. Sans cookie et sans identifiant qui te suit d&apos;un jour à
+              l&apos;autre : je vois des chiffres globaux, jamais qui tu es.
             </dd>
           </div>
 

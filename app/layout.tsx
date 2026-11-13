@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 import { Compte, CompteSquelette } from "@/components/Compte";
 import "./globals.css";
 import { chargerDonnees } from "@/lib/donnees";
@@ -132,6 +133,8 @@ export default async function RootLayout({
             </div>
           </div>
         </footer>
+        {/* Mesure d'audience anonyme de Vercel : pages vues, pays, appareil. Sans cookie. */}
+        <Analytics />
       </body>
     </html>
   );
