@@ -15,7 +15,7 @@ export function SourceChip({ source }: { source: string }) {
 /**
  * La zone de l'offre.
  *
- * `sansLieu` existe parce que 26 annonces sur 290 ne donnent aucun lieu. Le calcul de zone les
+ * `sansLieu` existe parce que 39 annonces sur 369 (export du 7 novembre 2026) ne donnent aucun lieu. Le calcul de zone les
  * range dans « autre », ce qui est le bon comportement pour le moteur, et la pastille les
  * affichait alors « France ». C'était une affirmation que la source ne permet pas : on ne sait
  * pas où est le poste, pas même s'il est en France. La distinction se fait ici, à l'affichage,
@@ -47,7 +47,7 @@ export function ZoneChip({ zone, sansLieu = false }: { zone: Zone; sansLieu?: bo
 }
 
 /**
- * Le type de contrat. Quand la source ne le renseigne pas, on l'écrit — et le
+ * Le type de contrat. Quand la source ne le renseigne pas, on l'écrit, et le
  * style le distingue nettement, pour qu'aucune offre ne se fasse passer pour un stage.
  */
 export function ContractChip({ offre }: { offre: Offer }) {

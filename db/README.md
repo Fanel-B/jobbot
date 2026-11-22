@@ -1,10 +1,10 @@
-# `db/` — brancher le site sur PostgreSQL (Neon)
+# `db/` : brancher le site sur PostgreSQL (Neon)
 
-Dans ce dossier, je prépare le passage de `data/offers.json` à une vraie base. Il contient :
+Ce dossier décrit la base PostgreSQL (Neon) que le site lit à la place de `data/offers.json`. Il contient :
 
 | Fichier | Rôle |
 |---|---|
-| `schema.sql` | les tables `offers`, `users`, `profiles`, `resumes`, `saved_offers`, `ai_usage` |
+| `schema.sql` | les tables `offers`, `collectes`, `users`, `accounts`, `sessions`, `verification_token`, `profiles`, `resumes`, `saved_offers`, `ai_usage` |
 | `requirements.txt` | les dépendances Python du collecteur (`psycopg` 3) |
 | `../tools/collecteur_postgres.py` | copie les offres de la base SQLite du pipeline vers PostgreSQL |
 
@@ -15,7 +15,8 @@ Deux décisions que je ne veux pas casser (voir `BRIEFING.md`, section 5) :
 - `offers` n'a **pas** de colonne `score` : la note dépend de qui regarde, le site la calcule à la
   lecture.
 
-`data/offers.json` reste en place : c'est le jeu de démonstration hors ligne.
+`data/offers.json` reste en place : fichier de secours du site, et oracle des contrôles
+`verifier-scoring` et `verifier-eligibility`.
 
 **Je lance toutes les commandes de ce document depuis la racine du dépôt**, qui est aussi celle du
 site. C'est ce qui rend corrects mes chemins `db/schema.sql`, `tools/collecteur_postgres.py` et surtout
@@ -117,7 +118,7 @@ Je vérifie que les tables sont là (`npm run verifier-db` en donne la liste att
 
 ### 5. Je lance le collecteur
 
-D'abord à blanc — **aucune connexion** à PostgreSQL, `DATABASE_URL` n'est même pas lue :
+D'abord à blanc : **aucune connexion** à PostgreSQL, `DATABASE_URL` n'est même pas lue :
 
 ```sh
 ~/.hermes/venv-jobbot-db/bin/python tools/collecteur_postgres.py --dry-run
@@ -125,7 +126,8 @@ D'abord à blanc — **aucune connexion** à PostgreSQL, `DATABASE_URL` n'est m�
 
 Mon collecteur lit ma base du pipeline (en lecture seule), table `offers`, et retient les offres
 avec la règle de `charger()` dans `export_site.py` : toutes sauf les rejetées, plus les 40 offres
-sans type de contrat les plus récentes, 400 au plus. Une seule différence avec l'export : il ne
+sans type de contrat les plus récentes, 700 au plus (`OFFRES_MAX`, 400 avant le 9 novembre 2026).
+Une seule différence avec l'export : il ne
 garde que les contrats qui contiennent un des mots de `CONTRATS_COPIES` (aujourd'hui « stage »,
 ce qui inclut « stage ou alternance »). Il montre un aperçu des offres qui seraient écrites, puis
 un résumé (lues, à écrire, ignorées et pourquoi).
@@ -187,11 +189,10 @@ le collecteur ne copie pas tant que `CONTRATS_COPIES` ne contient que « stage �
 
 ---
 
-## Ce qui reste à faire ensuite (hors de ce dossier)
+## Ce qui est fait, hors de ce dossier
 
-- Le site lit PostgreSQL au lieu de `data/offers.json` et calcule la note en TypeScript au rendu
-  (portage de `reference/priorites.py`, vérifié contre le JSON comme oracle).
-- Les tables propres à Auth.js (comptes OAuth, sessions, jetons) s'ajoutent avec l'adaptateur
-  choisi ; `users` est déjà là.
-- Le signal « formation imposée » et son extrait ne sont pas encore copiés : ils dépendent de
-  `eligibility.partner_school_match`, à porter ou à exporter par le pipeline.
+- Le site lit PostgreSQL au lieu de `data/offers.json` quand `OFFERS_SOURCE=db`, et calcule la note
+  en TypeScript au rendu (portage de `reference/priorites.py`, vérifié contre le JSON comme oracle).
+- Les tables propres à Auth.js (`accounts`, `sessions`, `verification_token`) sont dans `schema.sql`.
+- Le signal « formation imposée » n'est pas copié en base : le site le calcule à la lecture
+  (`signalEcole`, `lib/eligibilite.ts`, portage de `eligibility.partner_school_match`).

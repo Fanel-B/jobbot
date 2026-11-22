@@ -7,12 +7,12 @@
  *
  * Ce module ne change rien au calcul. Il n'ajoute aucune compétence, n'en retire aucune, et ne
  * renomme rien : il se contente de dire laquelle appartient à quelle famille. `lib/competences.test.ts`
- * vérifie que la partition est **exacte** — chaque entrée du catalogue dans une famille et une
+ * vérifie que la partition est **exacte**, chaque entrée du catalogue dans une famille et une
  * seule, et aucune famille ne cite de compétence inexistante. Une compétence ajoutée au pipeline
  * sans être rangée ici fait échouer les tests plutôt que de disparaître silencieusement du
  * formulaire.
  *
- * `principales` / `variantes` : le vocabulaire contient des doublons de surface — « IA » et
+ * `principales` / `variantes` : le vocabulaire contient des doublons de surface, « IA » et
  * « intelligence artificielle », « ML » et « machine learning », « IA générative » et sa forme
  * sans accent. Ce sont des entrées distinctes parce que les annonces écrivent les deux, et les
  * supprimer ferait rater des offres. Mais les aligner toutes au même niveau dans un formulaire
@@ -155,7 +155,7 @@ export function competencesOrphelines(): string[] {
   return CATALOGUE.map((c) => c.nom).filter((n) => !rangees.has(n));
 }
 
-/** Les compétences citées par une famille mais absentes du catalogue — donc jamais notées. */
+/** Les compétences citées par une famille mais absentes du catalogue, donc jamais notées. */
 export function competencesFantomes(): string[] {
   const connues = new Set(CATALOGUE.map((c) => c.nom));
   return competencesRangees().filter((n) => !connues.has(n));

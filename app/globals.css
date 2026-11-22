@@ -12,11 +12,11 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
-   JobBot — identité visuelle
+   JobBot : identité visuelle
 
    Noir et blanc, et des gris strictement neutres. La couleur ne sert qu'à deux
    choses : signaler la qualité d'une note, et marquer une action. Rien de
-   décoratif — c'est un outil, pas une vitrine.
+   décoratif : c'est un outil, pas une vitrine.
 
    Inspirée de hamishw.com (HamishMW/portfolio), dont trois idées sont reprises
    et adaptées à un fond clair :
@@ -32,7 +32,7 @@
    un contraste d'environ 4,8:1 sur blanc.
    --------------------------------------------------------------------------- */
 @theme {
-  /* Surfaces — un blanc cassé chaud, jamais le blanc pur.
+  /* Surfaces : un blanc cassé chaud, jamais le blanc pur.
      Le blanc d'écran à 100 % de luminance brûle les yeux le soir ; la page
      descend à 91 % et les cartes à 96 %, avec une pointe de chaleur. Ça évite
      d'avoir à proposer un thème sombre : il n'y a plus de quoi éblouir. */
@@ -40,7 +40,7 @@
   --color-paper-deep: oklch(87.5% 0.009 82);
   --color-surface: oklch(96% 0.005 82);
 
-  /* Encre — un noir adouci, légèrement chaud. Le noir pur sur blanc pur,
+  /* Encre : un noir adouci, légèrement chaud. Le noir pur sur blanc pur,
      c'est 17:1 : bien au-delà de ce qu'il faut, et fatigant. Ici 10:1. */
   --color-ink: oklch(23% 0.009 60);
   --color-ink-soft: oklch(38% 0.008 60);
@@ -51,25 +51,25 @@
 
   /* Trois couleurs, trois rôles. Le fond reste noir et blanc : elles ne servent
      qu'à dire quelque chose, jamais à décorer.
-       bleu  — les liens, et tout ce qui est tracé (barres, points) ;
-       vert  — ce qui est acquis, ce qui monte ;
-       jaune — ce qui demande une vérification. */
+       bleu : les liens, et tout ce qui est tracé (barres, points) ;
+       vert : ce qui est acquis, ce qui monte ;
+       jaune : ce qui demande une vérification. */
 
-  /* Bleu — accent et liens */
+  /* Bleu : accent et liens */
   --color-accent: oklch(48% 0.17 258);
   --color-accent-ink: oklch(38% 0.14 258);
   --color-accent-soft: oklch(96.5% 0.028 258);
 
-  /* Bleu — les tracés. Deux nuances d'une seule teinte : la règle du avant/après. */
+  /* Bleu : les tracés. Deux nuances d'une seule teinte : la règle du avant/après. */
   --color-trace: oklch(57% 0.165 258);
   --color-trace-fort: oklch(44% 0.17 258);
   --color-trace-pale: oklch(84% 0.085 258);
 
-  /* Vert — acquis */
+  /* Vert : acquis */
   --color-good: oklch(50% 0.14 150);
   --color-good-soft: oklch(95.5% 0.04 150);
 
-  /* Jaune — attention. Deux valeurs : une sombre qui tient comme texte,
+  /* Jaune : attention. Deux valeurs : une sombre qui tient comme texte,
      une franche qui ne sert que de fond, avec de l'encre par-dessus. */
   --color-warn: oklch(50% 0.11 78);
   --color-warn-soft: oklch(95% 0.065 95);
@@ -80,8 +80,8 @@
      d'accueil, dans le formulaire et sur les puces cochées. La couleur porte donc une
      information, ce qui est la seule raison valable d'en ajouter six.
      Même clarté et même chroma pour les six : elles se lisent comme une famille et non
-     comme six décisions séparées. 46 % de clarté est le point où la plus faible — le
-     sarcelle — passe encore 4,5:1 sur le papier, mesuré, pas estimé. */
+     comme six décisions séparées. 46 % de clarté est le point où la plus faible, le
+     sarcelle, passe encore 4,5:1 sur le papier, mesuré, pas estimé. */
   --color-fam-web: oklch(46% 0.14 258);
   --color-fam-donnees: oklch(46% 0.14 150);
   --color-fam-ia: oklch(46% 0.14 310);
@@ -97,7 +97,7 @@
   --color-fam-infra-doux: oklch(96% 0.028 195);
   --color-fam-methode-doux: oklch(96% 0.028 85);
 
-  /* Rouge — ce qui manque */
+  /* Rouge : ce qui manque */
   --color-bad: oklch(50% 0.17 27);
   --color-bad-soft: oklch(96% 0.03 27);
 
@@ -122,7 +122,7 @@
   --ombre-carte: 0 1px 2px rgb(0 0 0 / 0.04), 0 10px 24px -16px rgb(0 0 0 / 0.14);
   --ombre-levee: var(--ombre-carte);
 
-  /* Mouvement — courbe et durées de la référence */
+  /* Mouvement : courbe et durées de la référence */
   --ease-doux: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-sortie: cubic-bezier(0.16, 1, 0.3, 1);
   --duree-courte: 200ms;
@@ -176,10 +176,10 @@
     border: 1px solid var(--color-line);
   }
 
-  /* La carte : blanc sur gris, posée — pas dessinée. L'ombre fait le relief que le
+  /* La carte : blanc sur gris, posée, pas dessinée. L'ombre fait le relief que le
      filet seul ne faisait pas, et la carte se soulève quand on la survole. */
   /* La carte est plate : blanc sur papier, un filet net. C'est le contraste de surface qui la
-     détache. Une ombre sur chaque carte ne hiérarchise plus rien — elle devient du bruit. */
+     détache. Une ombre sur chaque carte ne hiérarchise plus rien, elle devient du bruit. */
   .card {
     background: var(--color-surface);
     border: 1px solid var(--color-line);
@@ -208,7 +208,7 @@
   /* Papier réglé.
      Le halo flou en dégradé est la signature des pages d'accueil faites à la
      chaîne : tout le monde a le même. JobBot note des offres et affiche des
-     bulletins — sa trame, c'est celle d'un cahier de notes. La grille est fine,
+     bulletins : sa trame, c'est celle d'un cahier de notes. La grille est fine,
      elle s'efface vers le bas, et un seul lavis chaud l'empêche d'être clinique. */
   .regle {
     position: relative;
@@ -389,7 +389,7 @@
   }
 
   /* Apparition au chargement, en cascade : chaque enfant part un cran après le
-     précédent. Décorative — elle se coupe dès que la personne a demandé moins
+     précédent. Décorative, elle se coupe dès que la personne a demandé moins
      d'animations. */
   .apparait {
     animation: apparait var(--duree-longue) var(--ease-sortie) both;

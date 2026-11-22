@@ -124,8 +124,8 @@ async function Formulaire({ searchParams }: { searchParams: Promise<{ enregistre
             liste trop généreuse donne des notes flatteuses et des candidatures perdues.
           </p>
 
-          {/* Six familles au lieu d'un mur de 75 cases. Les variantes — « ML » à côté de
-              « machine learning », « IA générative » et sa forme sans accent — sont repliées :
+          {/* Six familles au lieu d'un mur de 75 cases. Les variantes, « ML » à côté de
+              « machine learning », « IA générative » et sa forme sans accent, sont repliées :
               les annonces emploient les deux, donc on ne peut pas les supprimer, mais les aligner
               au même niveau donnait une liste qui avait l'air mal rangée. */}
           <div className="mt-6 space-y-8">

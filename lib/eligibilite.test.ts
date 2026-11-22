@@ -4,15 +4,15 @@
  * POURQUOI CE FICHIER EXISTE, ALORS QUE `verifier-eligibility` PASSE DÉJÀ
  *
  * Le vérificateur compare le portage à l'oracle sur les 255 offres réelles, et sort à zéro
- * désaccord. Ça ne suffit pas. J'ai muté volontairement le portage de trois façons — inverser
+ * désaccord. Ça ne suffit pas. J'ai muté volontairement le portage de trois façons, inverser
  * l'ordre des zones, découper les contrats sur la virgule seulement, oublier la normalisation des
- * accents — et **les trois mutations passaient quand même**. Les données n'exercent simplement pas
+ * accents, et **les trois mutations passaient quand même**. Les données n'exercent simplement pas
  * ces règles : aucune offre n'a de `/` dans son type de contrat, aucune ne correspond à deux
  * motifs de zone, aucune ne déclenche le signal d'école.
  *
  * Un vérificateur vert sur des données qui ne testent rien reste un vérificateur vert. Ces tests
  * couvrent donc ce que l'oracle ne peut pas couvrir : l'ordre de priorité, les séparateurs, les
- * frontières de mot, et la normalisation. Les deux sont complémentaires — l'oracle prouve la
+ * frontières de mot, et la normalisation. Les deux sont complémentaires, l'oracle prouve la
  * fidélité sur le réel, ceci prouve la règle.
  */
 import { describe, expect, it } from "vitest";
@@ -171,7 +171,7 @@ describe("le signal d'école partenaire", () => {
 
 describe("ce que l'export écrit vraiment", () => {
   it("ne cherche le signal que si l'annonce a une description", () => {
-    // Règle 5 : jamais d'accusation sans citation. Sans texte, il n'y a rien à citer — et
+    // Règle 5 : jamais d'accusation sans citation. Sans texte, il n'y a rien à citer, et
     // `export_site.ligne` ne lance même pas la recherche.
     expect(signalEcoleExporte({ title: "Alternance ISCOD", description: null })).toBeNull();
     expect(

@@ -21,7 +21,7 @@ import {
  *
  * Tout ce qui est ici se calcule à la lecture, pour la personne qui regarde : le haut du
  * classement, son bulletin d'exemple, ce qui lui manque, et ce que chaque compétence lui
- * rapporterait. Le reste de la page — la promesse, les chiffres de la collecte, les sources —
+ * rapporterait. Le reste de la page, la promesse, les chiffres de la collecte, les sources,
  * ne dépend de personne et reste pré-rendu.
  *
  * Avant, ces quatre sections tournaient sur le profil d'usine pendant que la liste et les

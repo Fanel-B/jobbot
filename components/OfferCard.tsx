@@ -17,7 +17,7 @@ import type { Offer, OffreNotee } from "@/lib/offers";
  * `sansNote` sert aux visiteurs qui n'ont pas encore de profil. Une note calculée sur un profil
  * vide est un chiffre exact et un renseignement faux : elle dit « 12/100 » quand la vérité est
  * « on ne sait pas encore ». Dans ce cas la pastille disparaît, et la ligne « absent de ton
- * profil » aussi — il n'y a pas de profil dont être absent.
+ * profil » aussi : il n'y a pas de profil dont être absent.
  */
 export function OfferRow({
   offre,

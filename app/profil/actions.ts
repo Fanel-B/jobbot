@@ -27,7 +27,7 @@ const UN_AN = 60 * 60 * 24 * 365;
  * Enregistre le profil coché.
  *
  * C'est une action serveur attachée à un `<form>` : la page fonctionne donc **sans JavaScript**,
- * comme les filtres de la liste. Rien n'est deviné — seules les valeurs présentes dans le
+ * comme les filtres de la liste. Rien n'est deviné, seules les valeurs présentes dans le
  * formulaire sont retenues, et chacune est validée contre le catalogue avant d'être écrite.
  */
 export async function enregistrerProfil(donnees: FormData) {
@@ -67,12 +67,12 @@ export async function enregistrerProfil(donnees: FormData) {
  *
  * Côté base, une seule instruction suffit : `accounts` et `sessions` référencent `users (id) ON
  * DELETE CASCADE`, donc la ligne supprimée emporte les identités externes et les sessions
- * ouvertes. La cascade est dans le schéma plutôt que dans du code — c'est ce qui rend l'oubli
+ * ouvertes. La cascade est dans le schéma plutôt que dans du code, c'est ce qui rend l'oubli
  * impossible.
  *
  * Mais effacer nos lignes ne suffisait pas. L'autorisation vit aussi chez Google, et elle y
  * restait : se reconnecter juste après une suppression ne demandait plus aucun consentement et
- * recréait un compte en un clic. On révoque donc **avant** de supprimer — après la cascade, les
+ * recréait un compte en un clic. On révoque donc **avant** de supprimer, après la cascade, les
  * jetons n'existent plus et il serait trop tard.
  *
  * L'ordre importe, l'échec non : si Google ne répond pas, la suppression a lieu quand même.
@@ -102,7 +102,7 @@ export async function supprimerCompte() {
   await signOut({ redirectTo: "/?compte=supprime" });
 }
 
-/** Remet le profil d'usine — celui du pipeline. Le pendant honnête du « supprimer mes données ». */
+/** Remet le profil d'usine, celui du pipeline. Le pendant honnête du « supprimer mes données ». */
 export async function reinitialiserProfil() {
   const magasin = await cookies();
   magasin.delete(COOKIE_PROFIL);

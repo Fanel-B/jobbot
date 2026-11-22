@@ -5,7 +5,7 @@ import { bande, BANDE_TEXTE, type Bande } from "@/lib/offers";
  *
  * Ce composant était un rectangle coloré à coins ronds : la forme que prend la note sur tous les
  * sites d'emploi, et celle que produit n'importe quel gabarit. Elle avait un défaut de fond en
- * plus d'être banale — l'aplat de couleur attirait l'œil sur la pastille, alors que
+ * plus d'être banale : l'aplat de couleur attirait l'œil sur la pastille, alors que
  * l'information, ici, c'est le nombre.
  *
  * Désormais le chiffre **est** la marque : composé grand et maigre dans la serif des titres,

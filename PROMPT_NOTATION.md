@@ -168,9 +168,9 @@ Fraîcheur de l'offre                            5          12
 Diversité des candidatures                     14          14
 ──────────────────────────────────────────────────────────────
 AJUSTEMENTS · −5 POINTS
-Niveau de diplôme exigé                        −8           —
-Dates de disponibilité                         +3           —
-Prérequis métier                                0           —
+Niveau de diplôme exigé                        −8,
+Dates de disponibilité                         +3,
+Prérequis métier                                0,
 ══════════════════════════════════════════════════════════════
 TOTAL                                          74         100
 Appréciation                            Bonne piste
@@ -195,7 +195,7 @@ Quatre décisions déjà prises, que ta réponse peut contester mais doit prendr
 
 **Pourquoi ça compte pour ta réponse.** Un relevé scolaire n'a jamais montré qu'un nombre : il
 porte une moyenne, une appréciation, et une observation du professeur. C'est peut-être la réponse
-à la question du score honnêtement bas — « 8/20, peut mieux faire » n'est pas vécu comme
+à la question du score honnêtement bas, « 8/20, peut mieux faire » n'est pas vécu comme
 « 8/20 » seul, parce que l'observation dit quoi travailler. JobBot sait déjà calculer cette
 observation : il connaît, pour chaque offre, les compétences manquantes, et il sait mesurer ce
 qu'en ajouter une changerait sur toute la collecte (« cocher SQL ferait monter 23 offres »).
@@ -216,7 +216,7 @@ dans la convention d'origine, et s'en écarter coûte la lisibilité immédiate 
 2. **Comment présenter un score honnêtement bas sans décourager ?** C'est le vrai problème produit.
    18/100 est exact ; c'est aussi ce qui fait fermer l'onglet.
 3. **Que faire de « diversité » et de ses 14 points identiques pour tous ?** Et des 34 % d'offres
-   qui ne citent aucune technologie — leur donner des points par défaut, zéro, ou les sortir du
+   qui ne citent aucune technologie, leur donner des points par défaut, zéro, ou les sortir du
    classement en le disant ?
 4. **Que montrer en page d'accueil à quelqu'un qui n'a encore rien coché ?** Fanel veut une
    démonstration au début. Avec de vraies données uniquement.
@@ -226,5 +226,5 @@ dans la convention d'origine, et s'en écarter coûte la lisibilité immédiate 
    ressemble à une probabilité d'embauche sans en être une ?
 
 Réponds en français. Va au fond plutôt que de survoler les cinq points : mieux vaut deux réponses
-solides que cinq tièdes. Si tu penses que la prémisse est fausse — qu'il ne faut pas de note du
-tout — dis-le.
+solides que cinq tièdes. Si tu penses que la prémisse est fausse, qu'il ne faut pas de note du
+tout : dis-le.

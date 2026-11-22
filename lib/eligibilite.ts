@@ -3,7 +3,7 @@
  * type de contrat, et le signal d'école partenaire.
  *
  * Aujourd'hui ces trois valeurs arrivent toutes faites dans `data/offers.json`. Ce portage ne sert
- * donc encore à rien — il sert à ce qui vient : quand le site lira PostgreSQL au lieu du fichier,
+ * donc encore à rien, il sert à ce qui vient : quand le site lira PostgreSQL au lieu du fichier,
  * la base ne contiendra que les champs bruts de l'annonce, et c'est lui qui devra les dériver.
  *
  * Les oracles, ligne par ligne :
@@ -15,7 +15,7 @@
  * `npm run verifier-eligibility` les compare à l'export sur chaque offre.
  *
  * **`eligibility.zone_status()` n'est pas porté, et c'est volontaire.** Il rend des statuts
- * (éligible / incertain / rejeté) et se rabat sur le titre quand le lieu est vide — ce n'est pas
+ * (éligible / incertain / rejeté) et se rabat sur le titre quand le lieu est vide, ce n'est pas
  * ce que l'export écrit dans `location_zone`. Le porter donnerait des désaccords garantis.
  */
 
@@ -162,7 +162,7 @@ export function zonesReconnues(location: string | null | undefined): Zone[] {
  *
  * Python découpe sur `,` **et** `/`, retire les espaces de bord, passe en minuscules et jette les
  * morceaux vides. Les parenthèses restent : « stage (d'après l'alerte) » est un type à part
- * entière — c'est exactement ce qui avait rendu deux offres invisibles dans les filtres, et c'est
+ * entière : c'est exactement ce qui avait rendu deux offres invisibles dans les filtres, et c'est
  * `familleContrat` (lib/offers.ts) qui s'occupe de les regrouper à l'affichage, pas ce découpage.
  */
 export function contratsDe(contractType: string | null | undefined): string[] {
@@ -177,7 +177,7 @@ export function contratsDe(contractType: string | null | undefined): string[] {
  * Le type de contrat est-il renseigné ?
  *
  * Python écrit `bool(offre.get("contract_type"))` : une chaîne vide est fausse, mais une chaîne
- * d'espaces est **vraie**. On reproduit ce comportement plutôt que le corriger — l'oracle fait
+ * d'espaces est **vraie**. On reproduit ce comportement plutôt que le corriger, l'oracle fait
  * foi, et un écart ici se paierait en désaccords.
  */
 export function contratConnu(contractType: string | null | undefined): boolean {
@@ -201,7 +201,7 @@ export function normaliser(valeur: unknown): string {
 /**
  * Les motifs d'école ou de CFA imposé, dans l'ordre de `PARTNER_SCHOOL_PATTERNS`.
  *
- * L'ordre décide **quel** motif est renvoyé quand plusieurs correspondent — ce n'est pas un
+ * L'ordre décide **quel** motif est renvoyé quand plusieurs correspondent, ce n'est pas un
  * ensemble, et le motif renvoyé est celui qui sera cité à l'utilisateur.
  *
  * `\b` se comporte ici comme en Python parce que le texte est déjà normalisé : plus un seul
@@ -255,7 +255,7 @@ export function signalEcole(offre: OffreAExaminer): string | null {
 
 /**
  * Ce que `export_site.ligne` écrit dans `training_flag` : le signal n'est cherché que si l'annonce
- * a une description. Sans texte, il n'y a rien à citer — et accuser sans citer est précisément ce
+ * a une description. Sans texte, il n'y a rien à citer, et accuser sans citer est précisément ce
  * que le produit s'interdit.
  */
 export function signalEcoleExporte(offre: OffreAExaminer): string | null {

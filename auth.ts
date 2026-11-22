@@ -1,5 +1,5 @@
 /**
- * Auth.js — la connexion par compte Google.
+ * Auth.js, la connexion par compte Google.
  *
  * Deux décisions qui ne sont pas des détails :
  *
@@ -13,7 +13,7 @@
  * sessions, sans code à écrire ni oubli possible.
  *
  * Le pilote `pg` ne tourne pas sur le runtime edge. Il n'y a donc volontairement pas de
- * middleware d'authentification — les pages protégées vérifient la session côté serveur, dans
+ * middleware d'authentification : les pages protégées vérifient la session côté serveur, dans
  * une frontière <Suspense> comme l'impose `cacheComponents`.
  */
 import NextAuth from "next-auth";

@@ -1,17 +1,18 @@
-# JobBot — les offres qui correspondent vraiment
+# JobBot : les offres qui correspondent vraiment
 
-**Trouver, parmi des centaines d'annonces, celles qui correspondent réellement à mon profil — et
+**Trouver, parmi des centaines d'annonces, celles qui correspondent réellement à mon profil, et
 pouvoir expliquer pourquoi, offre par offre, avec une note que n'importe qui peut recalculer à la
 main.**
 
 Je suis [Fanel Balemo](https://github.com/Fanel-B), étudiant en L3 MIAGE à l'Université de Toulouse.
 Je cherche un stage pour mars 2027 et je perdais mes soirées à lire des annonces qui ne me
 correspondaient pas. J'ai donc écrit un système qui fait ce travail à ma place, honnêtement : il
-tourne tous les jours depuis le 21 septembre 2026, sans que j'aie à y toucher. **546 annonces
-collectées, 290 publiées** sur le site, **403 contrôles** côté moteur, **201 tests** côté site, et un
-contrôle croisé de 290 offres entre les deux implémentations du calcul (au 25 octobre 2026).
+tourne tous les jours depuis le 21 septembre 2026, sans que j'aie à y toucher. **369 offres publiées**
+dans l'export du 7 novembre 2026, **403 contrôles** côté moteur, **558 tests** côté site, et un
+contrôle croisé de ces 369 offres entre les deux implémentations du calcul (0 désaccord au
+22 novembre 2026).
 
-**J'ai mis le site en ligne : <http://148.113.247.10/>**
+**Le site est en ligne : <https://jobbot-orcin.vercel.app>**
 
 ---
 
@@ -33,7 +34,7 @@ donnée : un champ absent dans l'annonce ressort à `null` et s'affiche « non p
 
 **1. Les sites carrière des entreprises, via leur ATS.** Les grandes entreprises publient leurs stages
 sur leur propre site, alimenté par un logiciel de recrutement (Workday, SmartRecruiters). Ces ATS
-exposent une **API JSON publique** — exactement celle qu'utilise la page carrière de mon navigateur.
+exposent une **API JSON publique**, exactement celle qu'utilise la page carrière de mon navigateur.
 Je l'appelle directement : pas d'analyse de page HTML fragile, pas de clé à demander, et des données
 structurées (titre, lieu, date de publication, référence de l'offre). C'est ma source la plus fiable,
 et celle qui me donne les offres les mieux notées (Airbus, Thales, Sopra Steria, SII, Capgemini, Atos,
@@ -48,8 +49,8 @@ titre.
 **3. France Travail**, l'API « Offres d'emploi v2 » (`francetravail.io`), en OAuth2, avec une
 pagination de 150 offres par page.
 
-**4. Mes propres alertes e-mail** (LinkedIn, Indeed). Plutôt que de solliciter LinkedIn — ce que ses
-conditions d'utilisation interdisent — je lis **les alertes que j'ai moi-même créées** : elles
+**4. Mes propres alertes e-mail** (LinkedIn, Indeed). Plutôt que de solliciter LinkedIn, ce que ses
+conditions d'utilisation interdisent : je lis **les alertes que j'ai moi-même créées** : elles
 arrivent dans ma boîte, je les ouvre en **lecture seule** (sans jamais les marquer comme lues),
 uniquement pour les expéditeurs que j'ai déclarés, et j'en extrais une offre par lien.
 
@@ -57,7 +58,7 @@ uniquement pour les expéditeurs que j'ai déclarés, et j'en extrais une offre 
 
 - Je respecte `robots.txt` et les `sitemaps`, et j'honore les `Crawl-delay`.
 - **Je ne contourne aucune protection anti-robot.** Quand un site me bloque (erreur 403, pare-feu),
-  j'abandonne cette entreprise au lieu de forcer — et je l'assume par écrit dans le code.
+  j'abandonne cette entreprise au lieu de forcer, et je l'assume par écrit dans le code.
 - Je respecte les quotas des API, et mes clés vivent dans l'environnement de mon serveur, **jamais
   dans ce dépôt** : aucune clé, aucun jeton, aucun mot de passe n'a jamais été versionné.
 - Je dédoublonne entre sources : une même offre vue sur deux canaux ne compte qu'une fois.
@@ -71,7 +72,7 @@ volontairement séparée du calcul.
 **Ce que l'agent fait pour moi :**
 
 - il **déclenche** la collecte (toutes les heures) et les rapports (quotidien, hebdomadaire, dernier
-  appel) par tâches planifiées, avec un service `systemd` pour le site ;
+  appel) par tâches planifiées ;
 - il **m'alerte sur Telegram** dès qu'une offre dépasse mon seuil, me donne le rapport du jour, me
   relance sur mes candidatures et me rappelle mes rendez-vous ;
 - il **tient mon suivi de candidatures** dans une feuille de calcul (entreprise, poste, date d'envoi,
@@ -122,23 +123,26 @@ ne montre pas cela ; ici, un recruteur comme un candidat peut vérifier chaque p
 ```
    sites carrière (API ATS publiques) ─┐
    La Bonne Alternance (API publique) ─┤
-   France Travail (API OAuth2) ────────┤──►  pipeline Python  ──►  SQLite (544 offres)
+   France Travail (API OAuth2) ────────┤──►  pipeline Python  ──►  SQLite
    mes alertes e-mail (LinkedIn, …) ───┘     collecte · dédoublonnage
                                              note · éligibilité
                                                      │
-                                                     ▼
-                                          data/offers.json  (290 offres)
-                                                     │
-                                                     ▼
-                                        site Next.js  ────►  systemd, port 80
-                                        (rafraîchi chaque jour)
+                                   ┌─────────────────┴───────────────┐
+                                   ▼                                 ▼
+                       collecteur (tools/)                   export_site.py
+                                   │                                 │
+                                   ▼                                 ▼
+                         PostgreSQL (Neon)                  data/offers.json
+                                   │                  (oracle des contrôles, secours)
+                                   ▼
+                         site Next.js sur Vercel
 
    l'agent : tâches planifiées (collecte, rapports, relances) · Telegram · feuille de suivi
 ```
 
-Le site ne déclenche jamais de collecte lui-même : il lit un fichier produit par le pipeline. C'est ce
-qui me permet de garder une seule chaîne observable — et de rendre le site indépendant des quotas des
-sources.
+Le site ne déclenche jamais de collecte lui-même : il lit la base que le pipeline alimente, et se
+rabat sur le fichier `data/offers.json` si la base est vide ou injoignable. C'est ce qui me permet de
+garder une seule chaîne observable, et de rendre le site indépendant des quotas des sources.
 
 ## Structure du dépôt
 
@@ -150,13 +154,13 @@ app/
   offres/[id]/page.tsx     fiche : note expliquée, compétences, annonce, lien d'origine
   methode/page.tsx         sources, règles de collecte, fabrication de la note
 components/                badges, bulletin de note, carte d'offre, simulateur, graphes
-lib/scoring.ts             le calcul — 9 critères et 5 ajustements, miroir de mon moteur Python
+lib/scoring.ts             le calcul, 9 critères et 5 ajustements, miroir de mon moteur Python
 lib/profil.ts              mon profil : compétences prouvées, atouts, lacunes
 lib/offers.ts              types, libellés, fraîcheur, bandes de note
-data/offers.json           les offres réelles, exportées par mon pipeline
+data/offers.json           l'export du pipeline : oracle des contrôles et fichier de secours
 reference/                 le moteur Python, en lecture seule (il fait autorité)
 scripts/verifier-scoring.mjs  le contrôle croisé TypeScript ↔ Python
-db/, tools/                le schéma PostgreSQL et le collecteur (étape suivante)
+db/, tools/                le schéma PostgreSQL (Neon) et le collecteur qui le remplit
 v1/                        mon ancienne application, conservée hors service
 ```
 
@@ -176,18 +180,19 @@ v1/                        mon ancienne application, conservée hors service
 
 ## Déploiement
 
-Je fais tourner le site sur mon serveur personnel (VPS), pas sur Vercel :
+Le site est servi par **Vercel** et lit ses offres dans **PostgreSQL (Neon)**. Mon serveur personnel
+(VPS) fait tourner le pipeline : collecte, note, export, et le collecteur qui copie les offres vers
+Neon.
 
-- **Service** : unité `systemd` `jobbot-site.service`, qui lance `next start` sur le port 80 en tant
-  qu'utilisateur non privilégié (capacité `CAP_NET_BIND_SERVICE`, redémarrage automatique). L'unité
-  ne contient aucun secret.
-- **Rafraîchissement** : un script réexporte les offres depuis mon pipeline, reconstruit le site et
-  redémarre le service, chaque jour après la collecte. Il **reste silencieux quand tout va bien** et
-  ne parle qu'en cas de problème.
-- **Pourquoi pas Vercel** : mon site est statique et alimenté par des données produites ailleurs ; le
-  servir depuis le serveur qui fait déjà tourner la collecte évite un aller-retour réseau et garde
-  toute la chaîne observable au même endroit.
-- **Étape suivante** : PostgreSQL (Neon) et comptes — voir `db/README.md`.
+- **Site** : Vercel redéploie à chaque fusion sur `main`. Avec `OFFERS_SOURCE=db`, il lit la table
+  `offers` (cache de quinze minutes). Sans cette variable, ou si la base est vide ou injoignable, il
+  lit `data/offers.json`.
+- **Données** : `tools/collecteur_postgres.py` copie les offres de la base SQLite du pipeline vers
+  Neon, et écrit une ligne dans `collectes` à chaque copie réussie : c'est la date « Dernière
+  collecte » du pied de page.
+- **Comptes** : connexion Google par Auth.js, sessions stockées dans Neon.
+- **Procédures** : `DEPLOIEMENT.md` (commandes, ordre des étapes, retour arrière) et `db/README.md`
+  (schéma, migrations).
 
 ## Preuve que ça marche
 
@@ -197,13 +202,14 @@ diverger :
 
 - `npm run verifier-scoring` compare, **offre par offre et ligne par ligne** (nom du critère, points,
   maximum et détail, accents compris), le calcul TypeScript au fichier produit par le pipeline.
-  Aujourd'hui : **290 offres comparées, 0 désaccord** ;
+  Au 22 novembre 2026 : **369 offres comparées, 0 désaccord**. `npm run verifier-eligibility` fait
+  la même comparaison pour la zone, les contrats et le signal d'école ;
 - mon pipeline porte **403 contrôles** internes, dont la vérification que chaque compétence citée
   dans un CV est réellement prouvée par mes projets.
 
 Cette contrainte n'est pas décorative : elle m'a fait trouver de vrais défauts. Exemple : mon site
 considérait « Docker » comme une compétence que je maîtrise et ne pénalisait pas les offres qui
-l'exigent, alors que je l'avais retiré de mon référentiel — le contrôle croisé a désigné 7 offres
+l'exigent, alors que je l'avais retiré de mon référentiel, le contrôle croisé a désigné 7 offres
 incohérentes, corrigées le 24 octobre 2026. Deuxième exemple, le 25 octobre : la comparaison lisait
 « ML » dans « HT**ML** », donc trois offres affichaient une case verte devant une compétence que je
 n'ai pas. Corrigé, et vérifié sur la page publique.
@@ -212,18 +218,20 @@ n'ai pas. Corrigé, et vérifié sur la page publique.
 
 - **Site** : Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4. Pages rendues côté serveur,
   filtres par URL **partageables et fonctionnels sans JavaScript**.
-- **Données** : pipeline Python, base SQLite, export JSON versionné (`data/offers.json`).
-- **Exploitation** : mon serveur privé, `systemd`, tâches planifiées, rafraîchissement quotidien ;
-  bibliothèques Google officielles pour la lecture de mes alertes et le suivi de mes candidatures.
-- **Tests** : Vitest (201 tests TypeScript) et 403 contrôles Python ; contrôle croisé Python ↔
-  TypeScript.
+- **Données** : pipeline Python, base SQLite, copie vers PostgreSQL (Neon) par le collecteur, export
+  JSON versionné (`data/offers.json`) pour les contrôles et le secours.
+- **Exploitation** : Vercel (site), Neon (données), mon serveur privé (pipeline et tâches
+  planifiées) ; bibliothèques Google officielles pour la lecture de mes alertes et le suivi de mes
+  candidatures.
+- **Tests** : Vitest (558 tests TypeScript), 27 tests Python pour le collecteur et les règles de zone,
+  403 contrôles dans le pipeline ; contrôles croisés Python ↔ TypeScript.
 
 ## Lancer le projet
 
 ```bash
 npm install
 npm run dev                       # http://localhost:3000
-npm test                          # 201 tests
+npm test                          # 558 tests
 npx tsc --noEmit                  # typage
 npm run verifier-scoring          # contrôle croisé avec mon calcul Python (0 désaccord attendu)
 npm run build && npm start        # version de production
@@ -241,11 +249,11 @@ Ma partie moteur (Python) est dans `reference/`, en lecture seule : c'est le pip
   début, mon filtre ne peut pas trancher : l'offre est marquée « à vérifier » au lieu d'être inventée.
 - **Certaines sources refusent les robots**, et je les abandonne au lieu de forcer (Safran, EDF, GRDF,
   Alten à ce jour).
-- **Mon système ne postule pas à ma place.** Il prépare, il explique, il suit — je décide.
+- **Mon système ne postule pas à ma place.** Il prépare, il explique, il suit, je décide.
 
 ## Auteur
 
-**Fanel Balemo** — L3 MIAGE, Université de Toulouse (2026-2027)
+**Fanel Balemo** : L3 MIAGE, Université de Toulouse (2026-2027)
 
 - GitHub : <https://github.com/Fanel-B>
 - Portfolio : <https://portfolio-v2-fanel-65.vercel.app>

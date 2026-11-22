@@ -54,7 +54,7 @@ function somme(r: Resultat): number {
 
 const CRITERES = ["cohérence", "métier", "source", "fiche", "calendrier", "dépôt", "dossier",
   "fraîcheur", "diversité", "diplôme", "prérequis", "compétences", "dates", "fin"];
-// Les cinq derniers sont les ajustements du 22/10/2026 — les quatre critères d'accessibilité puis
+// Les cinq derniers sont les ajustements du 22/10/2026, les quatre critères d'accessibilité puis
 // la date de fin : maximum 0, leurs points sont signés et entrent dans la note. Le « plafond », s'il
 // mord, est une ligne supplémentaire ajoutée après.
 const MAXIMA = [30, 12, 8, 6, 8, 6, 4, 12, 14, 0, 0, 0, 0, 0];
@@ -349,7 +349,7 @@ describe("fiche : longueur de la description", () => {
   });
 
   it("la longueur se compte en caractères comme `len` de Python, pas en unités UTF-16", () => {
-    // 150 émojis : 150 pour Python, 300 pour `String.length` — la fiche doit rester vide.
+    // 150 émojis : 150 pour Python, 300 pour `String.length`, la fiche doit rester vide.
     expect(ligne(noter(offre(1, { description: "😀".repeat(150) })), "fiche").points).toBe(1);
   });
 });
@@ -579,7 +579,7 @@ describe("heure du calcul", () => {
 });
 
 /* ==========================================================================
- * `scoreOffre` — les quatre critères ajoutés le 22/10/2026
+ * `scoreOffre` : les quatre critères ajoutés le 22/10/2026
  *
  * Ces valeurs sont recopiées de `scoring.py` (source de vérité) : +7 Bac+3, -8 Bac+5, -4 par
  * prérequis métier, plafond 55 sur bloqueur administratif, -10 / +3 / 0 sur les dates.

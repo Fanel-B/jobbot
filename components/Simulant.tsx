@@ -26,7 +26,7 @@ export async function Simulant({
 }) {
   const p = await searchParams;
   // Les compétences proposées sont celles qui manquent **à ce profil**, et l'écart est mesuré
-  // depuis sa note — pas depuis celle du profil d'usine.
+  // depuis sa note : pas depuis celle du profil d'usine.
   const profil = await lireProfil();
 
   // Sans profil, tout manque. Le simulant proposerait alors les quinze technos de l'annonce

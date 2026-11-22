@@ -1,4 +1,4 @@
-# Passation — JobBot V2, session du 19 octobre 2026
+# Passation : JobBot V2, session du 19 octobre 2026
 
 Document à lire **avant** de reprendre ce dépôt. Il raconte d'où vient le code, ce qui a été fait,
 comment il a été vérifié, et ce qui reste. Écrit par l'assistant Hermes de Fanel, qui a produit cette
@@ -18,7 +18,7 @@ recherche contient réellement.
 
 La conclusion structurante de cette fusion : le cahier de route prévoyait de recentrer la démo sur
 Paris, parce que les sources publiques ne donnaient qu'une seule offre de stage toulousaine. La
-mesure du 19/10 dit autre chose — les **interfaces publiques des entreprises** (Airbus, Thales,
+mesure du 19/10 dit autre chose, les **interfaces publiques des entreprises** (Airbus, Thales,
 Sopra Steria, Groupe SII, Capgemini, Atos, CNES) fournissent **114 stages à Toulouse**, tous publiés
 par l'employeur, tous légaux. La démo est donc centrée sur Toulouse, et Paris devient une extension.
 
@@ -30,7 +30,7 @@ vraie source, leur vrai texte, et « non précisé » là où la source se tait.
 Ce qui a des conséquences directes dans le code :
 
 - `data/offers.json` est un export réel, produit hors du dépôt (voir §4) ;
-- `contract_known: false` pour une offre dont la source ne donne pas le type de contrat — affichée
+- `contract_known: false` pour une offre dont la source ne donne pas le type de contrat, affichée
   quand même, mais dans **son propre bloc**, avec un badge distinct, hors classement principal ;
 - la fraîcheur est calculée par rapport à l'heure de **collecte** (`meta.generated_at`), pas par
   rapport à l'horloge du visiteur.
@@ -43,7 +43,7 @@ Ce qui a des conséquences directes dans le code :
 - **4 écrans** : accueil, liste filtrable, fiche d'offre, méthode.
 - **Identité visuelle** : fond papier chaud, encre franche, un seul accent, couleurs sémantiques
   réservées à la note, serif pour les titres (`Instrument Serif`) et Inter pour l'interface, chiffres
-  tabulaires. Les jetons vivent dans `app/globals.css` (`@theme`) — la palette change là, nulle part
+  tabulaires. Les jetons vivent dans `app/globals.css` (`@theme`), la palette change là, nulle part
   ailleurs.
 - **Les filtres sont des liens**, pas des composants clients : `?zone=toulouse&type=stage&min=80`.
   URL partageables, page utilisable sans JavaScript. Ne pas les transformer sans raison.
@@ -54,7 +54,7 @@ Ce qui a des conséquences directes dans le code :
 ### Ce qui a été trouvé en regardant, pas en lisant
 
 Trois défauts réels, dont deux invisibles à la lecture du code. Ils ont été trouvés en **prenant des
-captures d'écran et en les regardant** — c'est la méthode qui a payé, elle vaut d'être reprise.
+captures d'écran et en les regardant**, c'est la méthode qui a payé, elle vaut d'être reprise.
 
 1. **La note affichée ne correspondait pas à son bulletin.** La décomposition perdait les critères
    « dépôt » et « fraîcheur » : la classe de caractères utilisée pour découper les lignes excluait
@@ -64,7 +64,7 @@ captures d'écran et en les regardant** — c'est la méthode qui a payé, elle 
    pas, la page affichait la liste complète.
 3. **La liste « ce qui te manque » était éclatée** : « IA », « intelligence artificielle »,
    « IA générative » et « IA generative » apparaissaient comme quatre lignes concurrentes pour la
-   même famille. Regroupement par famille ajouté dans `lib/offers.ts` (`lacunesRegroupees`) — 85
+   même famille. Regroupement par famille ajouté dans `lib/offers.ts` (`lacunesRegroupees`), 85
    offres pour « IA / intelligence artificielle » au lieu de quatre lignes éparpillées.
 
 ### Ce qui reste **du côté pipeline** (pas dans ce dépôt)
@@ -99,7 +99,7 @@ Vérifiés à la compilation, pas supposés :
 - **`new Date()` au pré-rendu fait échouer le build** (« blocking-prerender-current-time »). C'est
   la raison pour laquelle la fraîcheur se calcule par rapport à `meta.generated_at`.
 - Ce projet a été créé avec `create-next-app@latest`, qui dépose un `AGENTS.md` renvoyant à
-  `node_modules/next/dist/docs/` — la documentation versionnée, à consulter avant d'écrire du code.
+  `node_modules/next/dist/docs/` : la documentation versionnée, à consulter avant d'écrire du code.
 
 ## 6. Les règles non négociables
 
@@ -116,17 +116,17 @@ Elles font la valeur du produit. Les casser, c'est le rendre malhonnête.
 
 ## 7. La suite, par ordre de valeur
 
-1. **Base PostgreSQL (Neon)** — l'étape structurante. Tant qu'il n'y a pas de comptes, un fichier
+1. **Base PostgreSQL (Neon)**, l'étape structurante. Tant qu'il n'y a pas de comptes, un fichier
    suffit ; dès qu'il y a plusieurs personnes, la note doit être calculée **à la lecture**, pas
-   stockée. Schéma : `offers`, `users`, `profiles`, `resumes`, `saved_offers`, `ai_usage` — et
+   stockée. Schéma : `offers`, `users`, `profiles`, `resumes`, `saved_offers`, `ai_usage`, et
    `offers` **sans** colonne `score`.
-2. **Comptes et score personnalisé** — Auth.js, `/profil`, portage du scoring en TypeScript. C'est
+2. **Comptes et score personnalisé**, Auth.js, `/profil`, portage du scoring en TypeScript. C'est
    la tranche qui transforme la vitrine en produit, et le meilleur exercice TypeScript possible :
    la logique est déjà écrite et testée côté Python.
-3. **CV adapté** — dépôt, extraction, compétences proposées par l'IA puis **confirmées par la
+3. **CV adapté**, dépôt, extraction, compétences proposées par l'IA puis **confirmées par la
    personne** (une compétence jamais confirmée ne compte jamais), export .docx, quota par compte.
-4. **Fit dynamique** — « et si tu ajoutais TypeScript ? » → recalcul, sans table ni appel IA.
-5. **Élargissement de la collecte à l'Île-de-France** — côté pipeline Python, hors de ce dépôt.
+4. **Fit dynamique**, « et si tu ajoutais TypeScript ? » → recalcul, sans table ni appel IA.
+5. **Élargissement de la collecte à l'Île-de-France**, côté pipeline Python, hors de ce dépôt.
 
 ## 8. Répartition des rôles
 
@@ -134,7 +134,7 @@ Elles font la valeur du produit. Les casser, c'est le rendre malhonnête.
 |---|---|---|
 | Ce dépôt | Fanel + Claude Code (VSCode) | lire, écrire, pousser sur GitHub |
 | Pipeline de collecte | assistant Hermes (serveur) | lire les sources, calculer les notes, exporter le JSON |
-| GitHub | Claude Code a l'écriture ; l'assistant Hermes a la **lecture seule** | l'assistant peut suivre les branches, lire le code, proposer des modifications — il ne pousse rien |
+| GitHub | Claude Code a l'écriture ; l'assistant Hermes a la **lecture seule** | l'assistant peut suivre les branches, lire le code, proposer des modifications, il ne pousse rien |
 
 Règle de travail : quand le site a besoin d'une donnée que la source ne fournit pas, **c'est le
 pipeline qu'on étend**, jamais le site qu'on fait deviner.
@@ -156,6 +156,6 @@ Le site tourne immédiatement : les offres sont committées dans `data/offers.js
 aucune variable d'environnement.
 
 Pourquoi la racine plutôt qu'un sous-dossier : Vercel ne sait pas construire une application Next
-rangée ailleurs qu'à la racine du projet — il y cherche le build, et `outputDirectory` est ignoré
+rangée ailleurs qu'à la racine du projet, il y cherche le build, et `outputDirectory` est ignoré
 pour ce framework. Le site a donc été remonté, plutôt que de dépendre d'un réglage à refaire à
 chaque nouveau déploiement.

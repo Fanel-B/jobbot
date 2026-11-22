@@ -218,7 +218,7 @@ export function sourceLabel(slug: string): string {
   return SOURCE_LABEL[slug] ?? slug;
 }
 
-/** Ce que veut dire chaque critère du bulletin — affiché à côté de la note. */
+/** Ce que veut dire chaque critère du bulletin, affiché à côté de la note. */
 export const CRITERE_LABEL: Record<string, string> = {
   cohérence: "Cohérence avec ton profil",
   metier: "Métier visé",
@@ -257,15 +257,15 @@ export type StructureBulletin = {
   notes: string[];
   /** Lignes d'ajustement : maximum nul, elles ajoutent ou retirent des points. */
   ajustements: string[];
-  /** Somme des maximums — 100, sauf si le pipeline change de barème. */
+  /** Somme des maximums : 100, sauf si le pipeline change de barème. */
   total: number;
 };
 
 /**
  * La forme réelle du bulletin, **lue dans les données** plutôt qu'écrite en dur.
  *
- * Le site a longtemps annoncé « neuf critères ». Le pipeline en a ajouté depuis — diplôme exigé,
- * prérequis métier, dates, bloqueurs administratifs — et la phrase est devenue fausse sans que
+ * Le site a longtemps annoncé « neuf critères ». Le pipeline en a ajouté depuis, diplôme exigé,
+ * prérequis métier, dates, bloqueurs administratifs, et la phrase est devenue fausse sans que
  * personne ne s'en aperçoive. La décrire à partir de l'export empêche que ça recommence.
  */
 export function structureDe(offres: Offer[]): StructureBulletin {
@@ -334,7 +334,7 @@ export function joursDepuis(iso: string | null, reference: Date): number | null 
 /**
  * Date de référence pour toute la fraîcheur affichée : l'heure de la **collecte**,
  * pas celle de l'affichage. Le site dit donc « vu il y a 2 jours à la collecte du 19 »,
- * ce qui reste vrai quel que soit le moment où la page est ouverte — et c'est
+ * ce qui reste vrai quel que soit le moment où la page est ouverte, et c'est
  * pré-rendable, donc la page ne dépend pas de l'horloge du visiteur.
  */
 export function referenceDe(m: Pick<Meta, "generated_at">): Date {
@@ -499,7 +499,7 @@ export function filtrerParContrat(offres: Offer[], type: string | undefined): Of
   return offres.filter((o) => familleContrat(o) === demande);
 }
 
-/** Combien d'offres par famille — ce qui permet d'afficher le compte sur chaque filtre. */
+/** Combien d'offres par famille, ce qui permet d'afficher le compte sur chaque filtre. */
 export function compterFamilles(offres: Offer[]): Record<FamilleContrat, number> {
   const comptes: Record<FamilleContrat, number> = {
     stage: 0,
@@ -516,7 +516,7 @@ export function compterFamilles(offres: Offer[]): Record<FamilleContrat, number>
 /**
  * Le signal n'est affichable que s'il peut être **cité**. C'est la règle 5 du briefing : jamais
  * d'accusation sans l'extrait qui l'a déclenchée. Un drapeau levé sans extrait est un défaut de
- * collecte, pas une raison de mettre en cause une entreprise — on n'affiche alors rien.
+ * collecte, pas une raison de mettre en cause une entreprise, on n'affiche alors rien.
  */
 export function signalFormationCitable(o: Offer): boolean {
   return o.training_flag && (o.training_excerpt ?? "").trim().length > 0;
@@ -553,7 +553,7 @@ export function sansAccents(s: string): string {
  * Familles de compétences regroupées à l'affichage **uniquement** : les sources écrivent
  * « IA », « intelligence artificielle », « IA générative » ou « IA generative » pour ce que le
  * lecteur lit comme une seule chose. Sans ce regroupement, la liste « ce qui te manque » affichait
- * quatre lignes concurrentes pour la même famille — le contraire d'une information utile.
+ * quatre lignes concurrentes pour la même famille, le contraire d'une information utile.
  *
  * Le regroupement est volontairement grossier et limité : on ne fusionne pas « machine learning »
  * avec « IA générative », ce ne sont pas les mêmes compétences.

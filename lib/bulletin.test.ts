@@ -1,8 +1,8 @@
 /**
  * Tests de la description du bulletin.
  *
- * Le site a longtemps annoncé « neuf critères ». Le pipeline en a ajouté — diplôme exigé,
- * prérequis métier, dates, bloqueurs administratifs — et la phrase est restée, devenue fausse,
+ * Le site a longtemps annoncé « neuf critères ». Le pipeline en a ajouté, diplôme exigé,
+ * prérequis métier, dates, bloqueurs administratifs, et la phrase est restée, devenue fausse,
  * sans que rien ne la signale. Ces tests verrouillent la propriété qui compte : ce que le site
  * raconte du bulletin se déduit des données, et ne peut plus se périmer en silence.
  */

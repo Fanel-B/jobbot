@@ -1,4 +1,4 @@
-# Briefing — JobBot V2
+# Briefing : JobBot V2
 
 Ce fichier est écrit pour être lu **avant** de coder dans ce dépôt, par un humain ou par un agent
 (Claude Code, VSCode, Copilot). Il dit ce qui existe, les règles à ne pas casser, et la suite.
@@ -12,7 +12,7 @@ Dernière mise à jour : 19 octobre 2026, par l'assistant Hermes de Fanel.
 Un outil de recherche d'alternance et de stage : agréger les offres, expliquer **pourquoi** elles
 correspondent à un profil, et dire **quoi travailler** pour celles qui ne correspondent pas encore.
 Destinataires : Fanel, puis quelques amis (2 à 6). Pas d'ouverture publique, pas de monétisation au
-début — c'est un choix qui évite toute charge de modération et de facturation.
+début : c'est un choix qui évite toute charge de modération et de facturation.
 
 Deux choses distinctes, à ne pas confondre :
 
@@ -31,7 +31,7 @@ c'est le pipeline qu'il faut étendre, pas le site qui doit la deviner.
 
 - **229 pages pré-rendues**, build vert, TypeScript strict.
 - **4 écrans** : `/` (accueil), `/offres` (liste filtrable), `/offres/[id]` (fiche), `/methode`.
-- **222 offres réelles** dans `data/offers.json` — 186 à Toulouse, 8 en Île-de-France, 40 sans type
+- **222 offres réelles** dans `data/offers.json`, 186 à Toulouse, 8 en Île-de-France, 40 sans type
   de contrat, 105 avec leur description. Aucune donnée de démonstration.
 - La note est **expliquée** : 9 critères, points et maximum, et le total affiché est exactement la
   somme des lignes (vérifié sur les 222 offres : 0 désaccord).
@@ -57,7 +57,7 @@ Ce sont les règles qui font la valeur du produit. Les casser, c'est le rendre m
 6. **Aucun contournement de protection.** Pas de scraping de LinkedIn ou d'Indeed, pas de CAPTCHA
    forcé. Les alertes mail sont celles que l'utilisateur a créées lui-même.
 7. **La fraîcheur est datée par rapport à la collecte** (`meta.generated_at`), jamais par rapport à
-   l'horloge du visiteur. C'est ce qui permet de pré-rendre les pages — Next 16 refuse `new Date()`
+   l'horloge du visiteur. C'est ce qui permet de pré-rendre les pages, Next 16 refuse `new Date()`
    au pré-rendu, et il a raison.
 
 ## 4. Carte du code
@@ -65,7 +65,7 @@ Ce sont les règles qui font la valeur du produit. Les casser, c'est le rendre m
 ```
 app/
   layout.tsx               polices, en-tête, pied de page ; lit meta du JSON
-  globals.css              jetons de design (Tailwind v4, @theme) — la palette vit ici
+  globals.css              jetons de design (Tailwind v4, @theme), la palette vit ici
   page.tsx                 accueil : chiffres réels, top 6, bulletin d'exemple, lacunes, méthode
   offres/page.tsx          liste : filtres par URL, <Suspense> obligatoire (searchParams en Next 16)
   offres/[id]/page.tsx     fiche : note expliquée, ✅/❌ compétences, annonce, lien d'origine
@@ -85,21 +85,21 @@ data/offers.json           les offres réelles exportées par le pipeline (commi
 
 ## 5. La suite, par ordre de valeur
 
-### A. Base PostgreSQL (Neon) — l'étape structurante
+### A. Base PostgreSQL (Neon), l'étape structurante
 
 Aujourd'hui le site lit un fichier. C'est parfait pour la démo, insuffisant dès qu'il y a des
 comptes : chaque personne doit avoir son classement, donc la note doit être calculée **à la
 lecture**, pas stockée.
 
 - [x] Schéma écrit : `db/schema.sql` crée les six tables. `offers.canonical_url` est **unique**
-      (base du dédoublonnage) et il n'y a **pas** de colonne `score` — la note dépend de qui regarde.
+      (base du dédoublonnage) et il n'y a **pas** de colonne `score`, la note dépend de qui regarde.
       Le fichier est rejouable : `IF NOT EXISTS` partout, aucune suppression.
 - [x] Connexion posée : `lib/db.ts` (pilote `node-postgres` + `attachDatabasePool`, comme le
       prescrit la skill `neon-postgres` pour Vercel) et `npm run verifier-db`, qui dit en une
       commande si la base répond et si les six tables existent.
 - [x] Outillage Neon installé : skills dans `.claude/skills/`, serveur MCP dans `.mcp.json`
       (URL seule, aucune clé).
-- [ ] **Créer le projet Neon et poser la chaîne** — *à faire par Fanel*. Elle ne passe jamais par
+- [ ] **Créer le projet Neon et poser la chaîne**, *à faire par Fanel*. Elle ne passe jamais par
       un chat : `.env.local` pour le site (chaîne **pooled**), `~/.hermes/.env` sur le VPS pour le
       collecteur (chaîne **directe**). Modèle : `.env.local.example`.
 - [ ] Le collecteur Python écrit dans Neon au lieu du JSON (garder le JSON pour la démo hors ligne).
@@ -112,15 +112,15 @@ lecture**, pas stockée.
 
 - [x] `/profil` : les compétences confirmées, la zone, le niveau, le type recherché. Un formulaire
       sur action serveur, donc utilisable sans JavaScript. Le profil vit dans un cookie lisible,
-      pas dans l'URL — il doit survivre à la navigation.
+      pas dans l'URL : il doit survivre à la navigation.
 - [x] Portage de `scoring.py` : `npm run verifier-scoring`, zéro désaccord sur l'export courant.
 - [x] Portage de `eligibility.py` : `npm run verifier-eligibility`, zéro désaccord. Attention,
-      ce zéro couvre moins qu'il n'y paraît — les données n'exercent ni le découpage sur « / », ni
+      ce zéro couvre moins qu'il n'y paraît, les données n'exercent ni le découpage sur « / », ni
       la priorité entre zones, ni le signal d'école. `lib/eligibilite.test.ts` épingle ces règles,
       et le vérificateur affiche lui-même sa couverture.
 - [x] Tri par score : la liste et les fiches sont classées par la note du profil, recalculée à la
       lecture et jamais stockée. Deux personnes voient la même offre, pas la même note.
-- [ ] **Auth.js** (Google ou lien e-mail) — le seul morceau qui reste. Il dépend de Neon (pour
+- [ ] **Auth.js** (Google ou lien e-mail), le seul morceau qui reste. Il dépend de Neon (pour
       stocker comptes et sessions) et d'identifiants OAuth à créer côté Google. Tant qu'il n'est
       pas là, le profil est par navigateur : ça marche pour une personne, pas pour plusieurs.
 
@@ -150,7 +150,7 @@ la base contient assez d'offres, sinon le chiffre ne veut rien dire.
   presque toutes d'alertes mail et **n'ont pas de type de contrat renseigné**. Pour que la promesse
   soit tenue, la collecte doit être élargie (voir ci-dessous).
 - **Le cron personnel reste toulousain.** C'est voulu : la recherche de Fanel est à Toulouse. Le site
-  est plus large que son besoin personnel — les deux ne doivent pas être alignés.
+  est plus large que son besoin personnel, les deux ne doivent pas être alignés.
 
 ## 7. Ce qu'il reste à faire côté pipeline pour l'Île-de-France
 
@@ -158,11 +158,11 @@ Ce dépôt ne peut pas le faire ; c'est du Python, dans `~/.hermes/skills/job-se
 exacts, pour qui reprend le sujet :
 
 1. `adapters/lba_adapter.py` : `SEARCH_LOCATIONS = ("Toulouse",)` → ajouter Paris / Île-de-France.
-2. `adapters/ft_adapter.py` : cherche déjà Toulouse **et** Paris (75, 92, 93, 94) — mais ne remonte
+2. `adapters/ft_adapter.py` : cherche déjà Toulouse **et** Paris (75, 92, 93, 94), mais ne remonte
    aujourd'hui aucune offre retenue : à diagnostiquer (termes de recherche, filtrage du contrat).
 3. `eligibility.zone_status()` : rejette tout ce qui n'est pas en zone toulousaine. Il faut
    **classer** les zones (`toulouse` / `idf` / `hors_zone`) au lieu de rejeter, et laisser le
-   rapport quotidien filtrer sur `toulouse` — sinon les offres d'Île-de-France polluent le rapport
+   rapport quotidien filtrer sur `toulouse`, sinon les offres d'Île-de-France polluent le rapport
    personnel.
 4. `adapters/careers_adapter.py` : les sites d'entreprise (Airbus, Thales, Sopra, SII, Capgemini,
    ATOS, CNES…) publient aussi des stages en Île-de-France ; le pré-filtre par zone les écarte

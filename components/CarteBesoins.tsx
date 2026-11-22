@@ -10,7 +10,7 @@ import { FAMILLES } from "@/lib/competences";
  *
  * La forme est reprise du relevé de design/cedaorg.net.md : une liste de besoins concrets plutôt
  * qu'un menu. Chaque ligne porte son intitulé et, en dessous, les technos réelles qu'elle
- * recouvre — on se reconnaît dans « REACT, NEXT.JS, TAILWIND » même sans savoir comment on
+ * recouvre : on se reconnaît dans « REACT, NEXT.JS, TAILWIND » même sans savoir comment on
  * s'appelle professionnellement. La dernière ligne admet que les six familles ne suffiront pas à
  * tout le monde, et donne quand même une porte.
  *

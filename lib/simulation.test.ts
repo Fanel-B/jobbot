@@ -8,7 +8,7 @@
  *    que le chemin par défaut du simulant est bien ce chemin-là.
  * 2. **La note reste la somme de son bulletin.** C'est la règle 2, et c'était le bug le plus grave
  *    trouvé avant ce dépôt : un total qui ne s'explique pas par ses lignes est un mensonge. Une
- *    note simulée n'y échappe pas — elle est recalculée, jamais obtenue en ajoutant un delta.
+ *    note simulée n'y échappe pas, elle est recalculée, jamais obtenue en ajoutant un delta.
  */
 import { describe, expect, it } from "vitest";
 import { offers } from "./offers";
