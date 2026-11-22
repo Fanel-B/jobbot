@@ -14,7 +14,7 @@ export const metadata: Metadata = {
  * La page de connexion.
  *
  * Elle dit ce qu'elle prend **avant** qu'on clique, pas après. C'est la contrepartie de la règle
- * du cahier de route : « une phrase claire à l'inscription — ce qui est stocké, pourquoi ».
+ * du cahier de route : « une phrase claire à l'inscription, ce qui est stocké, pourquoi ».
  *
  * La lecture de session se fait dans une frontière <Suspense> : avec `cacheComponents`, elle a
  * lieu à la requête et ne peut pas entrer dans la coquille pré-rendue.

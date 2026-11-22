@@ -50,7 +50,7 @@ yarn-error.log*
 !.env.local.example
 
 # Journaux de `next dev` redirigés dans un fichier pour être relus après coup. Utiles sur le
-# moment, sans intérêt dans l'historique — et ils contiennent les URL de rappel OAuth, codes
+# moment, sans intérêt dans l'historique, et ils contiennent les URL de rappel OAuth, codes
 # d'autorisation compris.
 dev*.log
 

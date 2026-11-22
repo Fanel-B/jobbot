@@ -13,8 +13,8 @@ export const metadata: Metadata = {
  *
  * Écrite pour être exacte au jour où elle est lue, pas pour cocher une case : chaque phrase
  * décrit ce que le code fait réellement aujourd'hui. Le cahier de route l'exige dès qu'une
- * personne autre que Fanel utilise le site — « ce qui est stocké, pourquoi, et que l'IA lit le
- * CV » — et la règle du projet interdit d'annoncer ce qui n'existe pas.
+ * personne autre que Fanel utilise le site, « ce qui est stocké, pourquoi, et que l'IA lit le
+ * CV » : et la règle du projet interdit d'annoncer ce qui n'existe pas.
  *
  * À reprendre le jour où les comptes arrivent : il y aura alors un hébergement de données chez
  * un tiers, et cette page devra le dire.

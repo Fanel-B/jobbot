@@ -2,17 +2,17 @@
  * La connexion à PostgreSQL (Neon).
  *
  * Rien dans le site n'en dépend encore : les offres viennent toujours de `data/offers.json`, et
- * c'est volontaire — tant que la base n'est pas peuplée par le collecteur, basculer casserait un
+ * c'est volontaire : tant que la base n'est pas peuplée par le collecteur, basculer casserait un
  * site qui marche. Ce module est la plomberie posée d'avance.
  *
  * Le choix du pilote suit la skill `neon-postgres` : sur Vercel, `node-postgres` (`pg`) avec
- * `attachDatabasePool`, et non le pilote serverless — celui-là vise l'edge et Netlify. Sur Vercel
+ * `attachDatabasePool`, et non le pilote serverless, celui-là vise l'edge et Netlify. Sur Vercel
  * Fluid compute, `attachDatabasePool` ferme proprement le pool quand la fonction se suspend ;
  * sans lui, les connexions fuient, et l'offre gratuite de Neon en a peu.
  *
  * Deux chaînes, deux usages (la confusion coûte cher, et l'erreur ne nomme jamais le pooler) :
- *   · `DATABASE_URL`          — pooled, l'hôte contient « -pooler ». Le trafic du site.
- *   · `DATABASE_URL_UNPOOLED` — directe. Les migrations, les sauvegardes, la réplication.
+ *   · `DATABASE_URL` : pooled, l'hôte contient « -pooler ». Le trafic du site.
+ *   · `DATABASE_URL_UNPOOLED` : directe. Les migrations, les sauvegardes, la réplication.
  *
  * Aucun secret n'est écrit ici : tout vient de l'environnement.
  */
@@ -28,7 +28,7 @@ export function baseConfiguree(): boolean {
 /**
  * Le pool de connexions, créé à la première demande et réutilisé ensuite.
  *
- * Lève si `DATABASE_URL` est absente, avec un message qui dit quoi faire — plutôt qu'une erreur
+ * Lève si `DATABASE_URL` est absente, avec un message qui dit quoi faire, plutôt qu'une erreur
  * de connexion obscure trente lignes plus loin.
  */
 export function base(): Pool {
@@ -50,8 +50,8 @@ export function base(): Pool {
     connectionTimeoutMillis: 10_000,
   });
 
-  // Sur Vercel, laisse la plateforme vider le pool quand la fonction se suspend. Ailleurs —
-  // en local, sur le VPS — le module n'existe pas ou ne sert à rien : on continue sans.
+  // Sur Vercel, laisse la plateforme vider le pool quand la fonction se suspend. Ailleurs,
+  // en local, sur le VPS, le module n'existe pas ou ne sert à rien : on continue sans.
   if (process.env.VERCEL) {
     void import("@vercel/functions")
       .then(({ attachDatabasePool }) => attachDatabasePool(pool!))
@@ -66,7 +66,7 @@ export function base(): Pool {
 /**
  * Écrit `sslmode=verify-full` à la place de `require`.
  *
- * `pg` traite aujourd'hui `require` comme `verify-full` — le certificat est vérifié — mais
+ * `pg` traite aujourd'hui `require` comme `verify-full`, le certificat est vérifié, mais
  * préviendra bientôt le contraire : en pg 9, `require` prendra la sémantique libpq, plus faible.
  * Neon présente un certificat valide, donc on demande explicitement le comportement fort plutôt
  * que d'hériter d'un affaiblissement à la prochaine montée de version.
@@ -99,7 +99,7 @@ export type EtatBase = {
   joignable: boolean;
   /** Les tables de `TABLES_ATTENDUES` réellement présentes. */
   presentes: string[];
-  /** Celles qui manquent — le schéma n'a pas été appliqué, ou pas entièrement. */
+  /** Celles qui manquent : le schéma n'a pas été appliqué, ou pas entièrement. */
   manquantes: string[];
   /** Nombre de lignes dans `offers`, si la table existe. */
   offres: number | null;
@@ -110,7 +110,7 @@ export type EtatBase = {
  * L'état de la base, sans rien modifier.
  *
  * Ne lève jamais : une base injoignable est un état à afficher, pas un plantage. Le message
- * d'erreur est repris tel quel **sauf** s'il contient la chaîne de connexion — `pg` la met parfois
+ * d'erreur est repris tel quel **sauf** s'il contient la chaîne de connexion, `pg` la met parfois
  * dans ses erreurs, et elle n'a rien à faire dans un journal.
  */
 export async function etatDeLaBase(): Promise<EtatBase> {

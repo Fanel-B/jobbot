@@ -3,13 +3,13 @@
  *
  * Tout repose sur `lib/scoring.ts`, dont le portage est vérifié contre l'oracle du pipeline
  * (`npm run verifier-scoring`, zéro désaccord sur chaque offre). Simuler une compétence, c'est
- * rejouer ce même calcul avec une couverture d'exigences élargie — rien d'autre. Aucune table,
+ * rejouer ce même calcul avec une couverture d'exigences élargie, rien d'autre. Aucune table,
  * aucun appel d'IA, aucune donnée nouvelle.
  *
  * Ce qui bouge quand on ajoute une compétence :
  *   - le critère **cohérence** (30 points), le seul qui dépende de ce que l'offre exige ;
  *   - la **diversité** (14 points), parce que le plafond par entreprise se distribue selon l'ordre
- *     des notes — une note qui monte peut donc en déplacer une autre.
+ *     des notes : une note qui monte peut donc en déplacer une autre.
  * Les sept autres critères ne dépendent pas du profil et ne bougent jamais.
  *
  * Les fonctions de ce module simulent sur le **profil d'usine** et sur le fichier : ce sont des
@@ -29,7 +29,7 @@ const MAINTENANT = maintenantDeLExport(meta.generated_at);
 
 /**
  * En dessous de ce volume, annoncer « N offres passeraient au-dessus de 70 » n'a pas de sens
- * statistique — c'est le garde-fou du cahier de route, et il vaut mieux ne rien dire.
+ * statistique : c'est le garde-fou du cahier de route, et il vaut mieux ne rien dire.
  */
 export const VOLUME_MINIMAL = 50;
 
@@ -164,19 +164,19 @@ export function effetGlobal(
 export type Competence = {
   /** Ce qu'on affiche : « IA / intelligence artificielle ». */
   label: string;
-  /** Les formes réelles trouvées dans les annonces — c'est ce que le calcul sait reconnaître. */
+  /** Les formes réelles trouvées dans les annonces, c'est ce que le calcul sait reconnaître. */
   formes: string[];
   /** Nombre d'**offres** qui la demandent sans que le profil la couvre. */
   demandee: number;
 };
 
 /**
- * Les compétences manquantes les plus demandées par la collecte — celles qui valent la peine
+ * Les compétences manquantes les plus demandées par la collecte, celles qui valent la peine
  * d'être simulées. On compte des **offres**, pas des occurrences.
  *
  * Le regroupement par famille n'est pas cosmétique ici : « IA », « intelligence artificielle » et
  * « IA générative » sont une seule chose à apprendre. Les proposer séparément ferait croire à trois
- * leviers distincts, et chacun afficherait un gain presque identique — parce que c'est le même.
+ * leviers distincts, et chacun afficherait un gain presque identique, parce que c'est le même.
  */
 export function competencesSimulables(max = 6): Competence[] {
   const parFamille = new Map<string, { offres: Set<number>; formes: Set<string> }>();
@@ -195,7 +195,7 @@ export function competencesSimulables(max = 6): Competence[] {
     .slice(0, max);
 }
 
-/** Combien d'offres sont aujourd'hui au-dessus du seuil — le point de départ du graphique. */
+/** Combien d'offres sont aujourd'hui au-dessus du seuil, le point de départ du graphique. */
 export function offresAuDessus(seuil: number = SEUIL_BONNE_PISTE): number {
   let n = 0;
   for (const r of classementSimule([]).values()) if (r.total >= seuil) n += 1;

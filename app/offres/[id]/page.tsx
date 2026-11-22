@@ -60,7 +60,7 @@ export async function generateMetadata({
  * « Non précisé » plutôt qu'une valeur inventée : la règle vaut pour tous les champs.
  *
  * L'accord suit le mot : « Durée non précisée », « Niveau non précisé ». Le libellé est déjà
- * au-dessus dans la liste de définitions, donc on n'affiche que la mention — la répéter donnait
+ * au-dessus dans la liste de définitions, donc on n'affiche que la mention, la répéter donnait
  * « Durée · Durée non précisé par l'annonce ».
  */
 function NonPrecise({ genre = "m" }: { genre?: "m" | "f" }) {
@@ -77,7 +77,7 @@ export default async function Page({
 }: {
   params: Promise<{ id: string }>;
   // Next 16 : `searchParams` est une Promise, et doit être lue dans un composant enveloppé
-  // de <Suspense> — sinon le pré-rendu échoue (« blocking-prerender-dynamic »).
+  // de <Suspense> : sinon le pré-rendu échoue (« blocking-prerender-dynamic »).
   searchParams: Promise<{ simule?: string }>;
 }) {
   const { id } = await params;

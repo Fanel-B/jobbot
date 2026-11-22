@@ -2,7 +2,7 @@
  * Tests du signal « formation imposée ».
  *
  * Règle 5 du briefing : jamais d'accusation sans citation. Le site affichait le badge et le bloc
- * d'avertissement sur la seule foi de `training_flag`, avec un repli « extrait non disponible » —
+ * d'avertissement sur la seule foi de `training_flag`, avec un repli « extrait non disponible »,
  * c'est-à-dire qu'il pouvait mettre en cause une entreprise sans rien citer. Ces tests verrouillent
  * la règle inverse : pas d'extrait, pas de signal.
  *
@@ -63,7 +63,7 @@ describe("le signal sur les offres réelles", () => {
   });
 
   it("dit la vérité sur cette collecte : le compte vaut ce que valent les données", () => {
-    // Zéro aujourd'hui — c'est un fait mesuré, que l'interface doit énoncer au lieu
+    // Zéro aujourd'hui : c'est un fait mesuré, que l'interface doit énoncer au lieu
     // d'afficher « 0 offre(s) signalée(s) ». Si le pipeline se met à remplir le champ,
     // ce test le signalera au lieu de laisser le texte mentir en silence.
     expect(nbSignalFormation(offers)).toBe(0);

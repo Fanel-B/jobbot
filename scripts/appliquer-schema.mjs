@@ -2,7 +2,7 @@
  * `npm run db:schema` : applique `db/schema.sql` à la base Neon.
  *
  * Par la connexion **directe** (`DATABASE_URL_UNPOOLED`), jamais la pooled : une migration passée
- * par PgBouncer échoue d'une façon qui ne nomme jamais le pooler — un `SET` qui ne survit pas à sa
+ * par PgBouncer échoue d'une façon qui ne nomme jamais le pooler, un `SET` qui ne survit pas à sa
  * transaction, une écriture qui tombe sur une transaction héritée en lecture seule.
  *
  * Le fichier est rejouable : `CREATE ... IF NOT EXISTS` partout, aucune suppression, le tout dans

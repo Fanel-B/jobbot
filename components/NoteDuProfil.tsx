@@ -9,7 +9,7 @@ import { chargerDonnees } from "@/lib/donnees";
  * La note de cette offre **pour le profil en cours**, avec son bulletin.
  *
  * Elle est recalculée à la lecture, jamais stockée : c'est la décision structurante du cahier de
- * route — deux personnes voient la même offre, pas la même note. Le résumé du profil est affiché
+ * route : deux personnes voient la même offre, pas la même note. Le résumé du profil est affiché
  * juste au-dessus, pour qu'on sache toujours à qui appartient le chiffre.
  */
 export async function NoteDuProfil({ offreId }: { offreId: number }) {

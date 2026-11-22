@@ -13,7 +13,7 @@ ligne dans `collectes`, écrite dans la même transaction : c'est la date que le
 Règles tenues :
   - la chaîne de connexion vient **uniquement** de la variable d'environnement `DATABASE_URL` :
     aucune option en ligne de commande (elle finirait dans l'historique du shell), aucune lecture
-    de fichier, et elle n'est jamais affichée — même dans un message d'erreur ;
+    de fichier, et elle n'est jamais affichée, même dans un message d'erreur ;
   - **idempotent** : l'écriture est un « insérer ou mettre à jour » sur `canonical_url` ;
     relancer le collecteur ne crée aucun doublon, et une offre inchangée n'est pas réécrite ;
   - `--dry-run` ne se connecte pas à PostgreSQL et n'importe même pas `psycopg` ;

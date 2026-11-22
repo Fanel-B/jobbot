@@ -2,7 +2,7 @@
  * `node scripts/etat-comptes.mjs` : combien de personnes, d'identités Google et de sessions.
  *
  * Sert à prouver qu'une connexion a bien atterri en base, et qu'une suppression de compte a bien
- * tout emporté. N'affiche aucune adresse e-mail et aucun jeton — seulement des comptes et des
+ * tout emporté. N'affiche aucune adresse e-mail et aucun jeton, seulement des comptes et des
  * dates, de quoi vérifier sans exposer quoi que ce soit.
  */
 import { readFileSync } from "node:fs";

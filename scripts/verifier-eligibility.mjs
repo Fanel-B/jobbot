@@ -4,9 +4,9 @@
  *
  * Trois sorties sont comparées, sur **chaque** offre, valeur et libellé :
  *
- *   · `location_zone`     — oracle : `zone_de()`, reference/export_site.py
- *   · `contract_kinds` et `contract_known` — oracle : `contrats()` + `bool(contract_type)`, même fichier
- *   · le signal d'école partenaire — oracle : `partner_school_match()`, reference/eligibility.py,
+ *   · `location_zone` : oracle : `zone_de()`, reference/export_site.py
+ *   · `contract_kinds` et `contract_known`, oracle : `contrats()` + `bool(contract_type)`, même fichier
+ *   · le signal d'école partenaire, oracle : `partner_school_match()`, reference/eligibility.py,
  *     appelé par `export_site.ligne` **uniquement si l'offre a une description**
  *   · « la date de début n'est pas exploitable » : oracle `note_date`, reference/export_site.py.
  *     Le site n'a besoin que du booléen (`dateDebutNonExploitable`, lib/dates.ts) : le texte de
@@ -91,8 +91,8 @@ const avecDescription = offers.filter((o) => o.description).length;
 /**
  * Ce que les données exercent réellement.
  *
- * Un « 0 désaccord » ne vaut que par ce que l'oracle met à l'épreuve. Trois mutations du portage
- * — ordre des zones inversé, découpage sur la seule virgule, normalisation des accents retirée —
+ * Un « 0 désaccord » ne vaut que par ce que l'oracle met à l'épreuve. Trois mutations du portage (
+ * ordre des zones inversé, découpage sur la seule virgule, normalisation des accents retirée)
  * passent toutes les trois sans un désaccord, parce qu'aucune offre ne porte le cas. Ces
  * compteurs disent donc ce que ce zéro couvre, et ce qu'il ne couvre pas : les règles non
  * exercées ici sont épinglées par `lib/eligibilite.test.ts`.

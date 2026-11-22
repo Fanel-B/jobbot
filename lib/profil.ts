@@ -6,7 +6,7 @@
  * confirmée ne compte jamais. Cette page est donc le seul endroit où le profil se décide.
  *
  * Il vit dans un cookie plutôt que dans l'URL : il doit survivre à la navigation entre la liste et
- * les fiches, et il n'a rien à faire dans un lien qu'on partage — contrairement aux filtres et au
+ * les fiches, et il n'a rien à faire dans un lien qu'on partage, contrairement aux filtres et au
  * simulant, qui sont des vues et restent des liens.
  *
  * Tant qu'il n'y a pas de comptes, le cookie suffit et ne demande aucune base. Le jour où Neon
@@ -42,8 +42,8 @@ export type Profil = {
 /**
  * Le profil de quelqu'un qui vient d'arriver : **vide**.
  *
- * Il a longtemps été l'inverse. Un nouveau venu héritait de `MES_ATOUTS` — les 31 compétences de
- * Fanel sur les 75 du catalogue — et le site lui annonçait des notes calculées sur le profil de
+ * Il a longtemps été l'inverse. Un nouveau venu héritait de `MES_ATOUTS`, les 31 compétences de
+ * Fanel sur les 75 du catalogue, et le site lui annonçait des notes calculées sur le profil de
  * quelqu'un d'autre, avec des cases déjà cochées qu'il n'avait jamais cochées. C'était faux pour
  * tout le monde sauf une personne, et ça contredisait la règle qui fonde le projet : une
  * compétence jamais confirmée ne compte jamais.
@@ -153,7 +153,7 @@ export async function profilRenseigne(): Promise<boolean> {
 
 /**
  * Les atouts du profil, dans la forme que le moteur attend : une clé reconnue dans l'annonce,
- * un nom affiché. Les alias du catalogue suivent la compétence cochée — cocher « SQL » couvre
+ * un nom affiché. Les alias du catalogue suivent la compétence cochée, cocher « SQL » couvre
  * donc aussi « MySQL » et « PostgreSQL », exactement comme côté pipeline.
  */
 export function atoutsDuProfil(p: Profil): (readonly [string, string])[] {

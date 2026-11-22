@@ -76,7 +76,7 @@ export type Haltere = {
 /**
  * Dumbbell : un point pour aujourd'hui, un pour la simulation, un segment entre les deux.
  *
- * Le point « aujourd'hui » vaut la même chose sur chaque ligne — c'est le nombre d'offres
+ * Le point « aujourd'hui » vaut la même chose sur chaque ligne, c'est le nombre d'offres
  * déjà au-dessus du seuil. Il forme donc une verticale, et seule la longueur du segment
  * varie : c'est exactement ce qu'on veut comparer.
  */

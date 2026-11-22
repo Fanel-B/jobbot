@@ -101,7 +101,7 @@ CREATE INDEX IF NOT EXISTS collectes_terminee_a_idx ON collectes (terminee_a DES
 -- ---------------------------------------------------------------- comptes
 
 -- Une personne qui se connecte (Auth.js : Google ou lien e-mail). Les tables propres à Auth.js
--- (comptes OAuth, sessions, jetons de vérification) seront ajoutées avec l'adaptateur choisi.
+-- (comptes OAuth, sessions, jetons de vérification) suivent plus bas, section « comptes et sessions ».
 -- Les noms de colonnes entre guillemets sont imposés par l'adaptateur Postgres d'Auth.js, qui
 -- écrit littéralement `"emailVerified"` et `"userId"`. PostgreSQL replie les identifiants nus en
 -- minuscules : sans les guillemets ici, les requêtes de l'adaptateur ne trouveraient pas leurs
@@ -123,7 +123,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS users_email_lower_key ON users (lower(email));
 
 -- `CREATE TABLE IF NOT EXISTS` ne touche pas une table déjà créée : une base montée avant
 -- l'arrivée d'Auth.js garde `email_verified` en minuscules et n'a pas de colonne `image`. Ces
--- deux blocs rattrapent l'écart sans rien perdre — un renommage conserve les données, et les
+-- deux blocs rattrapent l'écart sans rien perdre, un renommage conserve les données, et les
 -- deux sont sans effet si la colonne est déjà au bon nom.
 DO $$
 BEGIN
@@ -143,7 +143,7 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS image text;
 
 -- Les identités externes rattachées à une personne : un compte Google aujourd'hui, un autre
 -- fournisseur demain. `ON DELETE CASCADE` est ce qui fait que « supprimer mon compte » supprime
--- vraiment tout — c'est une obligation du cahier de route, pas une commodité.
+-- vraiment tout : c'est une obligation du cahier de route, pas une commodité.
 CREATE TABLE IF NOT EXISTS accounts (
     id                  bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     "userId"            bigint  NOT NULL REFERENCES users (id) ON DELETE CASCADE,

@@ -3,7 +3,7 @@
  *
  * Ces tests ne vérifient pas un goût de rangement, ils vérifient qu'aucune compétence ne se perd :
  * une entrée du vocabulaire absente des familles n'apparaîtrait jamais dans le formulaire et
- * deviendrait impossible à cocher — donc une offre qui la demande resterait éternellement
+ * deviendrait impossible à cocher, donc une offre qui la demande resterait éternellement
  * « manquante » sans moyen d'y remédier. C'est exactement le genre de défaut qui ne se voit pas.
  */
 import { readFileSync } from "node:fs";
@@ -55,7 +55,7 @@ describe("forme des familles", () => {
 
   it("donne à chacune une teinte distincte, réellement définie dans la feuille", () => {
     // Deux pièges que seul un test attrape : deux familles qui finissent de la même couleur,
-    // et une variable CSS citée ici mais jamais déclarée — auquel cas le texte s'affiche en
+    // et une variable CSS citée ici mais jamais déclarée, auquel cas le texte s'affiche en
     // noir sans que rien ne signale l'erreur.
     const feuille = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
     const teintes = FAMILLES.map((f) => f.teinte);

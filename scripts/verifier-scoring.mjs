@@ -2,13 +2,13 @@
  * `npm run verifier-scoring` : le calcul TypeScript (`lib/scoring.ts`) contre l'oracle
  * (`data/offers.json`, produit par le pipeline Python).
  *
- * Pour chaque offre : la note totale, puis chaque critère du bulletin — nom, points, maximum et
+ * Pour chaque offre : la note totale, puis chaque critère du bulletin, nom, points, maximum et
  * détail (accents compris). Le moindre écart est un désaccord. Sortie en code 0 si et seulement si
  * il n'y en a aucun.
  *
  * L'heure du calcul : `export_site.py` appelle `datetime.now()` (heure **locale** de la machine du
  * pipeline, sans fuseau) juste avant d'écrire `meta.generated_at` (en UTC). On repart donc de
- * `generated_at`, décalé du fuseau du pipeline (`FUSEAU_PIPELINE_HEURES`, UTC — voir `lib/scoring.ts`).
+ * `generated_at`, décalé du fuseau du pipeline (`FUSEAU_PIPELINE_HEURES`, UTC, voir `lib/scoring.ts`).
  * `--fuseau=N` permet d'essayer un autre décalage, pour le diagnostic uniquement.
  *
  * Node exécute directement le TypeScript de `lib/scoring.ts` (types effacés à la volée).

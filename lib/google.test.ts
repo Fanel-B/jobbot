@@ -2,7 +2,7 @@
  * La révocation ne doit jamais empêcher une suppression.
  *
  * C'est la propriété qui compte ici, et elle est invisible à l'œil : le jour où Google renvoie
- * une erreur, personne ne s'en apercevra — sauf si `supprimerCompte` lève et laisse le compte en
+ * une erreur, personne ne s'en apercevra, sauf si `supprimerCompte` lève et laisse le compte en
  * place. Ces tests épinglent les deux règles qui font que ça n'arrive pas : aucune exception ne
  * sort de la fonction, et un 400 compte comme un succès parce qu'il veut dire « ce jeton ne vaut
  * déjà plus rien ».

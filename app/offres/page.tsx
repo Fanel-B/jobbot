@@ -103,7 +103,7 @@ function Filtre({ actif, href, children }: { actif: boolean; href: string; child
 async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
   const p = await searchParams;
 
-  // Le classement est celui du profil en cours, recalculé à la lecture — jamais stocké.
+  // Le classement est celui du profil en cours, recalculé à la lecture, jamais stocké.
   // C'est la règle du cahier de route : deux personnes voient la même offre, pas la même note.
   const [profil, d] = await Promise.all([lireProfil(), chargerDonnees()]);
   const sansNote = estVide(profil);
@@ -328,7 +328,7 @@ async function Liste({ searchParams }: { searchParams: Promise<Params> }) {
         <div className="py-16 text-center">
           {alternanceVide ? (
             /* Une liste vide sans explication laisse croire à une panne. Ici l'absence est une
-               décision, documentée côté pipeline (reference/eligibility.py) — on la dit. */
+               décision, documentée côté pipeline (reference/eligibility.py), on la dit. */
             <p className="mx-auto max-w-xl text-sm leading-relaxed text-muted">
               Aucune offre d&apos;alternance dans cette collecte, et ce n&apos;est pas un défaut
               d&apos;affichage : la recherche d&apos;alternance est{" "}

@@ -7,16 +7,16 @@
 Tu reprends un projet Next.js qui existe déjà et qui tourne. Ton premier travail n'est pas d'écrire
 du code : c'est de comprendre et de me dire ce que tu vois.
 
-## Étape 1 — comprendre, sans coder
+## Étape 1 : comprendre, sans coder
 
 Dans cet ordre :
 
-1. `PASSATION.md` — l'histoire de la session qui a produit ce dépôt, ce qui a été vérifié, ce qui
+1. `PASSATION.md`, l'histoire de la session qui a produit ce dépôt, ce qui a été vérifié, ce qui
    reste.
-2. `BRIEFING.md` — la carte du code, les règles non négociables, la suite.
-3. `reference/README.md` et les fichiers de `reference/` — le moteur Python du pipeline, en lecture
+2. `BRIEFING.md`, la carte du code, les règles non négociables, la suite.
+3. `reference/README.md` et les fichiers de `reference/`, le moteur Python du pipeline, en lecture
    seule, qui sert de référence et d'oracle. **Ne les modifie pas.**
-4. Le cahier de route JobBot V2 (je te le fournis) — la vision d'origine, écrite avant ce code.
+4. Le cahier de route JobBot V2 (je te le fournis), la vision d'origine, écrite avant ce code.
 
 Puis installe et vérifie l'état réel :
 
@@ -32,7 +32,7 @@ Ouvre les quatre pages : `/`, `/offres`, une fiche d'offre, `/methode`.
 cassé, douteux ou incohérent avec le cahier de route, et ce que tu ferais en premier si tu décidais.
 Je veux ton avis, pas une reformulation de ce que tu as lu.
 
-## Étape 2 — mission : le simulant « et si j'ajoutais X ? »
+## Étape 2 : mission : le simulant « et si j'ajoutais X ? »
 
 C'est la fonctionnalité qui distingue ce produit, et elle ne demande ni base de données réactive ni
 appel d'IA : juste un recalcul.
@@ -43,11 +43,11 @@ recalculée, le critère qui bouge et de combien. Plus, sur la page d'accueil, u
 « maîtriser TypeScript ferait passer 23 offres au-dessus de 70 ».
 
 **Contrainte structurante** : pour ça, il faut recalculer la note côté TypeScript. Commence par
-**le critère « cohérence »** (30 points, celui qui dépend des compétences demandées par l'offre) —
+**le critère « cohérence »** (30 points, celui qui dépend des compétences demandées par l'offre),
 c'est le seul dont le simulant a besoin pour démarrer. N'essaie pas de porter les neuf critères d'un
 coup.
 
-**Exigence de vérité — c'est la partie la plus importante de la mission.** `data/offers.json`
+**Exigence de vérité : c'est la partie la plus importante de la mission.** `data/offers.json`
 contient, pour chaque offre, les points que le pipeline Python a calculés :
 
 ```json
@@ -57,7 +57,7 @@ contient, pour chaque offre, les points que le pipeline Python a calculés :
 C'est un **oracle**. Ta version TypeScript doit retrouver **exactement** ces points sur les 222
 offres du fichier. Livre un script de vérification (`npm run verifier-scoring` ou équivalent) qui
 compare et affiche les écarts. **Tant que le script n'affiche pas zéro écart, la mission n'est pas
-terminée.** Si tu n'arrives pas à retrouver un chiffre, dis-le et explique pourquoi — ne l'arrondis
+terminée.** Si tu n'arrives pas à retrouver un chiffre, dis-le et explique pourquoi, ne l'arrondis
 pas, ne le contourne pas.
 
 Lis `reference/priorites.py` pour connaître la règle exacte du crédit partiel : elle est dans le code
@@ -67,7 +67,7 @@ qui tourne en production, pas dans une supposition.
 
 1. **Aucune donnée inventée.** Un champ absent s'affiche « non précisé ». Jamais de valeur devinée.
 2. **La note reste la somme exacte de son bulletin.** Un total affiché qui ne correspond pas à ses
-   lignes est un mensonge — c'est exactement le bug le plus grave trouvé lors de la session
+   lignes est un mensonge, c'est exactement le bug le plus grave trouvé lors de la session
    précédente.
 3. **Un type de contrat inconnu reste inconnu** : badge distinct, bloc séparé, hors classement.
 4. **Le lien vers l'annonce d'origine reste toujours présent.**

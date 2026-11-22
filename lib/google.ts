@@ -3,7 +3,7 @@
  *
  * Supprimer un compte effaçait nos lignes et s'arrêtait là. Mais l'autorisation, elle, vit chez
  * Google : JobBot restait inscrit dans les applications autorisées du compte. Conséquence visible,
- * et c'est ce qui a fait découvrir le défaut — après « supprimer mon compte », se reconnecter ne
+ * et c'est ce qui a fait découvrir le défaut, après « supprimer mon compte », se reconnecter ne
  * demandait plus rien. Google sautait l'écran de consentement et renvoyait aussitôt, ce qui
  * recréait un compte neuf en un clic. L'effacement avait l'air d'un effacement et n'en était pas
  * tout à fait un : il restait, ailleurs, une trace disant que cette personne nous avait dit oui.
@@ -56,7 +56,7 @@ export async function revoquerAccesGoogle(userId: string): Promise<Revocation> {
       headers: { "content-type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ token: jeton }),
     });
-    // 200 : c'est fait. 400 : Google ne connaît plus ce jeton — déjà expiré ou déjà révoqué,
+    // 200 : c'est fait. 400 : Google ne connaît plus ce jeton, déjà expiré ou déjà révoqué,
     // ce qui est le résultat voulu, donc on ne le compte pas comme un échec.
     if (r.ok || r.status === 400) return { etat: "revoque" };
     return { etat: "refus", code: r.status };

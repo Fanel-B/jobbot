@@ -184,7 +184,7 @@ describe("référence : les 11 offres relues à la main", () => {
 
   it("#828 porte un bloqueur d'habilitation, mais sa note reste sous le plafond : 47", () => {
     // Le bloqueur existe (habilitation de sécurité) : la note serait plafonnée à 55 si elle
-    // dépassait — elle vaut 47, donc aucune ligne de plafond, et le total reste la somme des
+    // dépassait : elle vaut 47, donc aucune ligne de plafond, et le total reste la somme des
     // lignes. C'est le malus de fin qui la fait passer sous le plafond (fin 01/10/2027 : -8).
     expect(resultat(828).total).toBe(47);
     expect(ligneDe(828, "fin")).toContain("raccourcir");

@@ -12,6 +12,14 @@ Deux étiquettes reviennent partout :
 Aucune commande ici n'est inventée. Quand une commande est une commande Linux ou git ordinaire
 et non une commande du projet, c'est dit.
 
+> **Mise à jour du 22 novembre 2026.** Décision de Fanel : la production est sur Vercel et lit ses
+> offres dans Neon. Les sections 3 et 4 décrivent un site servi par le VPS (`jobbot-site.service`) :
+> elles ne concernent plus le site en ligne, et restent écrites pour le cas où il faudrait l'y servir
+> de nouveau. Les sections 5 (collecte, export, copie vers Neon), 6 (publier un export dans le dépôt)
+> et 7 (lecture depuis Neon, retour arrière) restent valables. La section 1 est mise à jour là où le
+> dépôt le permet ; ce que le dépôt ne montre pas (état de Neon, du collecteur, du VPS) n'est pas
+> affirmé.
+
 ---
 
 ## 1. Le diagnostic
@@ -20,15 +28,16 @@ et non une commande du projet, c'est dit.
 | --- | --- | --- |
 | Qui écrit `data/offers.json` ? | Le script `export_site.py` du pipeline Python, qui vit sur le VPS dans `~/.hermes/skills/job-search/`. | `PASSATION.md` §4, `BRIEFING.md` ligne 21 |
 | Qui le commite ? | Les commits portent « Hermes » ou « assistant-hermes », mais `PASSATION.md` écrit que Hermes n'a que la lecture sur GitHub. Le nom de l'auteur ne prouve donc pas qui a poussé. | `git log`, `PASSATION.md` ligne 137 |
-| Fréquence prévue | La collecte **toutes les heures**, les rapports chaque jour et chaque semaine, et le site « rafraîchi chaque jour après la collecte ». | `README.md` lignes 73, 134, 184 |
-| Fréquence réelle des commits | Neuf commits en six jours, du 19 au 25 octobre, puis **plus aucun**. Ce n'est pas un rythme quotidien. | `git log -- data/offers.json` |
-| Dernière mise à jour committée | **25 octobre 2026**, commit `2a80bc4` à 17:42 UTC. Le fichier se déclare généré à 17:41 UTC. | `git log`, `meta.generated_at` |
-| Ancienneté au 5 novembre | **Dix jours.** | calcul sur `meta.generated_at` |
-| Que sert le site en ligne sur Vercel ? | Le fichier committé, donc les données du 25 octobre. | `vercel.json`, et le pied de page du site |
+| Fréquence prévue | La collecte **toutes les heures**, les rapports chaque jour et chaque semaine, et le site « rafraîchi chaque jour après la collecte ». | `README.md` avant le 22 novembre 2026 (sections « Le rôle de l'agent » et « Déploiement ») |
+| Fréquence réelle des commits | Six commits du 19 au 25 octobre, puis un seul le 7 novembre (export de Hermes, PR n°5). Ce n'est pas un rythme quotidien, et ce n'est plus la source des offres en ligne. | `git log -- data/offers.json` |
+| Dernière mise à jour committée | **7 novembre 2026**, commit `be6ed85`, export de 369 offres. | `git log`, `meta.generated_at` |
+| Ancienneté au 22 novembre | **Quinze jours.** Cela ne dit rien des données de Neon. | calcul sur `meta.generated_at` |
+| Que sert le site en ligne sur Vercel ? | Les offres de Neon (`OFFERS_SOURCE=db`), d'après Fanel (22 novembre 2026). Le dépôt ne peut pas le confirmer. Le fichier committé sert de secours. | décision de Fanel, `lib/donnees.ts` |
 | Que sert le VPS ? | **Inconnu depuis le dépôt.** `export_site.py` écrit directement dans `~/jobbot-v2/data/offers.json` quand ce dossier existe, sans rien commiter. Le site du VPS peut donc être plus frais que GitHub, ou aussi périmé. | `reference/export_site.py`, fonction `sorties` |
 
-**Ce que ça veut dire.** Le fichier que GitHub et Vercel connaissent est figé au 25 octobre. Que le
-pipeline ait continué de tourner sur le VPS pendant ces dix jours, rien dans le dépôt ne permet de
+**Ce que ça veut dire.** Le fichier que GitHub connaît date du 7 novembre. Ce que Vercel sert vient
+de Neon, d'après Fanel : la fraîcheur se lit alors dans le pied de page (« Dernière collecte »), pas
+dans le dépôt. Que le pipeline et le collecteur tournent sur le VPS, rien dans le dépôt ne permet de
 l'affirmer ni de le nier.
 
 ---
@@ -43,10 +52,11 @@ ni entrée de planificateur.
 | La collecte | Elle lit les huit sources et remplit la base SQLite du pipeline, `~/.hermes/data/job-search/database.sqlite`, toutes les heures. | **[à vérifier sur le VPS]** : la commande qui la lance n'est écrite nulle part dans le dépôt. |
 | L'export | `python3 export_site.py`, dans `~/.hermes/skills/job-search/`. | **[dépôt]** |
 | Le rafraîchissement | Un script « réexporte les offres, reconstruit le site et redémarre le service, chaque jour après la collecte ». | **[à vérifier sur le VPS]** : son nom et son emplacement ne sont pas dans le dépôt. |
-| Le service du site | Une unité `systemd`, `jobbot-site.service`, qui lance `next start` sur le port 80 sans privilège. | Le nom vient de `README.md` ligne 181. Le contenu de l'unité **[à vérifier sur le VPS]**. |
+| Le service du site | Une unité `systemd`, `jobbot-site.service`, qui lance `next start` sur le port 80 sans privilège. | Le nom vient de l'ancien `README.md` (avant le 22 novembre 2026). Le contenu de l'unité **[à vérifier sur le VPS]**. |
 
-Le plus probable, et c'est une hypothèse : la collecte ou le script de rafraîchissement s'est
-arrêté vers le 25 octobre. Les deux se constatent en lecture seule, voir la section 3.
+Hypothèse écrite le 5 novembre, à revérifier : la collecte ou le script de rafraîchissement s'était
+arrêté vers le 25 octobre. Depuis, un export du 7 novembre a été publié, ce qui la contredit au moins
+pour l'export. Les deux se constatent en lecture seule, voir la section 3.
 
 ---
 
@@ -70,16 +80,16 @@ systemctl list-timers
 ```
 
 `systemctl`, `ls`, `grep` et `crontab` sont des commandes Linux ordinaires, pas des commandes du
-projet. Si `generated_at` est postérieur au 25 octobre, le VPS a continué de se rafraîchir et c'est
-GitHub qui est en retard. S'il est du 25 octobre, c'est la chaîne de rafraîchissement qui s'est
-arrêtée.
+projet. Si `generated_at` est postérieur au 7 novembre, le VPS a continué de se rafraîchir et c'est GitHub
+qui est en retard. S'il est du 7 novembre ou plus ancien, c'est la chaîne de rafraîchissement qui
+s'est arrêtée.
 
 ---
 
 ## 4. Faire servir la dernière version de `main` sur le VPS
 
 Les commandes `npm` sont **[dépôt]** : ce sont celles de `.github/workflows/verification.yml`, qui
-passent en CI. Le nom du service vient de `README.md`. Tout le reste est **[à vérifier sur le VPS]**.
+passent en CI. Le nom du service vient de l'ancien `README.md`. Tout le reste est **[à vérifier sur le VPS]**.
 
 ```bash
 cd ~/jobbot-v2                                 # [à vérifier] voir la note 1
@@ -112,8 +122,8 @@ au premier essai vient souvent de là.
 **La connexion Google sur le VPS.** Le site a besoin de quatre variables pour `/connexion` et
 `/profil` : `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` et `DATABASE_URL`. Elles sont
 posées dans `.env.local` en local et dans les réglages de Vercel. Auth.js les lit par convention :
-le code ne les nomme pas. **Le fichier `.env.local.example` du dépôt ne liste que `DATABASE_URL` et
-`DATABASE_URL_UNPOOLED`**, ce qui est un oubli : quelqu'un qui monte le site à partir de ce modèle
+le code ne les nomme pas. **Le fichier `.env.local.example` du dépôt ne liste que `DATABASE_URL`,
+`DATABASE_URL_UNPOOLED` et `OFFERS_SOURCE`**, ce qui est un oubli : quelqu'un qui monte le site à partir de ce modèle
 ne saurait pas qu'il manque les trois autres. **[à vérifier sur le VPS]** : sont-elles présentes dans
 le `.env.local` du clone ? L'adresse du VPS doit aussi être déclarée comme URI de rappel chez Google.
 Aucune valeur de ces variables ne doit être écrite dans un document ou un chat.
@@ -163,11 +173,11 @@ base n'est écrite nulle part dans le dépôt, et je n'en écris pas une pour co
 
 **[dépôt]** : `db/README.md`, section 5, et l'en-tête de `tools/collecteur_postgres.py`. Il copie la
 base SQLite vers la table `offers` de Neon, et écrit une ligne dans `collectes` à chaque copie
-réussie. Le site peut désormais lire cette table (section 7), mais **par défaut il lit encore
-`data/offers.json`** : relancer ce collecteur ne rafraîchit le site qu'une fois `OFFERS_SOURCE=db`
-posée.
+réussie. Le site peut lire cette table (section 7). Le code lit `data/offers.json` tant que
+`OFFERS_SOURCE=db` n'est pas posée ; en production elle l'est, d'après Fanel (22 novembre 2026).
 
-Le 30 octobre, `npm run verifier-db` comptait **zéro offre** dans cette table.
+Le 30 octobre, `npm run verifier-db` comptait **zéro offre** dans cette table (constat daté : la
+production lit Neon depuis, d'après Fanel).
 
 **Avant le premier passage, appliquer la migration T6** (numéro du pipeline, compétences
 souhaitées, table `collectes`). Elle ne fait que des ajouts `IF NOT EXISTS` et ne perd aucune
@@ -224,11 +234,13 @@ offre : ne pas copier avant de l'avoir expliqué.
 
 ### 5.5 Mettre en service le chantier zone : l'ordre
 
-Chaque étape attend un accord explicite ; rien n'est appliqué avant. Dans l'ordre :
+Chaque étape attend un accord explicite ; rien n'est appliqué avant. L'état des étapes 2 à 5
+(migration T7, déploiement du Python, réévaluation, copie) n'est pas vérifiable depuis le dépôt : à
+confirmer avec Hermes. Dans l'ordre :
 
-1. **Fusion de la pull request du chantier** (Vercel redéploie). Le site connaît alors l'Occitanie,
-   et il lit toujours son fichier. La pull request embarque l'export du 7 novembre 2026 comme
-   `data/offers.json` (369 offres, une en Occitanie) : fusionner la publie.
+1. **Fusion de la pull request du chantier** : **faite le 8 novembre 2026** (PR n°5). Vercel a
+   redéployé, le site connaît l'Occitanie, et le fichier de secours `data/offers.json` est l'export
+   du 7 novembre 2026 (369 offres, une en Occitanie).
 2. **Migration T7 sur Neon**, avant que le collecteur n'écrive la nouvelle zone. Elle remplace les
    contraintes `offers_location_zone_check` et `profiles_zones_check`, rejouable sans effet :
 
@@ -257,8 +269,10 @@ Chaque étape attend un accord explicite ; rien n'est appliqué avant. Dans l'or
 
 ## 6. Mettre à jour le site en ligne sur Vercel
 
-Le site de production sur Vercel sert le fichier **committé**. Un nouvel export sur le VPS ne le
-change pas : il faut aussi commiter le fichier.
+Le site sert le fichier **committé** quand `OFFERS_SOURCE` n'est pas `db`, ou en cas de repli. En
+production il lit Neon (section 7) : publier un export dans le dépôt ne change alors que le fichier
+de secours et l'oracle des contrôles. Un nouvel export sur le VPS ne change pas le fichier du dépôt :
+il faut le commiter.
 
 Depuis le 5 novembre, `main` est protégée, **administrateurs inclus** : plus personne ne peut y
 pousser directement, il faut une pull request dont le contrôle « Tests, oracles, types et build »
@@ -292,6 +306,10 @@ fichier qui est servi.
 ---
 
 ## 7. Passer Vercel en lecture depuis Neon (`OFFERS_SOURCE=db`)
+
+**Fait.** Fanel confirme, le 22 novembre 2026, que la production lit Neon. Cette section reste la
+procédure de contrôle et de retour arrière. L'état de la migration T7 n'est pas vérifiable depuis le
+dépôt.
 
 Le site lit `data/offers.json` tant que la variable `OFFERS_SOURCE` n'est pas exactement `db`. En
 mode `db`, il lit la table `offers`, met la lecture en cache **quinze minutes**, et se rabat sur le
@@ -333,7 +351,7 @@ lancer ensuite un nouveau déploiement (*Deployments*, le dernier, *Redeploy*). 
 Ouvrir le site de production, descendre au pied de page :
 
 - « Dernière collecte » doit afficher la date de la dernière copie (`derniere_copie` ci-dessus,
-  sans compter le fuseau d'affichage), **pas** le 25 octobre ;
+  sans compter le fuseau d'affichage), **pas** la date du fichier de secours ;
 - il ne doit **pas** y avoir la ligne « Offres lues dans le fichier de secours » : si elle est là,
   le site lit le fichier et son motif dit pourquoi (base vide, base injoignable, `DATABASE_URL`
   absente, aucune collecte datée) ;

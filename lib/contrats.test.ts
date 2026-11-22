@@ -3,7 +3,7 @@
  *
  * Le défaut d'origine : `["stage (d'après l'alerte)"].includes("stage")` vaut **faux**, parce que
  * `includes` sur un tableau teste l'égalité exacte de l'élément. Deux annonces ne ressortaient donc
- * dans aucun filtre de contrat — ni « Stage », ni « Alternance », ni « Type non renseigné ».
+ * dans aucun filtre de contrat, ni « Stage », ni « Alternance », ni « Type non renseigné ».
  *
  * Corriger ces deux offres ne suffirait pas : le test qui compte est l'**invariant de partition**,
  * qui tue toute la classe de bugs. Tant qu'il passe, aucune annonce ne peut tomber entre deux
